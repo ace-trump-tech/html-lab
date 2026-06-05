@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RGB转二值图 | 在线工具</title>
+    <style>
+        *{box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif}
+        body{background:linear-gradient(145deg,#f5f7fc,#e9eef5);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0}
+        .card{max-width:850px;width:100%;background:rgba(255,255,255,.92);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,.2);overflow:hidden}
+        .header{background:#0f172a;padding:1.2rem 2rem;color:#fff}
+        .header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px}
+        .badge{background:#2dd4bf20;border-radius:40px;padding:.2rem .8rem;font-size:.8rem;border:1px solid #2dd4bf50}
+        .container{padding:2rem}
+        .upload-area{border:2px dashed #cbd5e1;border-radius:1.5rem;padding:1.2rem;text-align:center;margin-bottom:1rem;cursor:pointer}
+        .upload-area:hover{border-color:#0f172a;background:#f8fafc}
+        .upload-area input{display:none}
+        .workspace{display:none}
+        .preview-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+        .preview-col{flex:1;min-width:220px;text-align:center}
+        .preview-col .lbl{font-size:.8rem;color:#64748b;margin-bottom:4px;font-weight:600}
+        .preview-col canvas{max-width:100%;max-height:300px;border-radius:1rem;border:1px solid #e2e8f0}
+        .ctrl-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:1rem}
+        .ctrl-row label{font-size:.8rem;color:#64748b;font-weight:600;white-space:nowrap}
+        .ctrl-row input[type="range"]{flex:1;min-width:100px;accent-color:#0f172a}
+        .ctrl-row .val{font-family:'SF Mono',monospace;min-width:36px;text-align:right;font-size:.85rem}
+        .mode-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.8rem}
+        .mode-btn{padding:6px 14px;border-radius:20px;font-size:.8rem;border:1px solid #cbd5e1;background:#fff;cursor:pointer;transition:.15s}
+        .mode-btn.active{background:#0f172a;color:#fff;border-color:#0f172a}
+        .btn{padding:10px 20px;border-radius:60px;font-weight:500;cursor:pointer;transition:.2s;font-size:.9rem;background:#fff;border:1px solid #cbd5e1}
+        .btn-primary{background:#0f172a;color:#fff;border-color:#0f172a}
+        .btn-primary:hover{background:#1e293b}
+        .btn-outline:hover{background:#f1f5f9}
+        .toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:.5rem}
+        .histogram{width:100%;height:80px;background:#1e293b;border-radius:.8rem;position:relative;overflow:hidden;margin-bottom:.2rem}
+        .hist-bar{position:absolute;bottom:0;background:#2dd4bf;width:100%;border-radius:2px 2px 0 0;opacity:.7}
+        .threshold-line{position:absolute;top:0;bottom:0;width:2px;background:#f43f5e;z-index:2}
+        .footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:.8rem;color:#475569;border-top:1px solid #e2e8f0}
+        .footer a{color:#15607a;text-decoration:none}
+        @media(max-width:600px){.container{padding:1rem}}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>⬛⬜ RGB 转二值图 <span class="badge">阈值 · 黑白</span></h1><p style="margin:2px 0 0;font-size:.8rem;opacity:.8">将彩色/灰度图片转为纯黑白二值图，可调阈值与反转</p></div>
+    <div class="container">
+        <div class="upload-area" id="uploadArea">📁 点击或拖拽上传图片<input type="file" id="fileInput" accept="image/*"></div>
+        <div class="workspace" id="workspace">
+            <div class="preview-row">
+                <div class="preview-col"><div class="lbl">🖼️ 原图</div><canvas id="srcCanvas"></canvas></div>
+                <div class="preview-col"><div class="lbl">⬛⬜ 二值图</div><canvas id="outCanvas"></canvas></div>
+            </div>
+            <div class="histogram" id="histogram"><div class="threshold-line" id="threshLine" style="left:50%"></div></div>
+            <div class="ctrl-row">
+                <label>🎚️ 阈值</label>
+                <input type="range" id="threshold" min="0" max="255" value="128">
+                <span class="val" id="threshVal">128</span>
+                <label>📊 通道</label>
+                <select id="channel" style="padding:4px 10px;border:1px solid #cbd5e1;border-radius:.6rem;font-size:.85rem;">
+                    <option value="luma">亮度 (ITU-R)</option>
+                    <option value="avg">平均值</option>
+                    <option value="red">红色通道</option>
+                    <option value="green">绿色通道</option>
+                    <option value="blue">蓝色通道</option>
+                </select>
+            </div>
+            <div class="mode-row">
+                <button class="mode-btn active" data-mode="binary">⬛⬜ 二值</button>
+                <button class="mode-btn" data-mode="invert">⬜⬛ 反相</button>
+                <button class="mode-btn" data-mode="dither">🎨 抖动</button>
+            </div>
+            <div class="toolbar">
+                <button class="btn btn-primary" id="downloadBtn">⬇️ 下载 PNG</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a> &nbsp;| <a href="../"><strong>← 返回首页</strong></a></div>
+</div>
+<script>
+(function(){
+    var img=null,srcCanvas,srcCtx,outCanvas,outCtx,currentMode='binary';
+
+    document.getElementById('uploadArea').addEventListener('click',function(){document.getElementById('fileInput').click()});
+    document.getElementById('uploadArea').addEventListener('dragover',function(e){e.preventDefault()});
+    document.getElementById('uploadArea').addEventListener('drop',function(e){e.preventDefault();if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])});
+    document.getElementById('fileInput').addEventListener('change',function(){if(this.files[0])loadFile(this.files[0])});
+
+    function loadFile(file){
+        var r=new FileReader();
+        r.onload=function(e){
+            img=new Image();
+            img.onload=function(){
+                initCanvas();process();
+                document.getElementById('workspace').style.display='block';
+            };
+            img.src=e.target.result;
+        };
+        r.readAsDataURL(file);
+    }
+
+    function initCanvas(){
+        srcCanvas=document.getElementById('srcCanvas');srcCtx=srcCanvas.getContext('2d');
+        outCanvas=document.getElementById('outCanvas');outCtx=outCanvas.getContext('2d');
+        var maxW=Math.min(img.width,400);
+        var s=maxW/img.width;
+        [srcCanvas,outCanvas].forEach(function(c){c.width=maxW;c.height=img.height*s});
+        srcCtx.drawImage(img,0,0,srcCanvas.width,srcCanvas.height);
+    }
+
+    function getGray(r,g,b,channel){
+        if(channel==='red')return r;
+        if(channel==='green')return g;
+        if(channel==='blue')return b;
+        if(channel==='luma')return Math.round(0.299*r+0.587*g+0.114*b);
+        return Math.round((r+g+b)/3);
+    }
+
+    function process(){
+        if(!img)return;
+        var threshold=parseInt(document.getElementById('threshold').value);
+        var channel=document.getElementById('channel').value;
+        document.getElementById('threshVal').textContent=threshold;
+        var srcData=srcCtx.getImageData(0,0,srcCanvas.width,srcCanvas.height);
+        var outData=outCtx.createImageData(srcCanvas.width,srcCanvas.height);
+
+        // Build histogram
+        var hist=new Array(256).fill(0);
+        for(var i=0;i<srcData.data.length;i+=4){
+            var g=getGray(srcData.data[i],srcData.data[i+1],srcData.data[i+2],channel);
+            hist[g]++;
+        }
+        drawHistogram(hist,threshold);
+
+        if(currentMode==='dither'){
+            // Floyd-Steinberg dithering
+            var w=srcCanvas.width,h=srcCanvas.height;
+            var gray=new Float32Array(w*h);
+            for(var i=0;i<srcData.data.length;i+=4){
+                gray[i/4]=getGray(srcData.data[i],srcData.data[i+1],srcData.data[i+2],channel);
+            }
+            for(var y=0;y<h;y++){
+                for(var x=0;x<w;x++){
+                    var idx=y*w+x;
+                    var old=gray[idx];
+                    var nv=old<threshold?0:255;
+                    gray[idx]=nv;
+                    var err=old-nv;
+                    if(x+1<w)gray[idx+1]+=err*7/16;
+                    if(y+1<h){
+                        if(x>0)gray[idx+w-1]+=err*3/16;
+                        gray[idx+w]+=err*5/16;
+                        if(x+1<w)gray[idx+w+1]+=err*1/16;
+                    }
+                }
+            }
+            for(var i=0;i<srcData.data.length;i+=4){
+                var v=gray[i/4]||0;
+                outData.data[i]=v;outData.data[i+1]=v;outData.data[i+2]=v;outData.data[i+3]=255;
+            }
+        }else{
+            for(var i=0;i<srcData.data.length;i+=4){
+                var g=getGray(srcData.data[i],srcData.data[i+1],srcData.data[i+2],channel);
+                var v=g<threshold?0:255;
+                if(currentMode==='invert')v=255-v;
+                outData.data[i]=v;outData.data[i+1]=v;outData.data[i+2]=v;outData.data[i+3]=255;
+            }
+        }
+        outCtx.putImageData(outData,0,0);
+    }
+
+    function drawHistogram(hist,threshold){
+        var container=document.getElementById('histogram');
+        var w=container.clientWidth,h=container.clientHeight;
+        var maxVal=Math.max.apply(null,hist)||1;
+        var canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        var ctx=canvas.getContext('2d');
+        var barW=Math.ceil(w/256);
+        for(var i=0;i<256;i++){
+            var barH=(hist[i]/maxVal)*h;
+            ctx.fillStyle='#2dd4bf44';
+            ctx.fillRect(i*barW,h-barH,barW-1,barH);
+        }
+        // threshold line
+        ctx.strokeStyle='#f43f5e';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(threshold/255*w,0);ctx.lineTo(threshold/255*w,h);ctx.stroke();
+        container.innerHTML='';container.style.backgroundImage='url('+canvas.toDataURL()+')';container.style.backgroundSize='100% 100%';
+    }
+
+    document.getElementById('threshold').addEventListener('input',process);
+    document.getElementById('channel').addEventListener('change',process);
+    document.querySelectorAll('.mode-btn').forEach(function(b){
+        b.addEventListener('click',function(){
+            document.querySelectorAll('.mode-btn').forEach(function(x){x.classList.remove('active')});
+            this.classList.add('active');currentMode=this.dataset.mode;process();
+        });
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click',function(){
+        if(!img)return;
+        var a=document.createElement('a');a.href=outCanvas.toDataURL();a.download='binary.png';a.click();
+    });
+
+    window.addEventListener('resize',function(){if(img)process()});
+})();
+</script>
+</body>
+</html>
