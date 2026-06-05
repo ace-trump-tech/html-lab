@@ -1,9 +1,3 @@
-
----
-
-## 修改后的根目录 `index.html`
-
-```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -32,7 +26,6 @@
             margin: 0 auto;
         }
 
-        /* 头部 */
         .hero {
             text-align: center;
             margin-bottom: 2rem;
@@ -72,7 +65,6 @@
             margin: 1rem auto 0;
         }
 
-        /* 项目介绍卡片 */
         .intro-card {
             background: white;
             border-radius: 2rem;
@@ -113,7 +105,6 @@
             content: "🔄";
         }
 
-        /* 工具网格 */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -191,7 +182,6 @@
             background: #0a4f2a;
         }
 
-        /* 占位卡片样式调整 */
         .placeholder .tool-btn {
             background: #8ba0ae;
             cursor: default;
@@ -242,7 +232,6 @@
         <p>轻量、安全、纯前端 —— 所有工具本地运行，绝不收集隐私数据。</p>
     </div>
 
-    <!-- 项目介绍 + 更新计划 -->
     <div class="intro-card">
         <h2>📌 关于本项目</h2>
         <p><strong>HTML Lab</strong> 是一个由 <strong>ace-trump-tech</strong> 维护的开源工具集，专为开发者、设计师及日常用户提供便捷的在线小工具。所有功能均基于原生前端技术实现，无需任何后端，你的数据永远不会离开浏览器。</p>
@@ -263,19 +252,19 @@
             <h3>Base64 编码/解码</h3>
             <span class="tool-tag"># UTF-8 · 中文 · Emoji</span>
             <p>将文本与 Base64 格式互相转换，支持多语言字符，一键复制结果。适用于数据传输、简单加扰等场景。</p>
-            <a href="base64-tool/" class="tool-btn">🔓 立即使用 →</a>
+            <a href="base64/" class="tool-btn">🔓 立即使用 →</a>
         </div>
 
-        <!-- 二维码生成器卡片 -->
+        <!-- 二维码生成器卡片（已上线，确保跳转到 qrcode/） -->
         <div class="tool-card">
             <div class="card-icon">📱</div>
             <h3>二维码生成器</h3>
             <span class="tool-tag"># QR Code · 实时生成</span>
             <p>输入文本或网址，自动生成二维码，支持下载为 PNG 图片。纯前端实现，不泄露内容。</p>
-            <a href="qrcode-tool/" class="tool-btn">📲 立即使用 →</a>
+            <a href="qrcode/" class="tool-btn">📲 立即使用 →</a>
         </div>
 
-        <!-- 占位卡片：更多工具即将推出 -->
+        <!-- 更多工具占位卡片 -->
         <div class="tool-card placeholder">
             <div class="card-icon">✨</div>
             <h3>更多工具</h3>
