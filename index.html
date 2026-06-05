@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ACE 实验室 | 在线工具集</title>
+    <meta name="description" content="收集实用前端小工具，Base64编解码等，所有代码本地运行，安全可靠。">
+    <!-- 现代、干净、无依赖的样式，强调工具集导航 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f4f7fc 0%, #eef2f6 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', 'SF Pro Text', 'Noto Sans', sans-serif;
+            color: #1a2c3e;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* 主容器 - 响应式最大宽度，居中 */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* 头部区域：项目名称 + 说明 */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0a2b3e, #1e5a7a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero-badge {
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            border-radius: 100px;
+            padding: 0.2rem 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e5a7a;
+            border: 1px solid #cbdde9;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #2c4c6c;
+            max-width: 650px;
+            margin: 1rem auto 0;
+            opacity: 0.85;
+        }
+
+        /* 工具网格 — 卡片式布局，柔和悬停 */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0 3rem;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            box-shadow: 0 12px 28px -8px rgba(0, 20, 40, 0.08);
+            transition: all 0.25s ease;
+            border: 1px solid #e2edf2;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-6px);
+            background: white;
+            box-shadow: 0 24px 36px -12px rgba(0, 32, 64, 0.2);
+            border-color: #bdd4e0;
+        }
+
+        .card-icon {
+            font-size: 2.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .tool-card h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #0b3b4f;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+            color: #2c5a74;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 1.2rem;
+            flex-grow: 1;
+        }
+
+        .tool-tag {
+            display: inline-block;
+            background: #e6f0f5;
+            color: #1b6b8f;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.2rem 0.8rem;
+            width: fit-content;
+            letter-spacing: 0.3px;
+        }
+
+        /* 底部信息区：开源链接，说明页脚 */
+        .footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #cbdde6;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #4a6f8a;
+        }
+
+        .footer a {
+            color: #15607a;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dotted #90b4cc;
+        }
+
+        .footer a:hover {
+            color: #0a3b4f;
+            border-bottom-color: #15607a;
+        }
+
+        /* 右侧或额外信息区域不用多余脚本，保持干净 */
+        @media (max-width: 680px) {
+            body {
+                padding: 1.2rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .tools-grid {
+                gap: 1.2rem;
+            }
+            .tool-card {
+                padding: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <h1>
+            🧰 ACE 实验室 · 在线工具箱
+            <span class="hero-badge">纯前端 · 安全</span>
+        </h1>
+        <p>集合日常开发与隐私保护常用的小工具，完全运行在浏览器本地，无需上传任何数据。</p>
+    </div>
+
+    <div class="tools-grid">
+        <!-- Base64 编码解码工具卡片 (核心子项目) -->
+        <a href="base64-tool/" class="tool-card">
+            <div class="card-icon">📦</div>
+            <h3>Base64 编码 / 解码</h3>
+            <p>支持 UTF-8 文本，包含中文、emoji 及特殊字符。在线转换，保护敏感信息，一键复制结果。</p>
+            <span class="tool-tag"># UTF-8</span>
+        </a>
+
+        <!-- 未来拓展工具卡片示例1 (注释状态 或 可直接启用模板) 
+        <a href="json-formatter/" class="tool-card">
+            <div class="card-icon">🔧</div>
+            <h3>JSON 格式化 & 校验</h3>
+            <p>智能美化 JSON 结构，语法高亮，错误快速定位，本地处理无日志。</p>
+            <span class="tool-tag"># 格式化</span>
+        </a>
+        -->
+
+        <!-- 未来拓展卡片: 时间戳转换 -->
+        <!--
+        <a href="timestamp/" class="tool-card">
+            <div class="card-icon">⏱️</div>
+            <h3>Unix 时间戳转换</h3>
+            <p>毫秒与秒级时间戳互转，实时显示本地时间与UTC。</p>
+            <span class="tool-tag"># 时间工具</span>
+        </a>
+        -->
+
+        <!-- 展示一个“即将推出”占位卡片，让访问者知道仓库会持续更新 -->
+        <div class="tool-card" style="opacity:0.9; background:#f9fdfe;">
+            <div class="card-icon">✨</div>
+            <h3>更多工具即将推出</h3>
+            <p>计划加入二维码生成、颜色拾取、Markdown 预览等实用功能，保持关注。</p>
+            <span class="tool-tag"># 迭代中</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>⚡ 开源项目 · 托管于 GitHub Pages | 设计极简 · 无跟踪 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank" rel="noopener noreferrer">🔗 仓库地址</a></p>
+        <p style="margin-top: 8px; font-size: 0.75rem;">数据仅在本地浏览器处理，不会上传到服务器。建议使用现代浏览器以获取最佳体验。</p>
+    </div>
+</div>
+</body>
+</html>
