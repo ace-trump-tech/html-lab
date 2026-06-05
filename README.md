@@ -13,14 +13,14 @@
 
 ### 主站首页
 **[https://ace-trump-tech.github.io/html-lab/](https://ace-trump-tech.github.io/html-lab/)**  
-首页以卡片形式展示所有可用工具，点击卡片上的按钮即可跳转到对应工具。
+首页以卡片形式展示所有可用工具，点击即可跳转。
 
 ### 当前已上线工具
 
 | 工具名称 | 直达链接 | 功能说明 |
 |---------|----------|----------|
-| **Base64 编码/解码** | [base64-tool/](https://ace-trump-tech.github.io/html-lab/base64-tool/) | 支持 UTF-8 文本（中文、emoji），在线编码解码，一键复制结果。 |
-| **二维码生成器** | [qrcode-tool/](https://ace-trump-tech.github.io/html-lab/qrcode-tool/) | 输入文本或网址，实时生成 QR Code，可下载为 PNG 图片。 |
+| **Base64 编码/解码** | [base64/](https://ace-trump-tech.github.io/html-lab/base64/) | 支持 UTF-8 文本（中文、emoji），在线编码解码，一键复制结果。 |
+| **二维码生成器** | [qrcode/](https://ace-trump-tech.github.io/html-lab/qrcode/) | 输入文本或网址，实时生成 QR Code，可下载为 PNG 图片。 |
 
 > 💡 所有工具完全在浏览器本地运行，**不会上传任何数据**，可放心使用。
 
@@ -48,9 +48,9 @@ python -m http.server 8080
 ```
 html-lab/
 ├── index.html              # 工具集首页（导航卡片）
-├── base64-tool/
+├── base64/
 │   └── index.html          # Base64 编解码工具
-├── qrcode-tool/
+├── qrcode/
 │   └── index.html          # 二维码生成器
 ├── README.md
 └── (未来新增工具的文件夹)
@@ -98,6 +98,7 @@ html-lab/
 **⭐ 如果这个工具箱对你有帮助，请给仓库点个 Star！**
 ```
 
-- **保留了开发相关内容**：本地运行、项目结构、贡献指南依然存在，方便想二次开发的人。
 
-你可以直接用这个内容替换仓库中的 `README.md`。推送后，访客就能一目了然地知道怎么用这个项目了。
+4. **等待 GitHub Pages 重新部署**，访问 `https://ace-trump-tech.github.io/html-lab/` 确认链接可以正常工作。
+
+如果子文件夹中的 `index.html` 里也有内部链接（比如互相跳转），一般不需要改动，因为它们内部不会硬编码文件夹名。如果有，也请相应调整。
