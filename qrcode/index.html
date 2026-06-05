@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>二维码生成器 | 在线工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .header {
+            background: #0f172a;
+            padding: 1.2rem 2rem;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #2dd4bf20;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.8rem;
+            border: 1px solid #2dd4bf50;
+        }
+
+        .container {
+            padding: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 1.2rem;
+            background: white;
+            resize: vertical;
+            transition: 0.1s;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #0f172a;
+            box-shadow: 0 0 0 3px #0f172a20;
+        }
+
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 1.5rem 0;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e2edf2;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border-radius: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            border-color: #0f172a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        .footer {
+            background: #f1f5f9;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer a {
+            color: #15607a;
+            text-decoration: none;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @media (max-width: 680px) {
+            .container {
+                padding: 1.2rem;
+            }
+            .btn {
+                padding: 6px 14px;
+            }
+        }
+    </style>
+    <!-- 引入轻量级 qrcode-generator 库 (纯JS, 无依赖, MIT) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>
+            📱 二维码生成器
+            <span class="badge">QR Code · 实时生成</span>
+        </h1>
+        <p>输入文本或网址，自动生成二维码，支持下载为 PNG 图片</p>
+    </div>
+    <div class="container">
+        <div class="input-group">
+            <label>📝 内容 (文本 / URL)</label>
+            <textarea id="qrText" rows="3" placeholder="例如：https://github.com 或 你好世界"></textarea>
+        </div>
+
+        <div class="qr-container">
+            <canvas id="qrCanvas" width="300" height="300" style="width: 300px; height: 300px;"></canvas>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="downloadBtn">⬇️ 下载为 PNG</button>
+                <button class="btn btn-outline" id="clearBtn">🗑️ 清空内容</button>
+            </div>
+            <p style="font-size:0.75rem; color:#64748b; margin-top:1rem;">✨ 纯前端生成，数据不会上传</p>
+        </div>
+    </div>
+    <div class="footer">
+        🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">✅ 已复制/下载</div>
+
+<script>
+    (function() {
+        const textarea = document.getElementById('qrText');
+        const canvas = document.getElementById('qrCanvas');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const toast = document.getElementById('toastMsg');
+        let toastTimer = null;
+
+        function showMessage(msg, isErr = false) {
+            if (toastTimer) clearTimeout(toastTimer);
+            toast.textContent = msg;
+            toast.style.background = isErr ? '#be123c' : '#0f172a';
+            toast.style.opacity = '1';
+            toastTimer = setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 1800);
+        }
+
+        // 生成二维码并绘制到 canvas
+        function generateQRCode(text) {
+            if (!text || text.trim() === '') {
+                // 清空 canvas
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '14px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText('等待输入内容...', canvas.width/2, canvas.height/2);
+                return;
+            }
+
+            try {
+                // 使用 qrcode-generator 库 (v1.4.4)
+                // 纠错级别: M (中等), 版本范围 1-40，自动选择合适版本
+                // 简单策略: 先尝试版本 4，如果内容太多自动提升，但库需要指定版本。最好先计算长度动态设置
+                // 更好的办法: 先尝试低版本，捕获异常再提升。这里用固定版本但允许内容较长时增加版本。
+                let version = 4;
+                let errorCorrection = 'M';
+                let qr = null;
+                let maxAttempts = 10;
+                while (version <= 20) {
+                    try {
+                        qr = qrcode(version, errorCorrection);
+                        qr.addData(text);
+                        qr.make();
+                        break; // 成功
+                    } catch(e) {
+                        version++;
+                        if (version > 20) throw new Error('内容过长，无法生成二维码');
+                    }
+                }
+                if (!qr) throw new Error('生成失败');
+                
+                const moduleCount = qr.getModuleCount();
+                const cellSize = canvas.width / moduleCount;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制黑色模块
+                ctx.fillStyle = '#000000';
+                for (let row = 0; row < moduleCount; row++) {
+                    for (let col = 0; col < moduleCount; col++) {
+                        if (qr.isDark(row, col)) {
+                            ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+                // 可选：绘制边框微调
+            } catch (err) {
+                console.error(err);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fee2e2';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#b91c1c';
+                ctx.font = '14px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText('内容太长或无效', canvas.width/2, canvas.height/2);
+                showMessage('生成失败：' + err.message, true);
+            }
+        }
+
+        // 监听输入实时生成
+        function onInputChange() {
+            const val = textarea.value;
+            generateQRCode(val);
+        }
+
+        // 清空输入框和 canvas
+        function clearAll() {
+            textarea.value = '';
+            generateQRCode('');
+            showMessage('🧹 已清空');
+        }
+
+        // 下载 Canvas 为 PNG
+        function downloadPNG() {
+            // 检查 canvas 是否有效内容（非默认空白提示）
+            const val = textarea.value.trim();
+            if (!val) {
+                showMessage('⚠️ 请先输入内容生成二维码', true);
+                return;
+            }
+            try {
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showMessage('📸 二维码已下载为 PNG');
+            } catch(e) {
+                showMessage('下载失败，请重试', true);
+            }
+        }
+
+        // 初始化示例内容
+        textarea.value = 'https://github.com/ace-trump-tech/html-lab';
+        generateQRCode(textarea.value);
+
+        // 绑定事件
+        textarea.addEventListener('input', onInputChange);
+        clearBtn.addEventListener('click', clearAll);
+        downloadBtn.addEventListener('click', downloadPNG);
+    })();
+</script>
+</body>
+</html>
