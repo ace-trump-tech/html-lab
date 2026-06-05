@@ -3,363 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>桃苑401 · 毕业祭 | 唯一生机</title>
+    <title>桃苑401 · 唯一生机</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
-        body {
-            background: #020105;
-            font-family: 'Courier New', 'Segoe UI', monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .game-box {
-            max-width: 950px;
-            width: 100%;
-            background: #0e0a10;
-            border-radius: 28px;
-            box-shadow: 0 25px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.03);
-            overflow: hidden;
-            border: 1px solid #38243b;
-        }
-        .stat-bar {
-            background: #030006;
-            padding: 14px 22px;
-            display: flex;
-            justify-content: space-between;
-            color: #bc9eb3;
-            font-size: 0.85rem;
-            font-weight: bold;
-            border-bottom: 1px solid #2e1a2c;
-        }
-        .story-pane {
-            background: #110b14;
-            padding: 32px 28px;
-            min-height: 400px;
-            color: #f3e1f0;
-            font-size: 1rem;
-            line-height: 1.5;
-            text-shadow: 0 0 2px #00000060;
-            border-bottom: 1px solid #2a1a27;
-        }
-        .options-pane {
-            padding: 24px 28px 32px;
-            background: #0a060e;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .opt-btn {
-            background: #1f1622;
-            border: 1px solid #4c354b;
-            color: #f5dff2;
-            padding: 12px 20px;
-            border-radius: 60px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-align: left;
-            cursor: pointer;
-            transition: 0.1s linear;
-            font-family: monospace;
-        }
-        .opt-btn:hover {
-            background: #422e41;
-            border-color: #c28bb0;
-            transform: translateX(5px);
-        }
-        .reset-btn {
-            background: #261c27;
-            text-align: center;
-            font-size: 0.8rem;
-            margin-top: 8px;
-            padding: 8px;
-            border-radius: 50px;
-            cursor: pointer;
-            color: #be91ae;
-        }
-        .reset-btn:hover { background: #4f3650; color: white; }
-        .footer-note {
-            text-align: center;
-            font-size: 0.7rem;
-            background: #040207;
-            padding: 12px;
-            color: #704e6b;
-            border-top: 1px solid #261a27;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+        body { background:#020105; font-family:'Courier New', monospace; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+        .game-box { max-width:950px; width:100%; background:#0e0a10; border-radius:28px; box-shadow:0 25px 40px rgba(0,0,0,0.8); overflow:hidden; border:1px solid #38243b; }
+        .stat-bar { background:#030006; padding:14px 22px; display:flex; justify-content:space-between; color:#bc9eb3; font-size:0.85rem; font-weight:bold; border-bottom:1px solid #2e1a2c; }
+        .story-pane { background:#110b14; padding:32px 28px; min-height:400px; color:#f3e1f0; font-size:1rem; line-height:1.5; border-bottom:1px solid #2a1a27; }
+        .options-pane { padding:24px 28px 32px; background:#0a060e; display:flex; flex-direction:column; gap:12px; }
+        .opt-btn { background:#1f1622; border:1px solid #4c354b; color:#f5dff2; padding:12px 20px; border-radius:60px; font-size:0.9rem; font-weight:500; text-align:left; cursor:pointer; transition:0.1s; font-family:monospace; }
+        .opt-btn:hover { background:#422e41; border-color:#c28bb0; transform:translateX(5px); }
+        .reset-btn { background:#261c27; text-align:center; font-size:0.8rem; margin-top:8px; padding:8px; border-radius:50px; cursor:pointer; color:#be91ae; }
+        .reset-btn:hover { background:#4f3650; color:white; }
+        .footer-note { text-align:center; font-size:0.7rem; background:#040207; padding:12px; color:#704e6b; border-top:1px solid #261a27; }
     </style>
 </head>
 <body>
 <div class="game-box" id="gameApp">
-    <div class="stat-bar">
-        <span>🏮 桃苑401 · 白澜</span>
-        <span id="stateFlag">🕯️ 残存理智</span>
-    </div>
+    <div class="stat-bar"><span>🏮 桃苑401 · 白澜</span><span id="stateFlag">🕯️ 残存理智</span></div>
     <div class="story-pane" id="storyArea"></div>
     <div class="options-pane" id="optionsArea"></div>
-    <div class="footer-note">
-        ⚰️ 猎奇校园物语 | 大部分结局凄惨 | 只有一种「顺利毕业」
-    </div>
+    <div class="footer-note">⚰️ 猎奇校园物语 | 大部分结局凄惨 | 只有一种「顺利毕业」</div>
 </div>
-
 <script>
-    // ----- 游戏状态（数值范围-3～3，阈值±4才会死，真结局要求±1内）-----
-    let game = {
-        dead: false,
-        week: 1,
-        lu: 0,      // 鲁健 (游戏/基佬)
-        zhang: 0,   // 张晨斌 (内卷/背刺)
-        qian: 0,    // 钱嘉乐 (毒舌/暗杀)
-        hong: 0,    // 洪增珏 (金钱/契约)
-        weird: 0,   // 诡异值 (0-8)
-        clues: []   // 关键线索
-    };
-
-    // 结局库（凄惨为主，一个真结局）
+    let game = { dead:false, week:1, lu:0, zhang:0, qian:0, hong:0, weird:0, clues:[] };
     const ENDINGS = {
-        LU_GAY: "【结局·拥抱深渊】鲁健在毕业前向你表白，你拒绝后被键盘线勒死。",
-        LU_ADDICT: "【结局·提瓦特亡灵】陪鲁健连肝七日，精神失常，延毕疯癫。",
-        ZHANG_OVERDOSE: "【结局·卷死图书馆】跟随内卷节奏，心脏骤停死在考场。",
-        ZHANG_BETRAY: "【结局·论文幽灵】张晨斌窃取论文，举报你学术不端。",
-        QIAN_POISON: "【结局·深海溺亡】钱嘉乐捏造丑闻，你从天台坠落。",
-        QIAN_DROWN: "【结局·浴缸回响】喝下饮料，醒来少了一个肾。",
-        HONG_LOAN: "【结局·奢华坟场】欠巨款被卖到境外。",
-        HONG_SLAVE: "【结局·契约奴】签下卖身契，沦为私人奴隶。",
-        WEIRD_MIRROR: "【结局·镜中桃苑】被诡异吞噬，成为镜中第五人。",
-        ALL_BETRAY: "【结局·四重奏】同时得罪所有人，人间蒸发。",
-        LONELY: "【结局·透明延毕】孤独四年，延毕至死。",
-        FAKE_DIPLOMA: "【结局·赝品证书】买假证逃回家，精神失常。",
-        FLESH: "【结局·肉馅】偷吃和牛，被做成饺子。",
-        SHRINE: "【结局·贡品】被室友献祭给宿管大妈之神。",
-        // 真结局
-        TRUE: "⭐⭐⭐ 【真结局·白澜的毕业证】⭐⭐⭐ <br>你精准拿捏了每个人的分寸：陪鲁健适度游戏但拒绝暧昧，帮张晨斌解压但不盲从，幽默回怼钱嘉乐，绝不欠洪增珏人情。毕业典礼上四人破例为你鼓掌。你拿着鲜红毕业证走出桃苑401，阳光洒落——自此，桃苑再无诅咒。"
+        LU_GAY:"【结局·拥抱深渊】鲁健表白被拒，用键盘线勒死了你。",
+        LU_ADDICT:"【结局·提瓦特亡灵】陪鲁健连肝七日，精神失常，延毕疯癫。",
+        ZHANG_OVERDOSE:"【结局·卷死图书馆】跟随内卷节奏，心脏骤停死在考场。",
+        ZHANG_BETRAY:"【结局·论文幽灵】张晨斌窃取论文，举报你学术不端。",
+        QIAN_POISON:"【结局·深海溺亡】钱嘉乐捏造丑闻，你从天台坠落。",
+        QIAN_DROWN:"【结局·浴缸回响】喝下饮料，醒来少了一个肾。",
+        HONG_LOAN:"【结局·奢华坟场】欠巨款被卖到境外。",
+        HONG_SLAVE:"【结局·契约奴】签下卖身契，沦为私人奴隶。",
+        WEIRD_MIRROR:"【结局·镜中桃苑】被诡异吞噬，成为镜中第五人。",
+        ALL_BETRAY:"【结局·四重奏】同时得罪所有人，人间蒸发。",
+        LONELY:"【结局·透明延毕】孤独四年，延毕至死。",
+        FAKE_DIPLOMA:"【结局·赝品证书】买假证逃回家，精神失常。",
+        FLESH:"【结局·肉馅】偷吃和牛，被做成饺子。",
+        SHRINE:"【结局·贡品】被室友献祭给宿管大妈之神。",
+        TRUE:"⭐⭐⭐ 【真结局·白澜的毕业证】⭐⭐⭐ <br>你精准拿捏了每个人的分寸。毕业典礼上四人破例为你鼓掌。你拿着鲜红毕业证走出桃苑401，阳光洒落——自此，桃苑再无诅咒。"
     };
-
-    function setEnding(key) {
-        if (game.dead) return;
-        game.dead = true;
-        let txt = ENDINGS[key] || "【扭曲结局】你消失在401的走廊里。";
-        renderGame(txt, [{ text: "♾️ 重新开始（轮回）", action: resetGame }]);
-    }
-
-    function resetGame() {
-        game = {
-            dead: false, week: 1,
-            lu: 0, zhang: 0, qian: 0, hong: 0,
-            weird: 0, clues: []
-        };
-        startGame();
-    }
-
-    function renderGame(storyText, options) {
-        document.getElementById("storyArea").innerHTML = storyText.replace(/\n/g, '<br>');
-        const optsDiv = document.getElementById("optionsArea");
-        optsDiv.innerHTML = "";
-        for (let opt of options) {
+    function setEnding(key) { if(game.dead) return; game.dead=true; renderGame(ENDINGS[key]||"【扭曲结局】", [{text:"♾️ 重新开始", action:resetGame}]); }
+    function resetGame() { game={ dead:false, week:1, lu:0, zhang:0, qian:0, hong:0, weird:0, clues:[] }; startGame(); }
+    function renderGame(txt, opts) {
+        document.getElementById("storyArea").innerHTML = txt.replace(/\n/g,'<br>');
+        const div = document.getElementById("optionsArea");
+        div.innerHTML = "";
+        for(let o of opts) {
             let btn = document.createElement("div");
             btn.className = "opt-btn";
-            btn.innerText = opt.text;
-            btn.onclick = () => {
-                if (game.dead && opt.text !== "♾️ 重新开始（轮回）") return;
-                opt.action();
-            };
-            optsDiv.appendChild(btn);
+            btn.innerText = o.text;
+            btn.onclick = () => { if(game.dead && o.text!=="♾️ 重新开始") return; o.action(); };
+            div.appendChild(btn);
         }
-        let flagMsg = `📆 第${game.week}周`;
-        if (game.weird >= 6) flagMsg = "👁️ 诡异缠身";
-        if (game.dead) flagMsg = "💀 终局";
-        document.getElementById("stateFlag").innerHTML = flagMsg;
+        let flag = `📆 第${game.week}周`;
+        if(game.weird>=5) flag="👁️ 诡异缠身";
+        if(game.dead) flag="💀 终局";
+        document.getElementById("stateFlag").innerHTML = flag;
     }
-
-    // 每周开始时检查致命阈值 (±4 或诡异≥6 触发坏结局)
     function checkDeadly() {
-        if (game.lu <= -4) setEnding("LU_ADDICT");
-        else if (game.lu >= 4) setEnding("LU_GAY");
-        else if (game.zhang <= -4) setEnding("ZHANG_BETRAY");
-        else if (game.zhang >= 4) setEnding("ZHANG_OVERDOSE");
-        else if (game.qian <= -4) setEnding("QIAN_POISON");
-        else if (game.qian >= 4) setEnding("QIAN_DROWN");
-        else if (game.hong <= -4) setEnding("HONG_LOAN");
-        else if (game.hong >= 4) setEnding("HONG_SLAVE");
-        else if (game.weird >= 6) setEnding("WEIRD_MIRROR");
-        else if (game.lu + game.zhang + game.qian + game.hong <= -6) setEnding("ALL_BETRAY");
-        else if (game.lu + game.zhang + game.qian + game.hong >= 6) setEnding("FLESH");
+        if(game.lu<=-5) setEnding("LU_ADDICT");
+        else if(game.lu>=5) setEnding("LU_GAY");
+        else if(game.zhang<=-5) setEnding("ZHANG_BETRAY");
+        else if(game.zhang>=5) setEnding("ZHANG_OVERDOSE");
+        else if(game.qian<=-5) setEnding("QIAN_POISON");
+        else if(game.qian>=5) setEnding("QIAN_DROWN");
+        else if(game.hong<=-5) setEnding("HONG_LOAN");
+        else if(game.hong>=5) setEnding("HONG_SLAVE");
+        else if(game.weird>=6) setEnding("WEIRD_MIRROR");
+        else if(game.lu+game.zhang+game.qian+game.hong <= -7) setEnding("ALL_BETRAY");
+        else if(game.lu+game.zhang+game.qian+game.hong >= 7) setEnding("FLESH");
     }
-
     function advanceWeek() {
-        if (game.dead) return;
+        if(game.dead) return;
         game.week++;
-        if (game.week > 16) {
-            finalGraduation();
-            return;
-        }
+        if(game.week>16) { finalGraduation(); return; }
         checkDeadly();
-        if (game.dead) return;
-        dispatchWeeklyEvent();
+        if(game.dead) return;
+        dispatchEvent();
     }
-
-    // 第1周初始
     function startGame() {
-        let txt = "九月初，你站在桃苑401门前。门缝飘出焦糖味。\n传闻往届无人正常毕业——疯、退、消失。\n推开门，四人盯着你：\n🔨鲁健：原神60级？\n📖张晨斌：四级过了吗？\n🐍钱嘉乐：祭品来了。\n💎洪增珏：缺钱找我，日息三分。";
-        renderGame(txt, [
-            { text: "🎮 和鲁健聊原神", action: () => { game.lu += 1; advanceWeek(); } },
-            { text: "📚 捧张晨斌", action: () => { game.zhang += 1; advanceWeek(); } },
-            { text: "🤐 无视钱嘉乐", action: () => { game.qian -= 1; advanceWeek(); } },
-            { text: "💸 向洪增珏借钱", action: () => { game.hong -= 1; advanceWeek(); } },
-            { text: "🌙 深夜走廊游荡", action: () => { game.weird += 1; advanceWeek(); } }
+        renderGame("九月初，你站在桃苑401门前。传闻无人正常毕业。\n推开门，四人盯着你：\n🔨鲁健：原神60级？\n📖张晨斌：四级过了吗？\n🐍钱嘉乐：祭品来了。\n💎洪增珏：缺钱找我。", [
+            {text:"🎮 和鲁健聊原神", action:()=>{ game.lu+=1; advanceWeek(); }},
+            {text:"📚 捧张晨斌", action:()=>{ game.zhang+=1; advanceWeek(); }},
+            {text:"🤐 无视钱嘉乐", action:()=>{ game.qian-=1; advanceWeek(); }},
+            {text:"💸 向洪增珏借钱", action:()=>{ game.hong-=1; advanceWeek(); }},
+            {text:"🌙 深夜走廊游荡", action:()=>{ game.weird+=1; advanceWeek(); }}
         ]);
     }
-
-    // 每周事件（保证存在一条完美路线）
-    function dispatchWeeklyEvent() {
-        const w = game.week;
-        if (w === 2) week2();
-        else if (w === 3) week3();
-        else if (w === 4) week4();
-        else if (w === 5) week5();
-        else if (w === 6) week6();
-        else if (w === 7) week7();
-        else if (w === 8) week8();
-        else if (w === 9) week9();
-        else if (w === 10) week10();
-        else if (w === 11) week11();
-        else if (w === 12) week12();
-        else if (w === 13) week13();
-        else if (w === 14) week14();
-        else if (w === 15) week15();
-        else advanceWeek();
+    function dispatchEvent() {
+        const w=game.week;
+        if(w===2) week2(); else if(w===3) week3(); else if(w===4) week4(); else if(w===5) week5(); else if(w===6) week6();
+        else if(w===7) week7(); else if(w===8) week8(); else if(w===9) week9(); else if(w===10) week10();
+        else if(w===11) week11(); else if(w===12) week12(); else if(w===13) week13(); else if(w===14) week14();
+        else if(w===15) week15(); else advanceWeek();
     }
-
-    // 完美路线指引（隐藏，玩家可摸索）
-    function week2() {
-        renderGame("第2周，鲁健凌晨邀你打深渊，桌上放着美工刀。", [
-            { text: "陪他打游戏", action: () => { game.lu += 1; advanceWeek(); } },
-            { text: "劝他睡觉", action: () => { game.lu -= 1; game.weird += 1; advanceWeek(); } },
-            { text: "假装睡着，听见他喃喃自语", action: () => { game.weird += 1; game.clues.push("美工刀"); advanceWeek(); } }
-        ]);
-    }
-    function week3() {
-        renderGame("第3周，张晨斌邀你加入“凌晨5点学习小组”，淘汰率30%。", [
-            { text: "加入", action: () => { game.zhang += 1; advanceWeek(); } },
-            { text: "拒绝并举报", action: () => { game.zhang -= 2; game.weird += 1; advanceWeek(); } },
-            { text: "在他笔记里放辣椒水", action: () => { game.zhang -= 1; game.qian += 1; advanceWeek(); } }
-        ]);
-    }
-    function week4() {
-        renderGame("第4周，钱嘉乐发你丑照配文“猪猡”。", [
-            { text: "自黑回击", action: () => { game.qian += 1; advanceWeek(); } },
-            { text: "砸他手机", action: () => { game.qian -= 2; game.weird += 1; advanceWeek(); } },
-            { text: "偷拍报复", action: () => setEnding("QIAN_DROWN") }
-        ]);
-    }
-    function week5() {
-        renderGame("第5周，洪增珏拿出借贷合同，买iPhone免息。", [
-            { text: "签字", action: () => { game.hong -= 2; advanceWeek(); } },
-            { text: "拒绝", action: () => { game.hong += 1; advanceWeek(); } },
-            { text: "偷拍举报", action: () => { game.hong += 1; game.weird += 1; game.clues.push("举报信"); advanceWeek(); } }
-        ]);
-    }
-    function week6() {
-        renderGame("第6周，宿舍响起唢呐，四人朝神龛磕头。", [
-            { text: "跟着磕头", action: () => { game.weird += 2; advanceWeek(); } },
-            { text: "尖叫逃跑", action: () => setEnding("SHRINE") },
-            { text: "偷偷录像", action: () => { game.clues.push("邪教视频"); advanceWeek(); } }
-        ]);
-    }
-    function week7() {
-        renderGame("第7周，张晨斌送你巧克力，包装印着“学术共谋协议”。", [
-            { text: "吃掉", action: () => { game.zhang += 2; advanceWeek(); } },
-            { text: "转送鲁健", action: () => { game.lu += 1; game.zhang -= 1; advanceWeek(); } },
-            { text: "报警", action: () => { game.weird += 2; setEnding("LONELY"); } }
-        ]);
-    }
-    function week8() {
-        renderGame("第8周，鲁健说你是“天选之人”，邀你去地下祭祀。", [
-            { text: "好奇前往", action: () => { game.lu += 1; game.weird += 1; advanceWeek(); } },
-            { text: "拒绝并通知辅导员", action: () => { game.lu -= 2; game.weird += 1; advanceWeek(); } },
-            { text: "联合钱嘉乐捉弄鲁健", action: () => { game.qian += 1; game.lu -= 1; advanceWeek(); } }
-        ]);
-    }
-    function week9() {
-        renderGame("第9周，洪增珏送你高档西装，领口二维码是卖身契。", [
-            { text: "收下", action: () => { game.hong -= 2; advanceWeek(); } },
-            { text: "退还", action: () => { game.hong += 1; advanceWeek(); } },
-            { text: "拿给钱嘉乐鉴定", action: () => { game.qian += 1; advanceWeek(); } }
-        ]);
-    }
-    function week10() {
-        renderGame("第10周，钱嘉乐天台约谈，说前几届学生被埋在东湖底。", [
-            { text: "惊恐逃跑", action: () => setEnding("WEIRD_MIRROR") },
-            { text: "假装同意套话", action: () => { game.qian += 1; game.clues.push("埋骨地"); advanceWeek(); } },
-            { text: "录音举报", action: () => { game.weird += 2; advanceWeek(); } }
-        ]);
-    }
-    function week11() {
-        renderGame("第11周，宿舍断电，四人围坐玩“贡献者”游戏。", [
-            { text: "参与游戏", action: () => { game.weird += 2; advanceWeek(); } },
-            { text: "假装肚子疼离开", action: () => { game.weird += 1; advanceWeek(); } },
-            { text: "打开手电筒看他们的脸", action: () => setEnding("FLESH") }
-        ]);
-    }
-    function week12() {
-        renderGame("第12周，日记本出现血字「选一个室友献祭」。", [
-            { text: "报告辅导员", action: () => setEnding("LONELY") },
-            { text: "调查笔迹怀疑张晨斌", action: () => { game.zhang -= 1; game.clues.push("血书"); advanceWeek(); } },
-            { text: "装摄像头", action: () => { game.weird += 1; advanceWeek(); } }
-        ]);
-    }
-    function week13() {
-        renderGame("第13周，鲁健和张晨斌为你争吵，洪增珏开赌局。", [
-            { text: "劝和", action: () => { game.lu -= 1; game.zhang -= 1; advanceWeek(); } },
-            { text: "站鲁健", action: () => { game.lu += 1; game.zhang -= 2; advanceWeek(); } },
-            { text: "站张晨斌", action: () => { game.zhang += 1; game.lu -= 2; advanceWeek(); } },
-            { text: "押洪增珏", action: () => { game.hong -= 1; advanceWeek(); } }
-        ]);
-    }
-    function week14() {
-        renderGame("第14周，钱嘉乐送你“毕业祝福”腌菜，内有指甲。", [
-            { text: "尝一口", action: () => { game.qian -= 2; game.weird += 1; advanceWeek(); } },
-            { text: "偷偷扔掉", action: () => { game.qian += 1; advanceWeek(); } },
-            { text: "送检报警", action: () => setEnding("QIAN_POISON") }
-        ]);
-    }
-    function week15() {
-        renderGame("第15周，洪增珏拿出“校友联络协议”，签字就能毕业。", [
-            { text: "签字拿证", action: () => setEnding("FAKE_DIPLOMA") },
-            { text: "拒绝并撕毁", action: () => { game.hong += 1; advanceWeek(); } },
-            { text: "偷走烧掉", action: () => { game.hong += 1; game.weird += 1; advanceWeek(); } }
-        ]);
-    }
-
-    // 第16周最终判定（真结局条件合理且可达）
+    // 以下是每周事件（完美路线已内嵌，玩家只需按指引选择）
+    function week2() { renderGame("第2周，鲁健凌晨邀你打深渊，桌上放着美工刀。", [
+        {text:"陪他打游戏", action:()=>{ game.lu+=1; advanceWeek(); }},
+        {text:"劝他睡觉", action:()=>{ game.lu-=1; game.weird+=1; advanceWeek(); }},
+        {text:"假装睡着", action:()=>{ game.weird+=1; game.clues.push("美工刀"); advanceWeek(); }}
+    ]);}
+    function week3() { renderGame("第3周，张晨斌邀你加入“凌晨5点学习小组”。", [
+        {text:"加入", action:()=>{ game.zhang+=1; advanceWeek(); }},
+        {text:"拒绝并举报", action:()=>{ game.zhang-=2; game.weird+=1; advanceWeek(); }},
+        {text:"放辣椒水", action:()=>{ game.zhang-=1; game.qian+=1; advanceWeek(); }}
+    ]);}
+    function week4() { renderGame("第4周，钱嘉乐发你丑照配文“猪猡”。", [
+        {text:"自黑回击", action:()=>{ game.qian+=1; advanceWeek(); }},
+        {text:"砸他手机", action:()=>{ game.qian-=2; game.weird+=1; advanceWeek(); }},
+        {text:"偷拍报复", action:()=> setEnding("QIAN_DROWN") }
+    ]);}
+    function week5() { renderGame("第5周，洪增珏拿出借贷合同。", [
+        {text:"签字", action:()=>{ game.hong-=2; advanceWeek(); }},
+        {text:"拒绝", action:()=>{ game.hong+=1; advanceWeek(); }},
+        {text:"偷拍举报", action:()=>{ game.hong+=1; game.weird+=1; game.clues.push("举报信"); advanceWeek(); }}
+    ]);}
+    function week6() { renderGame("第6周，宿舍响起唢呐，四人朝神龛磕头。", [
+        {text:"跟着磕头", action:()=>{ game.weird+=2; advanceWeek(); }},
+        {text:"尖叫逃跑", action:()=> setEnding("SHRINE") },
+        {text:"偷偷录像", action:()=>{ game.clues.push("邪教视频"); advanceWeek(); }}
+    ]);}
+    function week7() { renderGame("第7周，张晨斌送你巧克力，包装印着“学术共谋协议”。", [
+        {text:"吃掉", action:()=>{ game.zhang+=2; advanceWeek(); }},
+        {text:"转送鲁健", action:()=>{ game.lu+=1; game.zhang-=1; advanceWeek(); }},
+        {text:"报警", action:()=>{ game.weird+=2; setEnding("LONELY"); }}
+    ]);}
+    function week8() { renderGame("第8周，鲁健说你是“天选之人”，邀你去地下祭祀。", [
+        {text:"好奇前往", action:()=>{ game.lu+=1; game.weird+=1; advanceWeek(); }},
+        {text:"拒绝并通知辅导员", action:()=>{ game.lu-=2; game.weird+=1; advanceWeek(); }},
+        {text:"联合钱嘉乐捉弄鲁健", action:()=>{ game.qian+=1; game.lu-=1; advanceWeek(); }}
+    ]);}
+    function week9() { renderGame("第9周，洪增珏送你高档西装，领口二维码是卖身契。", [
+        {text:"收下", action:()=>{ game.hong-=2; advanceWeek(); }},
+        {text:"退还", action:()=>{ game.hong+=1; advanceWeek(); }},
+        {text:"拿给钱嘉乐鉴定", action:()=>{ game.qian+=1; advanceWeek(); }}
+    ]);}
+    function week10() { renderGame("第10周，钱嘉乐天台约谈，说前几届学生被埋在东湖底。", [
+        {text:"惊恐逃跑", action:()=> setEnding("WEIRD_MIRROR") },
+        {text:"假装同意套话", action:()=>{ game.qian+=1; game.clues.push("埋骨地"); advanceWeek(); }},
+        {text:"录音举报", action:()=>{ game.weird+=2; advanceWeek(); }}
+    ]);}
+    function week11() { renderGame("第11周，宿舍断电，四人围坐玩“贡献者”游戏。", [
+        {text:"参与游戏", action:()=>{ game.weird+=2; advanceWeek(); }},
+        {text:"假装肚子疼离开", action:()=>{ game.weird+=1; advanceWeek(); }},
+        {text:"打开手电筒看他们的脸", action:()=> setEnding("FLESH") }
+    ]);}
+    function week12() { renderGame("第12周，日记本出现血字「选一个室友献祭」。", [
+        {text:"报告辅导员", action:()=> setEnding("LONELY") },
+        {text:"调查笔迹怀疑张晨斌", action:()=>{ game.zhang-=1; game.clues.push("血书"); advanceWeek(); }},
+        {text:"装摄像头", action:()=>{ game.weird+=1; advanceWeek(); }}
+    ]);}
+    function week13() { renderGame("第13周，鲁健和张晨斌为你争吵，洪增珏开赌局。", [
+        {text:"劝和", action:()=>{ game.lu-=1; game.zhang-=1; advanceWeek(); }},
+        {text:"站鲁健", action:()=>{ game.lu+=1; game.zhang-=2; advanceWeek(); }},
+        {text:"站张晨斌", action:()=>{ game.zhang+=1; game.lu-=2; advanceWeek(); }},
+        {text:"押洪增珏", action:()=>{ game.hong-=1; advanceWeek(); }}
+    ]);}
+    function week14() { renderGame("第14周，钱嘉乐送你“毕业祝福”腌菜，内有指甲。", [
+        {text:"尝一口", action:()=>{ game.qian-=2; game.weird+=1; advanceWeek(); }},
+        {text:"偷偷扔掉", action:()=>{ game.qian+=1; advanceWeek(); }},
+        {text:"送检报警", action:()=> setEnding("QIAN_POISON") }
+    ]);}
+    function week15() { renderGame("第15周，洪增珏拿出“校友联络协议”，签字就能毕业。", [
+        {text:"签字拿证", action:()=> setEnding("FAKE_DIPLOMA") },
+        {text:"拒绝并撕毁", action:()=>{ game.hong+=1; advanceWeek(); }},
+        {text:"偷走烧掉", action:()=>{ game.hong+=1; game.weird+=1; advanceWeek(); }}
+    ]);}
     function finalGraduation() {
-        // 完美条件：各数值在-1~1之间，诡异≤3，线索≥3
-        let condLu = (game.lu >= -1 && game.lu <= 1);
-        let condZhang = (game.zhang >= -1 && game.zhang <= 1);
-        let condQian = (game.qian >= -1 && game.qian <= 1);
-        let condHong = (game.hong >= -1 && game.hong <= 1);
-        let condWeird = game.weird <= 3;
-        let condClues = game.clues.length >= 3;
-        if (condLu && condZhang && condQian && condHong && condWeird && condClues) {
-            setEnding("TRUE");
-        } else {
-            // 根据最突出的问题给坏结局
-            if (game.weird >= 5) setEnding("WEIRD_MIRROR");
-            else if (Math.abs(game.lu) >= 3) setEnding("LU_GAY");
-            else if (Math.abs(game.zhang) >= 3) setEnding("ZHANG_OVERDOSE");
-            else if (Math.abs(game.qian) >= 3) setEnding("QIAN_DROWN");
-            else if (Math.abs(game.hong) >= 3) setEnding("HONG_SLAVE");
-            else setEnding("LONELY");
-        }
+        // 放宽条件：数值在-2~2，诡异≤4，线索≥2
+        let condLu = (game.lu>=-2 && game.lu<=2);
+        let condZhang = (game.zhang>=-2 && game.zhang<=2);
+        let condQian = (game.qian>=-2 && game.qian<=2);
+        let condHong = (game.hong>=-2 && game.hong<=2);
+        let condWeird = game.weird <= 4;
+        let condClues = game.clues.length >= 2;
+        if(condLu && condZhang && condQian && condHong && condWeird && condClues) setEnding("TRUE");
+        else setEnding("LONELY");
     }
-
-    // 启动游戏
     resetGame();
 </script>
 </body>
