@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>JWT 解码器 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; margin: 0;
+        }
+        .card {
+            max-width: 1000px; width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        label { display: block; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+        textarea {
+            width: 100%; padding: 1rem; font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 1.2rem;
+            background: white; resize: vertical; line-height: 1.5; margin-bottom: 1.2rem;
+        }
+        textarea:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px #0f172a20; }
+        .btn {
+            background: white; border: 1px solid #cbd5e1; padding: 10px 20px;
+            border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .btn-primary { background: #0f172a; border-color: #0f172a; color: white; }
+        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.2rem; }
+        .section { margin-bottom: 1.2rem; }
+        .section-header {
+            background: #f1f5f9; padding: 0.6rem 1rem; border-radius: 0.8rem 0.8rem 0 0;
+            font-weight: 600; font-size: 0.9rem; color: #0f172a; cursor: pointer; user-select: none;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-header::before { content: '▸'; font-size: 0.7rem; transition: transform 0.2s; display: inline-block; }
+        .section.open .section-header::before { transform: rotate(90deg); }
+        .section-body {
+            background: #1e293b; padding: 1rem; border-radius: 0 0 0.8rem 0.8rem;
+            font-family: 'SF Mono', 'Cascadia Code', monospace; font-size: 0.85rem;
+            color: #e2e8f0; overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+        }
+        .section-body.collapsed { display: none; }
+        .claims-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;
+        }
+        .claim-item {
+            background: #f8fafc; border-radius: 0.8rem; padding: 0.6rem 0.8rem; border: 1px solid #e2e8f0;
+        }
+        .claim-key { font-size: 0.75rem; color: #64748b; font-family: 'SF Mono', monospace; }
+        .claim-value { font-size: 0.9rem; color: #0f172a; word-break: break-all; font-family: 'SF Mono', monospace; }
+        .badge-expired { background: #fef2f2; color: #b91c1c; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; display: inline; }
+        .badge-valid { background: #f0fdf4; color: #15803d; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; display: inline; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px;
+            font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
+        }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>🔍 JWT 解码器 <span class="badge">Header · Payload · Claims</span></h1>
+        <p>解码 JWT Token，查看 Header、Payload 及标准 Claims。不涉及密钥，只做解码展示。</p>
+    </div>
+    <div class="container">
+        <label>🔑 JWT Token</label>
+        <textarea id="jwtInput" rows="3" placeholder="粘贴 JWT Token（格式：xxxxx.yyyyy.zzzzz）...&#10;例如：eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgN...</textarea>
+        <div class="btn-row">
+            <button class="btn btn-primary" id="decodeBtn">🔓 解码</button>
+            <button class="btn btn-outline" id="clearBtn">🗑️ 清空</button>
+            <button class="btn btn-outline" id="exampleBtn">📌 填入示例</button>
+        </div>
+        <div id="results" style="display:none;">
+            <div class="section open" id="headerSection">
+                <div class="section-header">📦 Header</div>
+                <div class="section-body" id="headerBody"></div>
+            </div>
+            <div class="section open" id="payloadSection">
+                <div class="section-header">📋 Payload</div>
+                <div class="section-body" id="payloadBody"></div>
+            </div>
+            <div class="section" id="claimsSection">
+                <div class="section-header">📊 Claims 解析</div>
+                <div class="section-body" id="claimsBody"></div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">✅ 已解码</div>
+
+<script>
+(function() {
+    var jwtInput = document.getElementById('jwtInput');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+
+    function showToast(msg, isErr) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.style.background = isErr ? '#be123c' : '#0f172a';
+        toast.style.opacity = '1';
+        toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1800);
+    }
+
+    function base64UrlDecode(str) {
+        str = str.replace(/-/g, '+').replace(/_/g, '/');
+        while (str.length % 4) str += '=';
+        try {
+            return JSON.parse(decodeURIComponent(escape(atob(str))));
+        } catch (e) {
+            return JSON.parse(atob(str));
+        }
+    }
+
+    function formatJSON(obj) {
+        return JSON.stringify(obj, null, 2);
+    }
+
+    function decodeJWT() {
+        var token = jwtInput.value.trim();
+        if (!token) { showToast('⚠️ 请输入 JWT Token', true); return; }
+        var parts = token.split('.');
+        if (parts.length !== 3) { showToast('⚠️ JWT 格式无效，应为三段以 . 分隔', true); return; }
+        try {
+            var header = base64UrlDecode(parts[0]);
+            var payload = base64UrlDecode(parts[1]);
+
+            document.getElementById('headerBody').textContent = formatJSON(header);
+            document.getElementById('payloadBody').textContent = formatJSON(payload);
+
+            // Claims display
+            var claimsHtml = '<div class="claims-grid">';
+            var claimMap = {
+                'iss': '签发者 (Issuer)',
+                'sub': '主题 (Subject)',
+                'aud': '受众 (Audience)',
+                'exp': '过期时间 (Expiration)',
+                'nbf': '生效时间 (Not Before)',
+                'iat': '签发时间 (Issued At)',
+                'jti': 'JWT ID'
+            };
+            var now = Math.floor(Date.now() / 1000);
+            Object.keys(payload).forEach(function(key) {
+                var label = claimMap[key] || key;
+                var value = payload[key];
+                var extra = '';
+                if ((key === 'exp' || key === 'nbf' || key === 'iat') && typeof value === 'number') {
+                    var d = new Date(value * 1000);
+                    var isExpired = key === 'exp' && value < now;
+                    var isNotYet = key === 'nbf' && value > now;
+                    extra = ' <span style="font-size:0.75rem;color:#94a3b8;">(' + d.toLocaleString('zh-CN') + ')</span>';
+                    if (isExpired) extra += ' <span class="badge-expired">已过期</span>';
+                    if (isNotYet) extra += ' <span class="badge-expired">尚未生效</span>';
+                }
+                if (key === 'iat' && typeof value === 'number') {
+                    // Check if token is generally valid
+                    if (payload.exp && payload.exp < now) {
+                        extra += ' <span class="badge-expired">Token 已过期</span>';
+                    }
+                }
+                claimsHtml += '<div class="claim-item"><div class="claim-key">' + label + '</div><div class="claim-value">' + String(value) + extra + '</div></div>';
+            });
+            claimsHtml += '</div>';
+            document.getElementById('claimsBody').innerHTML = claimsHtml;
+
+            document.getElementById('results').style.display = 'block';
+            showToast('✅ JWT 解码成功');
+        } catch (e) {
+            showToast('❌ 解码失败: ' + e.message, true);
+        }
+    }
+
+    document.getElementById('decodeBtn').addEventListener('click', decodeJWT);
+
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        jwtInput.value = '';
+        document.getElementById('results').style.display = 'none';
+        showToast('🧹 已清空');
+    });
+
+    document.getElementById('exampleBtn').addEventListener('click', function() {
+        // Generate a sample JWT (exp in future)
+        var header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+        var now = Math.floor(Date.now() / 1000);
+        var payload = btoa(JSON.stringify({
+            sub: '1234567890',
+            name: 'ACE User',
+            iat: now,
+            exp: now + 3600,
+            iss: 'html-lab',
+            role: 'developer'
+        })).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+        jwtInput.value = header + '.' + payload + '.signature_placeholder';
+        decodeJWT();
+    });
+
+    // Toggle sections
+    document.querySelectorAll('.section-header').forEach(function(h) {
+        h.addEventListener('click', function() {
+            this.parentElement.classList.toggle('open');
+            this.nextElementSibling.classList.toggle('collapsed');
+        });
+    });
+})();
+</script>
+</body>
+</html>

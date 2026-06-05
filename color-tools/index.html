@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>颜色工具 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; margin: 0;
+        }
+        .card {
+            max-width: 900px; width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        .color-preview {
+            width: 100%; height: 120px; border-radius: 1.5rem; margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0; transition: background 0.15s;
+        }
+        .picker-row {
+            display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+        }
+        input[type="color"] {
+            width: 60px; height: 60px; border: none; border-radius: 1rem; cursor: pointer; padding: 0; background: none;
+        }
+        .format-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.2rem;
+        }
+        .format-card {
+            background: #f8fafc; border-radius: 1.2rem; padding: 1.2rem; border: 1px solid #e2e8f0;
+        }
+        .format-card h3 { margin: 0 0 0.8rem; font-size: 1rem; color: #0f172a; }
+        .format-row { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
+        .format-row label {
+            font-size: 0.8rem; color: #64748b; min-width: 28px; font-weight: 600;
+            font-family: 'SF Mono', 'Cascadia Code', monospace;
+        }
+        .format-row input {
+            flex: 1; padding: 6px 10px; font-family: 'SF Mono', 'Cascadia Code', monospace;
+            font-size: 0.9rem; border: 1px solid #cbd5e1; border-radius: 0.8rem; background: white;
+        }
+        .format-row input:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 2px #0f172a20; }
+        .color-swatch {
+            display: inline-block; width: 28px; height: 28px; border-radius: 6px; border: 1px solid #cbd5e1; flex-shrink: 0;
+        }
+        .css-preview {
+            background: #1e293b; border-radius: 1rem; padding: 1rem 1.2rem; margin-top: 1.2rem;
+            color: #e2e8f0; font-family: 'SF Mono', 'Cascadia Code', monospace; font-size: 0.85rem;
+        }
+        .btn {
+            background: white; border: 1px solid #cbd5e1; padding: 8px 16px;
+            border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+        }
+        .btn-outline:hover { background: #f1f5f9; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px;
+            font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
+        }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>🎨 颜色工具 <span class="badge">HEX · RGB · HSL</span></h1>
+        <p>颜色拾取器，支持 HEX / RGB / HSL 互转与实时预览</p>
+    </div>
+    <div class="container">
+        <div class="picker-row">
+            <input type="color" id="colorPicker" value="#3b82f6">
+            <div>
+                <div style="font-weight:600; color:#0f172a;">🎯 拾取颜色</div>
+                <div style="font-size:0.8rem; color:#64748b;">点击色块选择，或在下方输入框中直接输入</div>
+            </div>
+            <button class="btn btn-outline" id="randomBtn" style="margin-left:auto;">🎲 随机颜色</button>
+        </div>
+        <div class="color-preview" id="colorPreview" style="background:#3b82f6;"></div>
+        <div class="format-grid">
+            <div class="format-card">
+                <h3>🔴🟢🔵 RGB</h3>
+                <div class="format-row"><label>R</label><input type="number" id="rgbR" min="0" max="255" value="59"><span class="color-swatch" style="background:rgb(59,0,0);"></span></div>
+                <div class="format-row"><label>G</label><input type="number" id="rgbG" min="0" max="255" value="130"><span class="color-swatch" style="background:rgb(0,130,0);"></span></div>
+                <div class="format-row"><label>B</label><input type="number" id="rgbB" min="0" max="255" value="246"><span class="color-swatch" style="background:rgb(0,0,246);"></span></div>
+                <div style="margin-top:6px;"><span style="font-size:0.75rem;color:#64748b;">rgb(<span id="rgbPreview">59, 130, 246</span>)</span></div>
+            </div>
+            <div class="format-card">
+                <h3>📝 HEX</h3>
+                <div class="format-row">
+                    <label>#</label>
+                    <input type="text" id="hexInput" value="3b82f6" maxlength="6" style="text-transform:uppercase;">
+                    <span class="color-swatch" id="hexSwatch" style="background:#3b82f6;"></span>
+                </div>
+                <div style="margin-top:6px; font-size:0.75rem; color:#64748b;">支持 3 位或 6 位十六进制</div>
+            </div>
+            <div class="format-card">
+                <h3>🌈 HSL</h3>
+                <div class="format-row"><label>H</label><input type="number" id="hslH" min="0" max="360" value="217">°</div>
+                <div class="format-row"><label>S</label><input type="number" id="hslS" min="0" max="100" value="91">%</div>
+                <div class="format-row"><label>L</label><input type="number" id="hslL" min="0" max="100" value="60">%</div>
+                <div style="margin-top:6px;"><span style="font-size:0.75rem;color:#64748b;">hsl(<span id="hslPreview">217, 91%, 60%</span>)</span></div>
+            </div>
+        </div>
+        <div class="css-preview" id="cssPreview">
+            CSS: <span style="color:#93c5fd;">color</span>: <span style="color:#86efac;">#3b82f6</span>;
+            <span style="color:#93c5fd;">background</span>: <span style="color:#86efac;">rgb(59, 130, 246)</span>;
+        </div>
+    </div>
+    <div class="footer">
+        🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">📋 已复制</div>
+
+<script>
+(function() {
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+    var updating = false;
+
+    function showToast(msg) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.style.background = '#0f172a';
+        toast.style.opacity = '1';
+        toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1500);
+    }
+
+    function rgbToHex(r, g, b) {
+        return ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    function hexToRgb(hex) {
+        hex = hex.replace('#', '');
+        if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+        return [parseInt(hex.substring(0,2), 16), parseInt(hex.substring(2,4), 16), parseInt(hex.substring(4,6), 16)];
+    }
+
+    function rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h = 0, s = 0, l = (max + min) / 2;
+        if (max !== min) {
+            var d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                case g: h = ((b - r) / d + 2) / 6; break;
+                case b: h = ((r - g) / d + 4) / 6; break;
+            }
+        }
+        return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+    }
+
+    function hslToRgb(h, s, l) {
+        h /= 360; s /= 100; l /= 100;
+        var r, g, b;
+        if (s === 0) { r = g = b = l; }
+        else {
+            var hue2rgb = function(p, q, t) {
+                if (t < 0) t += 1; if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
+
+    function updateFromRGB(r, g, b) {
+        if (updating) return;
+        updating = true;
+        var hex = rgbToHex(r, g, b);
+        var hsl = rgbToHsl(r, g, b);
+        document.getElementById('rgbR').value = r;
+        document.getElementById('rgbG').value = g;
+        document.getElementById('rgbB').value = b;
+        document.getElementById('hexInput').value = hex;
+        document.getElementById('hslH').value = hsl[0];
+        document.getElementById('hslS').value = hsl[1];
+        document.getElementById('hslL').value = hsl[2];
+        document.getElementById('rgbPreview').textContent = r + ', ' + g + ', ' + b;
+        document.getElementById('hslPreview').textContent = hsl[0] + ', ' + hsl[1] + '%, ' + hsl[2] + '%';
+        document.getElementById('colorPicker').value = '#' + hex;
+        document.getElementById('colorPreview').style.background = '#' + hex;
+        document.getElementById('hexSwatch').style.background = '#' + hex;
+        document.getElementById('cssPreview').innerHTML = 'CSS: <span style="color:#93c5fd;">color</span>: <span style="color:#86efac;">#' + hex + '</span>; <span style="color:#93c5fd;">background</span>: <span style="color:#86efac;">rgb(' + r + ', ' + g + ', ' + b + ')</span>;';
+        updating = false;
+    }
+
+    document.getElementById('colorPicker').addEventListener('input', function() {
+        var rgb = hexToRgb(this.value);
+        updateFromRGB(rgb[0], rgb[1], rgb[2]);
+    });
+
+    document.getElementById('rgbR').addEventListener('input', function() { updateFromRGB(+this.value, +document.getElementById('rgbG').value, +document.getElementById('rgbB').value); });
+    document.getElementById('rgbG').addEventListener('input', function() { updateFromRGB(+document.getElementById('rgbR').value, +this.value, +document.getElementById('rgbB').value); });
+    document.getElementById('rgbB').addEventListener('input', function() { updateFromRGB(+document.getElementById('rgbR').value, +document.getElementById('rgbG').value, +this.value); });
+
+    document.getElementById('hexInput').addEventListener('input', function() {
+        var hex = this.value.replace(/[^0-9a-fA-F]/g, '').substring(0, 6);
+        this.value = hex;
+        if (hex.length === 3 || hex.length === 6) {
+            var fullHex = hex.length === 3 ? hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2] : hex;
+            var r = parseInt(fullHex.substring(0,2), 16);
+            var g = parseInt(fullHex.substring(2,4), 16);
+            var b = parseInt(fullHex.substring(4,6), 16);
+            if (!isNaN(r)) updateFromRGB(r, g, b);
+        }
+    });
+
+    document.getElementById('hslH').addEventListener('input', function() {
+        var rgb = hslToRgb(+this.value, +document.getElementById('hslS').value, +document.getElementById('hslL').value);
+        updateFromRGB(rgb[0], rgb[1], rgb[2]);
+    });
+    document.getElementById('hslS').addEventListener('input', function() {
+        var rgb = hslToRgb(+document.getElementById('hslH').value, +this.value, +document.getElementById('hslL').value);
+        updateFromRGB(rgb[0], rgb[1], rgb[2]);
+    });
+    document.getElementById('hslL').addEventListener('input', function() {
+        var rgb = hslToRgb(+document.getElementById('hslH').value, +document.getElementById('hslS').value, +this.value);
+        updateFromRGB(rgb[0], rgb[1], rgb[2]);
+    });
+
+    document.getElementById('randomBtn').addEventListener('click', function() {
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+        updateFromRGB(r, g, b);
+        showToast('🎲 随机颜色: #' + rgbToHex(r, g, b));
+    });
+
+    // Click to copy CSS preview
+    document.getElementById('cssPreview').addEventListener('click', function() {
+        var hex = document.getElementById('hexInput').value;
+        var r = document.getElementById('rgbR').value;
+        var g = document.getElementById('rgbG').value;
+        var b = document.getElementById('rgbB').value;
+        var css = 'color: #' + hex + ';\nbackground: rgb(' + r + ', ' + g + ', ' + b + ');';
+        navigator.clipboard.writeText(css).then(function() { showToast('📋 CSS 已复制'); })
+            .catch(function() { showToast('⚠️ 复制失败', true); });
+    });
+    document.getElementById('cssPreview').style.cursor = 'pointer';
+    document.getElementById('cssPreview').title = '点击复制 CSS';
+})();
+</script>
+</body>
+</html>

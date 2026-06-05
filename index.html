@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>摆烂仙君 | 仙法小技巧</title>
-    <meta name="description" content="摆烂仙君的仙法小技巧 —— 纯前端工具集，Base64编码解码、二维码生成器已上线，更多仙法陆续推出。零数据收集，本地运行。">
+    <title>摆烂仙君 | 十三仙器·在线工具箱</title>
+    <meta name="description" content="摆烂仙君的仙法小技巧 —— 十三件纯前端仙器，Base64、二维码、JSON格式化、时间戳、Markdown、颜色、密码、正则、JWT、哈希、Diff、字数统计均已炼成。零数据收集。">
     <style>
         * {
             margin: 0;
@@ -226,20 +226,30 @@
 <div class="container">
     <div class="hero">
         <h1>
-            🧙 摆烂仙君 · 仙法小技巧
-            <span class="hero-badge">渡劫飞升中</span>
+            🧙 摆烂仙君 · 十三仙器
+            <span class="hero-badge">功德圆满</span>
         </h1>
         <p>轻量仙法 · 纯前端 · 绝不窃取道友灵识</p>
     </div>
 
     <div class="intro-card">
         <h2>📜 仙府简介</h2>
-        <p><strong>摆烂仙君</strong> 闭关修炼之余，炼制几枚实用仙器（在线工具），专为开发、日常繁琐之事提供便利。所有仙法皆以 HTML/CSS/JS 为根基，不借外力，道友的数据绝不出仙府。</p>
-        <p><strong>🚀 渡劫进度</strong></p>
+        <p><strong>摆烂仙君</strong> 闭关修炼，已炼成<strong>十三件仙器</strong>（在线工具），涵盖编解码、格式化、生成器、预览器诸般法门。所有仙法皆以 HTML/CSS/JS 为根基，不借外力，道友的数据绝不出仙府。</p>
+        <p><strong>🚀 炼器总览</strong></p>
         <ul class="update-list">
             <li><strong>✅ 已炼成</strong> – Base64 编码/解码（支持 UTF-8 / 中文 / Emoji）</li>
             <li><strong>✅ 已炼成</strong> – 二维码生成器（文本/URL 转 QR Code，可下载 PNG）</li>
-            <li><strong>📅 炼制中</strong> – JSON 格式化、时间戳转换、颜色拾取、Markdown 预览……</li>
+            <li><strong>✅ 已炼成</strong> – JSON 格式化 & 校验（语法高亮、压缩、转义、错误定位）</li>
+            <li><strong>✅ 已炼成</strong> – URL 编码/解码（encodeURIComponent / encodeURI 双模式）</li>
+            <li><strong>✅ 已炼成</strong> – Unix 时间戳转换（实时显示、互转、秒/毫秒自动识别）</li>
+            <li><strong>✅ 已炼成</strong> – Markdown 在线预览（编辑实时渲染、快捷插入、导出 HTML）</li>
+            <li><strong>✅ 已炼成</strong> – 颜色工具（HEX / RGB / HSL 互转、随机色、CSS 复制）</li>
+            <li><strong>✅ 已炼成</strong> – 随机密码生成器（可配长度字符集、密码强度显示）</li>
+            <li><strong>✅ 已炼成</strong> – 正则表达式测试器（实时高亮、捕获分组、匹配位置）</li>
+            <li><strong>✅ 已炼成</strong> – JWT 解码器（Header/Payload/Claims 解析、过期检测）</li>
+            <li><strong>✅ 已炼成</strong> – 哈希生成器（MD5 / SHA-1 / SHA-256 / SHA-512）</li>
+            <li><strong>✅ 已炼成</strong> – 文本差异对比（逐行 Diff、增删高亮、行数统计）</li>
+            <li><strong>✅ 已炼成</strong> – 字数 & 字节统计器（UTF-8 字节、阅读时间、中文字符）</li>
             <li><strong>⭐ 道友若喜爱，可点 Star 助我飞升</strong> – 若有想要的仙器，可至 Issues 中留言。</li>
         </ul>
     </div>
@@ -264,12 +274,111 @@
             <a href="qrcode/" class="tool-btn">📲 施法 →</a>
         </div>
 
+        <!-- JSON 格式化仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">📋</div>
+            <h3>JSON 天书·格式化</h3>
+            <span class="tool-tag"># 语法高亮 · 压缩 · 转义</span>
+            <p>格式化、压缩、校验 JSON 天书，带语法高亮与乱码定位。解读天机，一目了然。</p>
+            <a href="json-formatter/" class="tool-btn">🔍 施法 →</a>
+        </div>
+
+        <!-- URL 编解码仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">🔗</div>
+            <h3>URL 遁术·编解码</h3>
+            <span class="tool-tag"># encodeURIComponent · 参数加密</span>
+            <p>对天网地址进行编码与解码，支持中土文字与特殊符号，双诀切换自如。</p>
+            <a href="url-codec/" class="tool-btn">🌐 施法 →</a>
+        </div>
+
+        <!-- 时间戳仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">⏱️</div>
+            <h3>时辰·时间戳互转</h3>
+            <span class="tool-tag"># 实时 · 秒/毫秒 · 互转</span>
+            <p>实时展示当前时辰（Unix时间戳），凡间历法与天界时辰随心互转。</p>
+            <a href="unix-timestamp/" class="tool-btn">🕐 施法 →</a>
+        </div>
+
+        <!-- Markdown 仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">📝</div>
+            <h3>Markdown 书卷·预览</h3>
+            <span class="tool-tag"># 编撰 · 实时预览 · 导出HTML</span>
+            <p>左栏编撰 Markdown 道经，右栏即时显化。附快捷插入法术，可复制 HTML 真言。</p>
+            <a href="markdown-preview/" class="tool-btn">📄 施法 →</a>
+        </div>
+
+        <!-- 颜色仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">🎨</div>
+            <h3>五色·神光变幻</h3>
+            <span class="tool-tag"># HEX · RGB · HSL 互转</span>
+            <p>取色仙器，HEX / RGB / HSL 三色法随心互转，随机取色与 CSS 真言一键凝练。</p>
+            <a href="color-tools/" class="tool-btn">🎯 施法 →</a>
+        </div>
+
+        <!-- 密码仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">🔐</div>
+            <h3>密令·随机生成</h3>
+            <span class="tool-tag"># 天机 · 可配置 · 强弱感知</span>
+            <p>借 Web Crypto 天机之术锻造秘钥，可调长短、选符文，实时感知密令强弱。</p>
+            <a href="password-generator/" class="tool-btn">🔑 施法 →</a>
+        </div>
+
+        <!-- 正则仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">🔍</div>
+            <h3>天罡·正则试炼</h3>
+            <span class="tool-tag"># RegExp · 实时高亮 · 捕获分组</span>
+            <p>输入天罡正则与试炼文本，实时高亮匹配之物，显示捕获分组及方位。</p>
+            <a href="regex-tester/" class="tool-btn">🧪 施法 →</a>
+        </div>
+
+        <!-- JWT 仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">🔓</div>
+            <h3>JWT 令牌·解读</h3>
+            <span class="tool-tag"># Header · Payload · Claims</span>
+            <p>解读 JWT 通界令牌的 Header 与 Payload，解析标准 Claims 并检测是否过期。</p>
+            <a href="jwt-decoder/" class="tool-btn">🔎 施法 →</a>
+        </div>
+
+        <!-- 哈希仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">🧬</div>
+            <h3>真言·哈希凝练</h3>
+            <span class="tool-tag"># MD5 · SHA-1 · SHA-256 · SHA-512</span>
+            <p>凝练文本真言为摘要哈希，支持 MD5 / SHA 诸般法门，本地炼化不泄天机。</p>
+            <a href="hash-generator/" class="tool-btn">🔬 施法 →</a>
+        </div>
+
+        <!-- 差异对比仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">⚖️</div>
+            <h3>照妖·文本对比</h3>
+            <span class="tool-tag"># Diff · 逐行比对 · 增减显形</span>
+            <p>比对两段经文的逐行差异，新增以绿显、删除以赤标，统计增减行数。</p>
+            <a href="diff-checker/" class="tool-btn">📊 施法 →</a>
+        </div>
+
+        <!-- 字数仙器 -->
+        <div class="tool-card">
+            <div class="card-icon">📊</div>
+            <h3>洞察·字数统计</h3>
+            <span class="tool-tag"># 实时统计 · 阅读时辰 · UTF-8</span>
+            <p>实时统计字符数、字节数（UTF-8）、单词数、中土文字数、行数、段落及阅读时辰。</p>
+            <a href="word-counter/" class="tool-btn">📈 施法 →</a>
+        </div>
+
         <!-- 占位仙器 -->
         <div class="tool-card placeholder">
             <div class="card-icon">✨</div>
             <h3>更多仙法</h3>
             <span class="tool-tag"># 即将点化</span>
-            <p>JSON 格式化、时间戳转换、颜色工具…… 贫道正在闭关修炼，敬请期待。</p>
+            <p>更多仙器炼制中…… 贫道正在闭关修炼，敬请期待。</p>
             <span class="tool-btn" style="background:#8ba0ae;">⏳ 炼丹中</span>
         </div>
     </div>

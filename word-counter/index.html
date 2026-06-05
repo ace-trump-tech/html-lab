@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>字数统计器 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; margin: 0;
+        }
+        .card {
+            max-width: 1000px; width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        textarea {
+            width: 100%; padding: 1rem; font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.9rem; border: 1px solid #cbd5e1; border-radius: 1.2rem;
+            background: white; resize: vertical; line-height: 1.6; margin-bottom: 1.5rem;
+        }
+        textarea:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px #0f172a20; }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;
+        }
+        .stat-card {
+            background: #f8fafc; border-radius: 1rem; padding: 1rem; text-align: center;
+            border: 1px solid #e2e8f0; transition: 0.15s;
+        }
+        .stat-card:hover { border-color: #cbd5e1; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: #0f172a; font-family: 'SF Mono', 'Cascadia Code', monospace; }
+        .stat-label { font-size: 0.8rem; color: #64748b; margin-top: 4px; }
+        .btn {
+            background: white; border: 1px solid #cbd5e1; padding: 10px 20px;
+            border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .btn-outline:hover { background: #f1f5f9; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px;
+            font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
+        }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>📊 字数 & 字节统计器 <span class="badge">实时统计</span></h1>
+        <p>统计文本的字符数、字节数、单词数、行数、段落数及预估阅读时间</p>
+    </div>
+    <div class="container">
+        <div class="toolbar">
+            <button class="btn btn-outline" id="clearBtn">🗑️ 清空</button>
+            <button class="btn btn-outline" id="pasteBtn">📋 粘贴</button>
+        </div>
+        <textarea id="inputText" rows="10" placeholder="输入或粘贴文本，下方将实时显示统计结果...&#10;例如：Hello World 你好世界 🌍"></textarea>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value" id="charCount">0</div><div class="stat-label">📝 字符数</div></div>
+            <div class="stat-card"><div class="stat-value" id="charNoSpace">0</div><div class="stat-label">📝 字符数（无空格）</div></div>
+            <div class="stat-card"><div class="stat-value" id="byteCount">0</div><div class="stat-label">💾 字节数 (UTF-8)</div></div>
+            <div class="stat-card"><div class="stat-value" id="wordCount">0</div><div class="stat-label">📖 单词数</div></div>
+            <div class="stat-card"><div class="stat-value" id="lineCount">0</div><div class="stat-label">📄 行数</div></div>
+            <div class="stat-card"><div class="stat-value" id="paraCount">0</div><div class="stat-label">📑 段落数</div></div>
+            <div class="stat-card"><div class="stat-value" id="cjkCount">0</div><div class="stat-label">🀄 中文字符数</div></div>
+            <div class="stat-card"><div class="stat-value" id="readTime">-</div><div class="stat-label">⏱️ 预估阅读时间</div></div>
+        </div>
+    </div>
+    <div class="footer">
+        🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">🧹 已清空</div>
+
+<script>
+(function() {
+    var inputTa = document.getElementById('inputText');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+
+    function showToast(msg) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.style.background = '#0f172a';
+        toast.style.opacity = '1';
+        toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1500);
+    }
+
+    function updateStats() {
+        var text = inputTa.value;
+        // Character count
+        document.getElementById('charCount').textContent = text.length.toLocaleString();
+        // Characters without spaces
+        document.getElementById('charNoSpace').textContent = text.replace(/\s/g, '').length.toLocaleString();
+        // Bytes (UTF-8)
+        var bytes = new TextEncoder().encode(text).length;
+        document.getElementById('byteCount').textContent = bytes.toLocaleString();
+        // Words (split by whitespace for Latin + count CJK chars individually as "words")
+        var trimmed = text.trim();
+        var wordCount = 0;
+        if (trimmed) {
+            // Count Latin/word sequences and CJK characters
+            var latinWords = trimmed.match(/[a-zA-Z0-9]+/g);
+            var cjkChars = trimmed.match(/[一-鿿㐀-䶿]/g);
+            wordCount = (latinWords ? latinWords.length : 0) + (cjkChars ? cjkChars.length : 0);
+            // Also count other non-space sequences like emoji, symbols
+            var other = trimmed.match(/[^\s\w一-鿿㐀-䶿]+/g);
+            if (other) wordCount += other.length;
+        }
+        document.getElementById('wordCount').textContent = wordCount.toLocaleString();
+        // Lines
+        document.getElementById('lineCount').textContent = (text ? text.split('\n').length : 0).toLocaleString();
+        // Paragraphs (separated by blank lines)
+        var paras = text.split(/\n\s*\n/).filter(function(p) { return p.trim(); });
+        document.getElementById('paraCount').textContent = paras.length.toLocaleString();
+        // CJK characters specifically
+        var cjk = text.match(/[一-鿿㐀-䶿　-〿＀-￯]/g);
+        document.getElementById('cjkCount').textContent = (cjk ? cjk.length : 0).toLocaleString();
+        // Reading time (avg 200 words/min for Latin, 400 chars/min for CJK)
+        var cjkCount = cjk ? cjk.length : 0;
+        var latinCount = text.replace(/\s/g, '').length - cjkCount;
+        var minutes = (latinCount / 5 / 200) + (cjkCount / 400);
+        if (minutes < 0.05) document.getElementById('readTime').textContent = '< 1 秒';
+        else if (minutes < 1) document.getElementById('readTime').textContent = Math.round(minutes * 60) + ' 秒';
+        else document.getElementById('readTime').textContent = minutes.toFixed(1) + ' 分钟';
+    }
+
+    inputTa.addEventListener('input', updateStats);
+
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        inputTa.value = '';
+        updateStats();
+        showToast('🧹 已清空');
+    });
+
+    document.getElementById('pasteBtn').addEventListener('click', function() {
+        navigator.clipboard.readText().then(function(text) {
+            inputTa.value = text;
+            updateStats();
+            showToast('📋 已粘贴剪贴板内容');
+        }).catch(function() {
+            showToast('⚠️ 无法读取剪贴板，请手动粘贴');
+        });
+    });
+
+    // Initial update
+    updateStats();
+})();
+</script>
+</body>
+</html>

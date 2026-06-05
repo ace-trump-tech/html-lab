@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>URL 编码解码器 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; margin: 0;
+        }
+        .card {
+            max-width: 1200px; width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; justify-content: center; }
+        .btn {
+            background: white; border: 1px solid #cbd5e1; padding: 10px 20px;
+            border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .btn-primary { background: #0f172a; border-color: #0f172a; color: white; }
+        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .row-2col { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 0.5rem; }
+        .col { flex: 1; min-width: 280px; }
+        .label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-weight: 600; color: #0f172a; }
+        textarea {
+            width: 100%; padding: 1rem; font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.9rem; border: 1px solid #cbd5e1; border-radius: 1.2rem;
+            background: white; resize: vertical; line-height: 1.5;
+        }
+        textarea:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px #0f172a20; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px;
+            font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
+        }
+        .mode-hint { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; }
+        .mode-hint strong { color: #0f172a; }
+        @media (max-width: 680px) {
+            .container { padding: 1.2rem; }
+            .btn { padding: 6px 14px; font-size: 0.8rem; }
+        }
+        .error-border { border-color: #f43f5e !important; background-color: #fff1f2 !important; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>🔗 URL 编码 / 解码器 <span class="badge">encodeURIComponent · 纯前端</span></h1>
+        <p>对 URL 参数进行编码与解码，支持中文及特殊字符，完全本地运行</p>
+    </div>
+    <div class="container">
+        <div class="toolbar">
+            <button class="btn btn-primary" id="encodeBtn">🔒 编码 (encodeURIComponent)</button>
+            <button class="btn btn-primary" id="decodeBtn">🔓 解码 (decodeURIComponent)</button>
+            <button class="btn btn-outline" id="encodeFullBtn">🌐 完整URL编码 (encodeURI)</button>
+            <button class="btn btn-outline" id="swapBtn">⇄ 交换内容</button>
+            <button class="btn btn-outline" id="clearBtn">🗑️ 清空</button>
+        </div>
+        <p class="mode-hint">
+            <strong>encodeURIComponent</strong> 编码所有特殊字符（适合 URL 参数值）；
+            <strong>encodeURI</strong> 保留 URL 结构字符（:///?&=），适合完整 URL。
+        </p>
+        <div class="row-2col">
+            <div class="col">
+                <div class="label">
+                    <span>📝 输入区域</span>
+                    <button class="btn" id="copyInputBtn" style="padding:4px 12px; font-size:0.75rem;">📋 复制输入</button>
+                </div>
+                <textarea id="inputText" rows="8" placeholder="输入要编码/解码的文本或 URL...&#10;例如：https://example.com?q=你好世界&lang=zh"></textarea>
+            </div>
+            <div class="col">
+                <div class="label">
+                    <span>✨ 输出结果</span>
+                    <button class="btn" id="copyOutputBtn" style="padding:4px 12px; font-size:0.75rem;">📋 复制输出</button>
+                </div>
+                <textarea id="outputText" rows="8" readonly placeholder="编码/解码后的结果会显示在这里..."></textarea>
+            </div>
+        </div>
+        <div style="font-size:0.85rem; background:#f8fafc; border-radius:1rem; padding:0.8rem 1rem; margin-top:1rem;">
+            💡 提示：Ctrl+Enter 快速编码，Ctrl+D 快速解码。常用场景：URL 参数中含有中文、空格或特殊符号时使用。
+        </div>
+    </div>
+    <div class="footer">
+        🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">✨ 已复制</div>
+
+<script>
+(function() {
+    var inputTa = document.getElementById('inputText');
+    var outputTa = document.getElementById('outputText');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+
+    function showToast(msg, isErr) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.style.background = isErr ? '#be123c' : '#0f172a';
+        toast.style.opacity = '1';
+        toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1800);
+    }
+
+    function setErrorBorder(el) { el.classList.add('error-border'); setTimeout(function() { el.classList.remove('error-border'); }, 1500); }
+
+    function doEncode() {
+        var val = inputTa.value;
+        if (!val) { outputTa.value = '⚠️ 输入为空'; setErrorBorder(outputTa); return; }
+        try {
+            outputTa.value = encodeURIComponent(val);
+            outputTa.classList.remove('error-border');
+        } catch (e) {
+            outputTa.value = '❌ 编码错误: ' + e.message;
+            setErrorBorder(outputTa);
+        }
+    }
+
+    function doDecode() {
+        var val = inputTa.value.trim();
+        if (!val) { outputTa.value = '⚠️ 输入为空'; setErrorBorder(outputTa); return; }
+        try {
+            outputTa.value = decodeURIComponent(val);
+            outputTa.classList.remove('error-border');
+        } catch (e) {
+            outputTa.value = '❌ 解码失败，请检查是否为合法的编码字符串\n' + e.message;
+            setErrorBorder(outputTa);
+        }
+    }
+
+    function doEncodeFull() {
+        var val = inputTa.value;
+        if (!val) { outputTa.value = '⚠️ 输入为空'; setErrorBorder(outputTa); return; }
+        try {
+            outputTa.value = encodeURI(val);
+            outputTa.classList.remove('error-border');
+        } catch (e) {
+            outputTa.value = '❌ 编码错误: ' + e.message;
+            setErrorBorder(outputTa);
+        }
+    }
+
+    function doSwap() {
+        var tmp = inputTa.value;
+        inputTa.value = outputTa.value;
+        outputTa.value = tmp;
+        showToast('🔄 已交换内容');
+    }
+
+    function doClear() {
+        inputTa.value = '';
+        outputTa.value = '';
+        showToast('🧹 已清空');
+    }
+
+    function copyText(text, label) {
+        if (!text) { showToast('⚠️ 没有可复制的' + label, true); return; }
+        navigator.clipboard.writeText(text).then(function() {
+            showToast('📋 ' + label + '已复制');
+        }).catch(function() {
+            var ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta);
+            ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+            showToast('📋 ' + label + '已复制 (fallback)');
+        });
+    }
+
+    document.getElementById('encodeBtn').addEventListener('click', doEncode);
+    document.getElementById('decodeBtn').addEventListener('click', doDecode);
+    document.getElementById('encodeFullBtn').addEventListener('click', doEncodeFull);
+    document.getElementById('swapBtn').addEventListener('click', doSwap);
+    document.getElementById('clearBtn').addEventListener('click', doClear);
+    document.getElementById('copyInputBtn').addEventListener('click', function() { copyText(inputTa.value, '输入内容'); });
+    document.getElementById('copyOutputBtn').addEventListener('click', function() { copyText(outputTa.value, '输出内容'); });
+    inputTa.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); doEncode(); }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); doDecode(); }
+    });
+})();
+</script>
+</body>
+</html>

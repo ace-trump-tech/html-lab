@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Markdown 预览器 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; margin: 0;
+        }
+        .card {
+            max-width: 1400px; width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 1.5rem; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+        .btn {
+            background: white; border: 1px solid #cbd5e1; padding: 8px 14px;
+            border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+        }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-primary { background: #0f172a; border-color: #0f172a; color: white; font-size: 0.85rem; }
+        .btn-primary:hover { background: #1e293b; }
+        .editor-preview {
+            display: flex; gap: 1rem; min-height: 500px;
+        }
+        .pane {
+            flex: 1; min-width: 0; display: flex; flex-direction: column;
+        }
+        .pane-header {
+            font-weight: 600; font-size: 0.85rem; color: #0f172a; margin-bottom: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        textarea {
+            flex: 1; padding: 1rem; font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 1rem;
+            background: white; resize: none; line-height: 1.6; tab-size: 2;
+        }
+        textarea:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px #0f172a20; }
+        .preview-pane {
+            flex: 1; min-width: 0; padding: 1rem; background: white;
+            border: 1px solid #e2e8f0; border-radius: 1rem; overflow-y: auto;
+            line-height: 1.7; color: #1a2c3e;
+        }
+        .preview-pane h1 { font-size: 1.6rem; margin: 0.8rem 0 0.4rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3rem; }
+        .preview-pane h2 { font-size: 1.3rem; margin: 0.7rem 0 0.3rem; }
+        .preview-pane h3 { font-size: 1.1rem; margin: 0.6rem 0 0.3rem; }
+        .preview-pane p { margin: 0.4rem 0; }
+        .preview-pane code {
+            background: #f1f5f9; padding: 2px 6px; border-radius: 4px;
+            font-family: 'SF Mono', monospace; font-size: 0.85rem;
+        }
+        .preview-pane pre {
+            background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.8rem;
+            overflow-x: auto; font-size: 0.85rem; line-height: 1.5;
+        }
+        .preview-pane pre code { background: none; color: inherit; padding: 0; }
+        .preview-pane blockquote {
+            border-left: 3px solid #94a3b8; padding-left: 1rem; color: #475569; margin: 0.5rem 0;
+        }
+        .preview-pane table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
+        .preview-pane th, .preview-pane td { border: 1px solid #e2e8f0; padding: 6px 12px; text-align: left; }
+        .preview-pane th { background: #f8fafc; font-weight: 600; }
+        .preview-pane img { max-width: 100%; }
+        .preview-pane ul, .preview-pane ol { padding-left: 1.5rem; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px;
+            font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
+        }
+        .example-select { font-size: 0.8rem; }
+        select {
+            padding: 4px 10px; border-radius: 20px; border: 1px solid #cbd5e1; font-size: 0.8rem;
+            background: white; cursor: pointer;
+        }
+        @media (max-width: 800px) {
+            .editor-preview { flex-direction: column; }
+            textarea { min-height: 250px; }
+            .preview-pane { min-height: 250px; }
+        }
+        @media (max-width: 680px) { .container { padding: 1rem; } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>📝 Markdown 在线预览 <span class="badge">编辑 · 实时预览</span></h1>
+        <p>左侧编写 Markdown，右侧实时渲染预览。支持导出 HTML，纯前端解析。</p>
+    </div>
+    <div class="container">
+        <div class="toolbar">
+            <button class="btn btn-outline" id="boldBtn"><strong>B</strong> 粗体</button>
+            <button class="btn btn-outline" id="italicBtn"><em>I</em> 斜体</button>
+            <button class="btn btn-outline" id="headingBtn"># 标题</button>
+            <button class="btn btn-outline" id="linkBtn">🔗 链接</button>
+            <button class="btn btn-outline" id="codeBtn">&lt;/&gt; 代码块</button>
+            <button class="btn btn-outline" id="listBtn">📋 列表</button>
+            <button class="btn btn-outline" id="tableBtn">📊 表格</button>
+            <button class="btn btn-primary" id="copyHtmlBtn">📋 复制 HTML</button>
+            <button class="btn btn-outline" id="clearBtn">🗑️ 清空</button>
+            <span style="margin-left:auto;" class="example-select">
+                📄 示例：
+                <select id="exampleSelect">
+                    <option value="">-- 选择 --</option>
+                    <option value="readme">README 示例</option>
+                    <option value="cheatsheet">语法参考</option>
+                </select>
+            </span>
+        </div>
+        <div class="editor-preview">
+            <div class="pane">
+                <div class="pane-header"><span>✏️ Markdown 编辑</span></div>
+                <textarea id="editor" placeholder="在此编写 Markdown..."># 欢迎使用 Markdown 预览器
+
+## 功能特性
+- **实时预览**：左边编辑，右边即时渲染
+- **纯前端**：基于 marked.js，数据不离开浏览器
+- **导出 HTML**：一键复制渲染结果
+
+## 代码示例
+```javascript
+function hello() {
+  console.log("Hello, Markdown!");
+}
+```
+
+> 这是一个引用块
+
+| 工具 | 状态 |
+|------|------|
+| Markdown 预览 | ✅ 已上线 |
+| JSON 格式化 | ✅ 已上线 |</textarea>
+            </div>
+            <div class="pane">
+                <div class="pane-header"><span>👁️ 实时预览</span></div>
+                <div class="preview-pane" id="previewPane"></div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">📋 已复制</div>
+
+<script>
+(function() {
+    var editor = document.getElementById('editor');
+    var previewPane = document.getElementById('previewPane');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+
+    function showToast(msg, isErr) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.style.background = isErr ? '#be123c' : '#0f172a';
+        toast.style.opacity = '1';
+        toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1800);
+    }
+
+    function updatePreview() {
+        var md = editor.value;
+        try {
+            previewPane.innerHTML = marked.parse(md);
+        } catch (e) {
+            previewPane.innerHTML = '<p style="color:#b91c1c;">渲染错误: ' + e.message + '</p>';
+        }
+    }
+
+    editor.addEventListener('input', updatePreview);
+
+    function insertAtCursor(before, after) {
+        var start = editor.selectionStart;
+        var end = editor.selectionEnd;
+        var text = editor.value;
+        var selected = text.substring(start, end);
+        var replacement = before + selected + (after || '');
+        editor.value = text.substring(0, start) + replacement + text.substring(end);
+        editor.focus();
+        var newPos = start + replacement.length;
+        if (selected) newPos = start + before.length + selected.length + (after ? after.length : 0);
+        editor.setSelectionRange(newPos, newPos);
+        updatePreview();
+    }
+
+    document.getElementById('boldBtn').addEventListener('click', function() { insertAtCursor('**', '**'); });
+    document.getElementById('italicBtn').addEventListener('click', function() { insertAtCursor('*', '*'); });
+    document.getElementById('headingBtn').addEventListener('click', function() {
+        var start = editor.selectionStart;
+        var lineStart = editor.value.lastIndexOf('\n', start - 1) + 1;
+        editor.setSelectionRange(lineStart, lineStart);
+        insertAtCursor('## ', '');
+    });
+    document.getElementById('linkBtn').addEventListener('click', function() { insertAtCursor('[', '](url)'); });
+    document.getElementById('codeBtn').addEventListener('click', function() { insertAtCursor('\n```\n', '\n```\n'); });
+    document.getElementById('listBtn').addEventListener('click', function() { insertAtCursor('- ', ''); });
+    document.getElementById('tableBtn').addEventListener('click', function() {
+        insertAtCursor('\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 值1 | 值2 | 值3 |\n', '');
+    });
+
+    document.getElementById('copyHtmlBtn').addEventListener('click', function() {
+        var html = previewPane.innerHTML;
+        if (!html) { showToast('⚠️ 没有可复制的内容', true); return; }
+        navigator.clipboard.writeText(html).then(function() {
+            showToast('📋 HTML 已复制到剪贴板');
+        }).catch(function() {
+            var ta = document.createElement('textarea');
+            ta.value = html; document.body.appendChild(ta);
+            ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+            showToast('📋 HTML 已复制 (fallback)');
+        });
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        editor.value = '';
+        previewPane.innerHTML = '';
+        showToast('🧹 已清空');
+    });
+
+    document.getElementById('exampleSelect').addEventListener('change', function() {
+        var val = this.value;
+        var examples = {
+            'readme': '# 我的项目\n\n## 简介\n\n这是一个示例项目。\n\n## 安装\n\n```bash\nnpm install\n```\n\n## 使用\n\n```javascript\nconst app = require("my-app");\napp.start();\n```\n\n## 许可证\n\nMIT',
+            'cheatsheet': '# Markdown 语法参考\n\n## 标题\n# H1\n## H2\n### H3\n\n## 文本样式\n**粗体** *斜体* ~~删除线~~ `行内代码`\n\n## 链接与图片\n[链接文字](https://example.com)\n\n## 列表\n- 无序项 1\n- 无序项 2\n\n1. 有序项 1\n2. 有序项 2\n\n## 引用\n> 这是一段引用\n\n## 代码块\n```python\nprint("hello")\n```\n\n## 表格\n| 名称 | 值 |\n|------|----|\n| A   | 1  |\n| B   | 2  |\n\n## 分隔线\n---'
+        };
+        if (val && examples[val]) {
+            editor.value = examples[val];
+            updatePreview();
+            this.value = '';
+        }
+    });
+
+    // Initial render
+    updatePreview();
+})();
+</script>
+</body>
+</html>

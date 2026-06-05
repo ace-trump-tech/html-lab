@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>文本差异对比 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; margin: 0;
+        }
+        .card {
+            max-width: 1400px; width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        .diff-inputs {
+            display: flex; gap: 1rem; margin-bottom: 1rem;
+        }
+        .diff-col { flex: 1; min-width: 0; }
+        .diff-col label { display: block; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+        textarea {
+            width: 100%; padding: 1rem; font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 1rem;
+            background: white; resize: vertical; line-height: 1.5; tab-size: 2;
+        }
+        textarea:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px #0f172a20; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem; justify-content: center; }
+        .btn {
+            background: white; border: 1px solid #cbd5e1; padding: 10px 20px;
+            border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .btn-primary { background: #0f172a; border-color: #0f172a; color: white; }
+        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .diff-output {
+            background: white; border: 1px solid #e2e8f0; border-radius: 1rem; overflow: hidden;
+        }
+        .diff-header {
+            background: #f8fafc; padding: 0.6rem 1rem; font-weight: 600;
+            font-size: 0.85rem; color: #0f172a; border-bottom: 1px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .diff-lines {
+            max-height: 500px; overflow-y: auto; font-family: 'SF Mono', 'Cascadia Code', monospace;
+            font-size: 0.85rem; line-height: 1.6;
+        }
+        .diff-row { display: flex; padding: 1px 0; }
+        .diff-row.add { background: #dcfce7; }
+        .diff-row.del { background: #fee2e2; }
+        .diff-row.ctx { background: white; }
+        .diff-row .ln {
+            min-width: 40px; text-align: right; padding: 0 8px; color: #94a3b8;
+            user-select: none; font-size: 0.75rem; flex-shrink: 0;
+        }
+        .diff-row .sign { min-width: 20px; text-align: center; font-weight: 700; flex-shrink: 0; }
+        .diff-row.add .sign { color: #15803d; }
+        .diff-row.del .sign { color: #b91c1c; }
+        .diff-row .content {
+            flex: 1; white-space: pre-wrap; word-break: break-all; padding-right: 8px;
+        }
+        .diff-row.add .content { color: #14532d; }
+        .diff-row.del .content { color: #991b1b; }
+        .diff-row.ctx .content { color: #475569; }
+        .stats-row { display: flex; gap: 16px; font-size: 0.85rem; color: #64748b; align-items: center; }
+        .stats-add { color: #15803d; font-weight: 600; }
+        .stats-del { color: #b91c1c; font-weight: 600; }
+        .no-diff { text-align: center; padding: 2rem; color: #94a3b8; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px;
+            font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
+        }
+        @media (max-width: 800px) {
+            .diff-inputs { flex-direction: column; }
+        }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>🔍 文本差异对比 <span class="badge">Diff · 逐行比较</span></h1>
+        <p>比较两段文本的差异，高亮显示新增、删除和修改的行</p>
+    </div>
+    <div class="container">
+        <div class="diff-inputs">
+            <div class="diff-col">
+                <label>📄 原始文本</label>
+                <textarea id="oldText" rows="8" placeholder="粘贴原始文本...">Hello World
+This is a test file.
+Line 3 - unchanged
+Line 4 - old version
+Line 5 - same
+Line 6 - will be removed</textarea>
+            </div>
+            <div class="diff-col">
+                <label>📝 修改后文本</label>
+                <textarea id="newText" rows="8" placeholder="粘贴修改后文本...">Hello World
+This is a test file.
+Line 3 - unchanged
+Line 4 - new version updated
+Line 5 - same
+Line 7 - newly added</textarea>
+            </div>
+        </div>
+        <div class="toolbar">
+            <button class="btn btn-primary" id="compareBtn">🔍 比较差异</button>
+            <button class="btn btn-outline" id="swapBtn">⇄ 交换文本</button>
+            <button class="btn btn-outline" id="clearBtn">🗑️ 清空</button>
+        </div>
+        <div class="diff-output" id="diffOutput">
+            <div class="diff-header">📊 差异结果 <span style="font-weight:400;font-size:0.8rem;color:#64748b;">点击上方按钮开始比较</span></div>
+            <div class="diff-lines" id="diffLines"><div class="no-diff">等待比较...</div></div>
+        </div>
+    </div>
+    <div class="footer">
+        🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">✅ 比较完成</div>
+
+<script>
+(function() {
+    var oldText = document.getElementById('oldText');
+    var newText = document.getElementById('newText');
+    var diffLines = document.getElementById('diffLines');
+    var diffHeader = document.querySelector('.diff-header');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+
+    function showToast(msg, isErr) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.style.background = isErr ? '#be123c' : '#0f172a';
+        toast.style.opacity = '1';
+        toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1800);
+    }
+
+    // Simple LCS-based diff for lines
+    function computeDiff(oldLines, newLines) {
+        var m = oldLines.length, n = newLines.length;
+        var dp = [];
+        for (var i = 0; i <= m; i++) { dp[i] = []; for (var j = 0; j <= n; j++) dp[i][j] = 0; }
+        for (var i = 1; i <= m; i++) {
+            for (var j = 1; j <= n; j++) {
+                if (oldLines[i-1] === newLines[j-1]) dp[i][j] = dp[i-1][j-1] + 1;
+                else dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        // Backtrack
+        var result = [];
+        var i = m, j = n;
+        while (i > 0 || j > 0) {
+            if (i > 0 && j > 0 && oldLines[i-1] === newLines[j-1]) {
+                result.unshift({ type: 'ctx', oldIdx: i-1, newIdx: j-1, text: oldLines[i-1] });
+                i--; j--;
+            } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+                result.unshift({ type: 'add', oldIdx: null, newIdx: j-1, text: newLines[j-1] });
+                j--;
+            } else {
+                result.unshift({ type: 'del', oldIdx: i-1, newIdx: null, text: oldLines[i-1] });
+                i--;
+            }
+        }
+        return result;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function doCompare() {
+        var oldLines = oldText.value.split('\n');
+        var newLines = newText.value.split('\n');
+
+        if (!oldText.value.trim() && !newText.value.trim()) {
+            diffLines.innerHTML = '<div class="no-diff">请输入文本后再比较</div>';
+            diffHeader.innerHTML = '📊 差异结果 <span style="font-weight:400;font-size:0.8rem;color:#64748b;">输入为空</span>';
+            return;
+        }
+
+        var diffs = computeDiff(oldLines, newLines);
+        var addCount = 0, delCount = 0;
+        var html = '';
+        diffs.forEach(function(d, idx) {
+            var rowClass = d.type === 'add' ? 'add' : d.type === 'del' ? 'del' : 'ctx';
+            var sign = d.type === 'add' ? '+' : d.type === 'del' ? '-' : ' ';
+            var oldLn = d.oldIdx !== null ? (d.oldIdx + 1) : '';
+            var newLn = d.newIdx !== null ? (d.newIdx + 1) : '';
+            if (d.type === 'add') addCount++;
+            if (d.type === 'del') delCount++;
+            html += '<div class="diff-row ' + rowClass + '">';
+            html += '<span class="ln">' + oldLn + '</span>';
+            html += '<span class="ln">' + newLn + '</span>';
+            html += '<span class="sign">' + sign + '</span>';
+            html += '<span class="content">' + escapeHtml(d.text) + '</span>';
+            html += '</div>';
+        });
+
+        diffLines.innerHTML = html;
+        diffHeader.innerHTML = '📊 差异结果 <span class="stats-row">' +
+            (addCount > 0 ? '<span class="stats-add">+' + addCount + ' 新增</span>' : '') +
+            (delCount > 0 ? '<span class="stats-del">-' + delCount + ' 删除</span>' : '') +
+            (addCount === 0 && delCount === 0 ? '<span style="color:#64748b;">文本完全相同</span>' : '') +
+            '</span>';
+        showToast('✅ 比较完成');
+    }
+
+    document.getElementById('compareBtn').addEventListener('click', doCompare);
+    document.getElementById('swapBtn').addEventListener('click', function() {
+        var tmp = oldText.value;
+        oldText.value = newText.value;
+        newText.value = tmp;
+        showToast('🔄 已交换文本');
+    });
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        oldText.value = '';
+        newText.value = '';
+        diffLines.innerHTML = '<div class="no-diff">已清空，等待比较...</div>';
+        diffHeader.innerHTML = '📊 差异结果 <span style="font-weight:400;font-size:0.8rem;color:#64748b;">已清空</span>';
+        showToast('🧹 已清空');
+    });
+
+    // Initial compare
+    doCompare();
+})();
+</script>
+</body>
+</html>

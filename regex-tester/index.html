@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>正则表达式测试器 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; margin: 0;
+        }
+        .card {
+            max-width: 1100px; width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        .input-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1rem; }
+        .input-row .field { flex: 1; min-width: 200px; }
+        label { display: block; font-weight: 600; color: #0f172a; margin-bottom: 4px; font-size: 0.85rem; }
+        input, textarea {
+            width: 100%; padding: 0.7rem 0.9rem; font-family: 'SF Mono', 'Cascadia Code', monospace;
+            font-size: 0.9rem; border: 1px solid #cbd5e1; border-radius: 0.8rem; background: white;
+        }
+        input:focus, textarea:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px #0f172a20; }
+        .regex-input { font-size: 1rem; letter-spacing: 0.02em; }
+        .flags-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+        .flag-item { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; color: #475569; cursor: pointer; user-select: none; }
+        .flag-item input[type="checkbox"] { width: auto; accent-color: #0f172a; }
+        textarea {
+            resize: vertical; line-height: 1.5; margin-bottom: 1rem;
+        }
+        .match-area {
+            background: #f8fafc; border-radius: 1rem; padding: 1rem; min-height: 80px;
+            border: 1px solid #e2e8f0; font-family: 'SF Mono', monospace; font-size: 0.9rem;
+            line-height: 1.8; white-space: pre-wrap; word-break: break-all;
+        }
+        .match-area .hl { background: #fef08a; border-radius: 2px; padding: 1px 0; }
+        .match-area .hl-group { background: #bbf7d0; border-radius: 2px; padding: 1px 0; }
+        .match-list { margin-top: 1rem; }
+        .match-list h3 { font-size: 1rem; color: #0f172a; margin-bottom: 8px; }
+        .match-item {
+            background: white; border: 1px solid #e2e8f0; border-radius: 0.8rem; padding: 0.6rem 1rem;
+            margin-bottom: 6px; font-family: 'SF Mono', monospace; font-size: 0.85rem;
+        }
+        .match-item .idx { color: #64748b; font-size: 0.75rem; }
+        .match-item .val { color: #0f172a; }
+        .no-match { color: #94a3b8; font-style: italic; }
+        .error-text { color: #b91c1c; font-size: 0.85rem; }
+        .btn {
+            background: white; border: 1px solid #cbd5e1; padding: 8px 16px;
+            border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+        }
+        .btn-outline:hover { background: #f1f5f9; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px;
+            font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
+        }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>🔍 正则表达式测试器 <span class="badge">Real-time · 高亮匹配</span></h1>
+        <p>输入正则表达式和测试文本，实时显示匹配结果及高亮</p>
+    </div>
+    <div class="container">
+        <div class="input-row">
+            <div class="field" style="flex:3;">
+                <label>📝 正则表达式 /<span id="flagsPreview">g</span></label>
+                <input type="text" id="regexInput" class="regex-input" placeholder="输入正则，如 \d{4}-\d{2}-\d{2}" value="\\d{4}-\\d{2}-\\d{2}">
+            </div>
+        </div>
+        <div class="flags-row">
+            <span style="font-size:0.85rem;color:#475569;font-weight:600;">Flags:</span>
+            <label class="flag-item"><input type="checkbox" id="flagG" checked> g (全局)</label>
+            <label class="flag-item"><input type="checkbox" id="flagI"> i (忽略大小写)</label>
+            <label class="flag-item"><input type="checkbox" id="flagM"> m (多行)</label>
+            <label class="flag-item"><input type="checkbox" id="flagS"> s (点匹配换行)</label>
+            <label class="flag-item"><input type="checkbox" id="flagU"> u (Unicode)</label>
+        </div>
+        <p id="regexError" class="error-text"></p>
+        <label>🧪 测试文本</label>
+        <textarea id="testText" rows="6" placeholder="输入要测试的文本...">2024-01-15 会议记录
+2024-12-31 年终总结
+日期：2023-06-01</textarea>
+        <label style="margin-top:0.5rem;">✨ 高亮结果</label>
+        <div class="match-area" id="highlightArea"></div>
+        <div class="match-list" id="matchList"></div>
+        <div style="font-size:0.85rem; background:#f8fafc; border-radius:1rem; padding:0.8rem 1rem; margin-top:1rem;">
+            💡 提示：常用正则 — 邮箱 <code>/[\w.-]+@[\w.-]+\.\w+/</code>、手机号 <code>/1[3-9]\d{9}/</code>、URL <code>/https?:\/\/[\w./-]+/</code>
+        </div>
+    </div>
+    <div class="footer">
+        🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">📋 已复制</div>
+
+<script>
+(function() {
+    var regexInput = document.getElementById('regexInput');
+    var testText = document.getElementById('testText');
+    var highlightArea = document.getElementById('highlightArea');
+    var matchList = document.getElementById('matchList');
+    var regexError = document.getElementById('regexError');
+    var flagsPreview = document.getElementById('flagsPreview');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+
+    function showToast(msg) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.style.background = '#0f172a';
+        toast.style.opacity = '1';
+        toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1500);
+    }
+
+    function getFlags() {
+        var flags = '';
+        if (document.getElementById('flagG').checked) flags += 'g';
+        if (document.getElementById('flagI').checked) flags += 'i';
+        if (document.getElementById('flagM').checked) flags += 'm';
+        if (document.getElementById('flagS').checked) flags += 's';
+        if (document.getElementById('flagU').checked) flags += 'u';
+        flagsPreview.textContent = flags || '(none)';
+        return flags;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function update() {
+        var pattern = regexInput.value;
+        var text = testText.value;
+        var flags = getFlags();
+        regexError.textContent = '';
+
+        if (!pattern) {
+            highlightArea.innerHTML = '<span style="color:#94a3b8;">等待输入正则表达式...</span>';
+            matchList.innerHTML = '';
+            return;
+        }
+
+        var regex;
+        try {
+            regex = new RegExp(pattern, flags);
+        } catch (e) {
+            regexError.textContent = '❌ 正则表达式错误: ' + e.message;
+            highlightArea.innerHTML = '<span style="color:#94a3b8;">正则表达式无效</span>';
+            matchList.innerHTML = '';
+            return;
+        }
+
+        // Highlight matches
+        var result = '';
+        var lastIdx = 0;
+        var matchCount = 0;
+        var matches = [];
+        var m;
+        if (flags.indexOf('g') !== -1) {
+            while ((m = regex.exec(text)) !== null) {
+                matches.push({ index: m.index, value: m[0], groups: m.slice(1) });
+                matchCount++;
+                if (m[0].length === 0) { regex.lastIndex++; if (regex.lastIndex > text.length) break; }
+                lastIdx = m.index + m[0].length;
+            }
+        } else {
+            m = text.match(regex);
+            if (m) {
+                matches.push({ index: m.index, value: m[0], groups: m.slice(1) });
+                matchCount = 1;
+            }
+        }
+
+        if (matches.length === 0) {
+            highlightArea.innerHTML = escapeHtml(text) || '<span style="color:#94a3b8;">无匹配结果</span>';
+            matchList.innerHTML = '<p class="no-match">未找到匹配项</p>';
+            return;
+        }
+
+        // Build highlighted HTML
+        var html = '';
+        var pos = 0;
+        matches.forEach(function(match) {
+            html += escapeHtml(text.substring(pos, match.index));
+            html += '<span class="hl">' + escapeHtml(match.value) + '</span>';
+            pos = match.index + match.value.length;
+        });
+        html += escapeHtml(text.substring(pos));
+        highlightArea.innerHTML = html || '&nbsp;';
+
+        // Match list
+        var listHtml = '<h3>📋 匹配结果（共 ' + matchCount + ' 项）</h3>';
+        matches.forEach(function(match, i) {
+            listHtml += '<div class="match-item"><span class="idx">[' + i + '] pos=' + match.index + '</span><br><span class="val">' + escapeHtml(match.value) + '</span>';
+            if (match.groups && match.groups.length > 0) {
+                match.groups.forEach(function(g, gi) {
+                    if (g !== undefined) {
+                        listHtml += '<br><span class="idx">  组 ' + (gi + 1) + ':</span> <span style="color:#15803d;">' + escapeHtml(g) + '</span>';
+                    }
+                });
+            }
+            listHtml += '</div>';
+        });
+        matchList.innerHTML = listHtml;
+    }
+
+    regexInput.addEventListener('input', update);
+    testText.addEventListener('input', update);
+    document.querySelectorAll('.flag-item input[type="checkbox"]').forEach(function(cb) {
+        cb.addEventListener('change', update);
+    });
+
+    // Initial update
+    update();
+})();
+</script>
+</body>
+</html>
