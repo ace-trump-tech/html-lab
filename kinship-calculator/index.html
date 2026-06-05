@@ -3,101 +3,279 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>亲戚称呼计算器 | 在线工具</title>
-    <style>*{box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif}body{background:linear-gradient(145deg,#f5f7fc,#e9eef5);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0}.card{max-width:700px;width:100%;background:rgba(255,255,255,.92);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,.2);overflow:hidden}.header{background:#0f172a;padding:1.2rem 2rem;color:#fff}.header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px}.badge{background:#2dd4bf20;border-radius:40px;padding:.2rem .8rem;font-size:.8rem;border:1px solid #2dd4bf50}.container{padding:2rem}.select-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:1rem;align-items:flex-end}.select-row label{font-size:.8rem;color:#64748b;font-weight:600;display:block}.select-row select{padding:8px 12px;border:1px solid #cbd5e1;border-radius:.6rem;font-size:.9rem;background:#fff;min-width:120px}.result-box{background:#1e293b;border-radius:1rem;padding:1.5rem;text-align:center}.result-box .call{font-size:2.5rem;color:#2dd4bf;font-weight:700}.result-box .explain{font-size:.9rem;color:#94a3b8;margin-top:8px}.path-display{font-size:.85rem;color:#64748b;margin-top:4px}.table-wrap{max-height:200px;overflow-y:auto;margin-top:1rem;background:#f8fafc;border-radius:1rem;padding:.8rem;border:1px solid #e2e8f0;font-size:.8rem}.table-wrap table{width:100%;border-collapse:collapse}.table-wrap td{padding:3px 8px;border-bottom:1px solid #e2e8f0}.table-wrap td:first-child{font-weight:600;color:#0f172a}.footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:.8rem;color:#475569;border-top:1px solid #e2e8f0}.footer a{color:#15607a;text-decoration:none}</style>
+    <style>
+        *{box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif}
+        body{background:linear-gradient(145deg,#f5f7fc,#e9eef5);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0}
+        .card{max-width:650px;width:100%;background:rgba(255,255,255,.92);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,.2);overflow:hidden}
+        .header{background:#0f172a;padding:1.2rem 2rem;color:#fff}
+        .header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px}
+        .badge{background:#2dd4bf20;border-radius:40px;padding:.2rem .8rem;font-size:.8rem;border:1px solid #2dd4bf50}
+        .container{padding:2rem}
+        .chain-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-bottom:1.5rem;font-size:1rem}
+        .chain-row span{color:#64748b;font-weight:600}
+        .chain-row select{padding:8px 12px;border:1px solid #cbd5e1;border-radius:.8rem;font-size:.95rem;background:#fff;cursor:pointer;min-width:90px;font-weight:500}
+        .chain-row select:focus{outline:none;border-color:#0f172a;box-shadow:0 0 0 2px #0f172a20}
+        .gender-toggle{display:flex;gap:10px;margin-bottom:1.2rem}
+        .gender-btn{padding:8px 24px;border-radius:60px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:.9rem;font-weight:500;transition:0.15s}
+        .gender-btn.active{background:#0f172a;color:#fff;border-color:#0f172a}
+        .result-box{background:#1e293b;border-radius:1.2rem;padding:1.5rem;text-align:center}
+        .result-box .label{color:#94a3b8;font-size:.85rem;margin-bottom:4px}
+        .result-box .call{font-size:2.5rem;color:#2dd4bf;font-weight:700}
+        .result-box .explain{color:#94a3b8;font-size:.85rem;margin-top:6px}
+        .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.2rem;justify-content:center}
+        .tag-btn{padding:4px 14px;border-radius:20px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:.8rem;transition:0.15s}
+        .tag-btn:hover{background:#f1f5f9}
+        .tag-btn.active-tag{background:#0f172a;color:#fff;border-color:#0f172a}
+        .footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:.8rem;color:#475569;border-top:1px solid #e2e8f0}
+        .footer a{color:#15607a;text-decoration:none}
+        @media(max-width:500px){.chain-row{font-size:.9rem}.chain-row select{min-width:70px;padding:6px 8px;font-size:.85rem}}
+    </style>
 </head>
 <body>
 <div class="card">
-    <div class="header"><h1>👨‍👩‍👧‍👦 亲戚称呼计算器 <span class="badge">中国式亲戚</span></h1><p style="margin:2px 0 0;font-size:.8rem;opacity:.8">选择关系路径，计算你应该如何称呼对方</p></div>
+    <div class="header"><h1>👨‍👩‍👧‍👦 亲戚称呼计算器 <span class="badge">链式推算</span></h1><p style="margin:2px 0 0;font-size:.8rem;opacity:.8">从"我"出发，一步步选择关系链，自动算出最终称呼</p></div>
     <div class="container">
-        <div class="select-row">
-            <div><label>我的性别</label><select id="myGender"><option value="male">男</option><option value="female">女</option></select></div>
-            <div><label>对方关系</label><select id="relation" onchange="calc()">
-                <option value="">-- 选择 --</option>
-                <optgroup label="父系">
-                    <option value="father">父亲</option><option value="mother">母亲</option>
-                    <option value="ffather">爷爷 (父亲的父亲)</option><option value="fmother">奶奶 (父亲的母亲)</option>
-                    <option value="fbrother_older">哥哥 (父亲的儿子, 比自己大)</option><option value="fbrother_younger">弟弟 (父亲的儿子, 比自己小)</option>
-                    <option value="fsister_older">姐姐 (父亲的女儿, 比自己大)</option><option value="fsister_younger">妹妹 (父亲的女儿, 比自己小)</option>
-                    <option value="funcle_father_older">伯父 (父亲的哥哥)</option><option value="funcle_father_younger">叔叔 (父亲的弟弟)</option>
-                    <option value="faunt_father">姑姑 (父亲的姐妹)</option>
-                    <option value="fscousin_male_older">堂兄 (伯父/叔叔的儿子, 比自己大)</option>
-                    <option value="fscousin_female_older">堂姐 (伯父/叔叔的女儿, 比自己大)</option>
-                    <option value="fscousin_sister">堂妹</option>
-                </optgroup>
-                <optgroup label="母系">
-                    <option value="mfather">外公 (母亲的父亲)</option><option value="mmother">外婆 (母亲的母亲)</option>
-                    <option value="muncle_father">舅舅 (母亲的兄弟)</option><option value="maunt_father">姨妈/阿姨 (母亲的姐妹)</option>
-                    <option value="mcousin_male_older">表哥 (舅舅/姨妈的儿子, 比自己大)</option><option value="mcousin_female_older">表姐 (舅舅/姨妈的女儿, 比自己大)</option>
-                </optgroup>
-                <optgroup label="姻亲">
-                    <option value="husband">丈夫</option><option value="wife">妻子</option>
-                    <option value="father_in_law">岳父/公公</option><option value="mother_in_law">岳母/婆婆</option>
-                    <option value="son">儿子</option><option value="daughter">女儿</option>
-                    <option value="nephew">侄子 (兄弟的儿子)</option><option value="niece">侄女 (兄弟的女儿)</option>
-                </optgroup>
-            </select></div>
+        <div class="gender-toggle">
+            <span style="line-height:2.4;font-weight:600;color:#0f172a;margin-right:8px;">我的性别：</span>
+            <button class="gender-btn active" data-g="male">👨 男</button>
+            <button class="gender-btn" data-g="female">👩 女</button>
+        </div>
+        <div class="chain-row" id="chainRow">
+            <span>我的</span>
+            <select class="chain-sel"><option value="">--</option></select>
+        </div>
+        <div class="btn-row" style="margin-bottom:1.5rem;">
+            <button class="tag-btn" id="resetBtn">🔄 重新开始</button>
+            <button class="tag-btn" id="removeLastBtn">↩ 撤销一步</button>
         </div>
         <div class="result-box">
+            <div class="label">🫂 你该叫对方</div>
             <div class="call" id="callResult">-</div>
-            <div class="explain" id="explainResult">请选择关系</div>
-        </div>
-        <div class="table-wrap">
-            <table>
-                <tr><td>父亲</td><td>爸爸/父亲</td><td>母亲</td><td>妈妈/母亲</td></tr>
-                <tr><td>爷爷</td><td>爷爷</td><td>奶奶</td><td>奶奶</td></tr>
-                <tr><td>外公</td><td>外公/姥爷</td><td>外婆</td><td>外婆/姥姥</td></tr>
-                <tr><td>哥哥</td><td>哥哥</td><td>姐姐</td><td>姐姐</td></tr>
-                <tr><td>弟弟</td><td>弟弟</td><td>妹妹</td><td>妹妹</td></tr>
-                <tr><td>伯父</td><td>伯伯/大爷</td><td>叔叔</td><td>叔叔</td></tr>
-                <tr><td>姑姑</td><td>姑姑/姑妈</td><td>舅舅</td><td>舅舅</td></tr>
-                <tr><td>姨妈</td><td>姨妈/阿姨</td><td>堂兄</td><td>堂哥</td></tr>
-                <tr><td>表哥</td><td>表哥</td><td>侄子</td><td>侄子/外甥</td></tr>
-                <tr><td>丈夫</td><td>老公/先生</td><td>妻子</td><td>老婆/太太</td></tr>
-                <tr><td>岳父</td><td>岳父/爸爸</td><td>岳母</td><td>岳母/妈妈</td></tr>
-            </table>
+            <div class="explain" id="explainResult">请选择关系链</div>
         </div>
     </div>
-    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a> &nbsp;| <a href="../"><strong>← 返回首页</strong></a></div>
 </div>
 <script>
-function calc(){
-    var myGender=document.getElementById('myGender').value;
-    var rel=document.getElementById('relation').value;
-    var calls={
-        father:{call:'爸爸 / 父亲',explain:'生养你的男性直系长辈'},
-        mother:{call:'妈妈 / 母亲',explain:'生养你的女性直系长辈'},
-        ffather:{call:'爷爷',explain:'父亲的父亲'},
-        fmother:{call:'奶奶',explain:'父亲的母亲'},
-        mfather:{call:'外公 / 姥爷',explain:'母亲的父亲'},
-        mmother:{call:'外婆 / 姥姥',explain:'母亲的母亲'},
-        fbrother_older:{call:'哥哥',explain:'同父母的兄长'},
-        fbrother_younger:{call:'弟弟',explain:'同父母的弟弟'},
-        fsister_older:{call:'姐姐',explain:'同父母的姐姐'},
-        fsister_younger:{call:'妹妹',explain:'同父母的妹妹'},
-        funcle_father_older:{call:'伯父 / 伯伯',explain:'父亲的哥哥'},
-        funcle_father_younger:{call:'叔叔',explain:'父亲的弟弟'},
-        faunt_father:{call:'姑姑 / 姑妈',explain:'父亲的姐妹'},
-        muncle_father:{call:'舅舅',explain:'母亲的兄弟'},
-        maunt_father:{call:'姨妈 / 阿姨',explain:'母亲的姐妹'},
-        mcousin_male_older:{call:myGender==='male'?'表哥':'表哥',explain:'舅舅/姨妈的儿子, 比自己大'},
-        mcousin_female_older:{call:'表姐',explain:'舅舅/姨妈的女儿, 比自己大'},
-        fscousin_male_older:{call:myGender==='male'?'堂哥':'堂哥',explain:'伯父/叔叔的儿子, 比自己大'},
-        fscousin_female_older:{call:'堂姐',explain:'伯父/叔叔的女儿, 比自己大'},
-        fscousin_sister:{call:'堂妹',explain:'伯父/叔叔的女儿, 比自己小'},
-        husband:{call:'老公 / 先生',explain:'你的丈夫'},
-        wife:{call:'老婆 / 太太',explain:'你的妻子'},
-        father_in_law:{call:myGender==='male'?'岳父 / 爸爸':'公公 / 爸爸',explain:myGender==='male'?'妻子的父亲':'丈夫的父亲'},
-        mother_in_law:{call:myGender==='male'?'岳母 / 妈妈':'婆婆 / 妈妈',explain:myGender==='male'?'妻子的母亲':'丈夫的母亲'},
-        son:{call:'儿子',explain:'你的男性孩子'},
-        daughter:{call:'女儿',explain:'你的女性孩子'},
-        nephew:{call:myGender==='male'?'侄子':'外甥',explain:myGender==='male'?'兄弟的儿子':'兄弟的儿子 / 姐妹的儿子'},
-        niece:{call:myGender==='male'?'侄女':'外甥女',explain:myGender==='male'?'兄弟的女儿':'兄弟的女儿 / 姐妹的女儿'}
-    };
-    if(!rel){document.getElementById('callResult').textContent='-';document.getElementById('explainResult').textContent='请选择关系';return;}
-    var r=calls[rel]||{call:'未知',explain:'暂无该关系的称呼数据'};
-    document.getElementById('callResult').textContent=r.call;
-    document.getElementById('explainResult').textContent=r.explain;
-}
+(function(){
+    var myGender='male';
+    var chain=[]; // array of relation keys
+
+    // Relations you can select from a given person
+    var relOptions=[
+        {k:'father',v:'爸爸'},{k:'mother',v:'妈妈'},
+        {k:'older_brother',v:'哥哥'},{k:'younger_brother',v:'弟弟'},
+        {k:'older_sister',v:'姐姐'},{k:'younger_sister',v:'妹妹'},
+        {k:'husband',v:'丈夫'},{k:'wife',v:'妻子'},
+        {k:'son',v:'儿子'},{k:'daughter',v:'女儿'}
+    ];
+
+    // Process a single relation step: given a person's info and a relation, return the target person's info
+    // info: {gender:'male'|'female', relationPath:[]} - relationPath describes how this person relates to ME
+    function step(info, relKey){
+        var g=info.gender;
+        var rp=info.relationPath;
+        switch(relKey){
+            case 'father':   return {gender:'male',   relationPath:rp.concat(['father'])};
+            case 'mother':   return {gender:'female', relationPath:rp.concat(['mother'])};
+            case 'husband':  return {gender:'male',   relationPath:rp.concat(['husband'])};
+            case 'wife':     return {gender:'female', relationPath:rp.concat(['wife'])};
+            case 'son':      return {gender:'male',   relationPath:rp.concat(['son'])};
+            case 'daughter': return {gender:'female', relationPath:rp.concat(['daughter'])};
+            case 'older_brother':
+            case 'younger_brother':
+                return {gender:'male', relationPath:rp.concat([relKey])};
+            case 'older_sister':
+            case 'younger_sister':
+                return {gender:'female', relationPath:rp.concat([relKey])};
+        }
+        return info;
+    }
+
+    // Determine what to call the final person based on accumulated path
+    function resolveCall(finalGender, pathStr){
+        // pathStr is a string like "husband_mother_younger_brother_daughter"
+        // We'll match against known patterns
+
+        var patterns=[
+            // Direct
+            {p:'father',c:'爸爸 / 父亲',e:'父亲'},
+            {p:'mother',c:'妈妈 / 母亲',e:'母亲'},
+            {p:'husband',c:myGender==='female'?'老公 / 先生':'（同性不能有丈夫）',e:'丈夫'},
+            {p:'wife',c:myGender==='male'?'老婆 / 太太':'（同性不能有妻子）',e:'妻子'},
+            {p:'older_brother',c:'哥哥',e:'同父母的兄长'},
+            {p:'younger_brother',c:'弟弟',e:'同父母的弟弟'},
+            {p:'older_sister',c:'姐姐',e:'同父母的姐姐'},
+            {p:'younger_sister',c:'妹妹',e:'同父母的妹妹'},
+            {p:'son',c:'儿子',e:'你的孩子'},
+            {p:'daughter',c:'女儿',e:'你的孩子'},
+
+            // Grandparents
+            {p:'father_father',c:'爷爷',e:'父亲的父亲'},
+            {p:'father_mother',c:'奶奶',e:'父亲的母亲'},
+            {p:'mother_father',c:'外公 / 姥爷',e:'母亲的父亲'},
+            {p:'mother_mother',c:'外婆 / 姥姥',e:'母亲的母亲'},
+
+            // Parents' siblings
+            {p:'father_older_brother',c:'伯父 / 伯伯',e:'父亲的哥哥'},
+            {p:'father_younger_brother',c:'叔叔',e:'父亲的弟弟'},
+            {p:'father_older_sister',c:'姑姑',e:'父亲的姐姐'},
+            {p:'father_younger_sister',c:'姑姑',e:'父亲的妹妹'},
+            {p:'mother_older_brother',c:'大舅',e:'母亲的哥哥'},
+            {p:'mother_younger_brother',c:'舅舅',e:'母亲的弟弟'},
+            {p:'mother_older_sister',c:'大姨',e:'母亲的姐姐'},
+            {p:'mother_younger_sister',c:'小姨',e:'母亲的妹妹'},
+
+            // Spouse's parents
+            {p:'husband_father',c:myGender==='female'?'公公 / 爸爸':'',e:'丈夫的父亲'},
+            {p:'husband_mother',c:myGender==='female'?'婆婆 / 妈妈':'',e:'丈夫的母亲'},
+            {p:'wife_father',c:myGender==='male'?'岳父 / 爸爸':'',e:'妻子的父亲'},
+            {p:'wife_mother',c:myGender==='male'?'岳母 / 妈妈':'',e:'妻子的母亲'},
+
+            // Spouse's siblings
+            {p:'husband_older_brother',c:myGender==='female'?'大伯子':'',e:'丈夫的哥哥'},
+            {p:'husband_younger_brother',c:myGender==='female'?'小叔子':'',e:'丈夫的弟弟'},
+            {p:'husband_older_sister',c:myGender==='female'?'大姑子':'',e:'丈夫的姐姐'},
+            {p:'husband_younger_sister',c:myGender==='female'?'小姑子':'',e:'丈夫的妹妹'},
+            {p:'wife_older_brother',c:myGender==='male'?'大舅子':'',e:'妻子的哥哥'},
+            {p:'wife_younger_brother',c:myGender==='male'?'小舅子':'',e:'妻子的弟弟'},
+            {p:'wife_older_sister',c:myGender==='male'?'大姨子':'',e:'妻子的姐姐'},
+            {p:'wife_younger_sister',c:myGender==='male'?'小姨子':'',e:'妻子的妹妹'},
+
+            // Father's brothers' children (堂 siblings)
+            {p:'father_older_brother_son',c:'堂哥/堂弟',e:'伯父的儿子'},
+            {p:'father_older_brother_daughter',c:'堂姐/堂妹',e:'伯父的女儿'},
+            {p:'father_younger_brother_son',c:'堂哥/堂弟',e:'叔叔的儿子'},
+            {p:'father_younger_brother_daughter',c:'堂姐/堂妹',e:'叔叔的女儿'},
+
+            // Father's sisters' children (表 siblings)
+            {p:'father_older_sister_son',c:'表哥/表弟',e:'姑姑的儿子'},
+            {p:'father_older_sister_daughter',c:'表姐/表妹',e:'姑姑的女儿'},
+            {p:'father_younger_sister_son',c:'表哥/表弟',e:'姑姑的儿子'},
+            {p:'father_younger_sister_daughter',c:'表姐/表妹',e:'姑姑的女儿'},
+
+            // Mother's brothers' children
+            {p:'mother_older_brother_son',c:'表哥/表弟',e:'舅舅的儿子'},
+            {p:'mother_older_brother_daughter',c:'表姐/表妹',e:'舅舅的女儿'},
+            {p:'mother_younger_brother_son',c:'表哥/表弟',e:'舅舅的儿子'},
+            {p:'mother_younger_brother_daughter',c:'表姐/表妹',e:'舅舅的女儿'},
+
+            // Mother's sisters' children
+            {p:'mother_older_sister_son',c:'表哥/表弟',e:'姨妈的儿子'},
+            {p:'mother_older_sister_daughter',c:'表姐/表妹',e:'姨妈的女儿'},
+            {p:'mother_younger_sister_son',c:'表哥/表弟',e:'姨妈的儿子'},
+            {p:'mother_younger_sister_daughter',c:'表姐/表妹',e:'姨妈的女儿'},
+
+            // Nephew/Niece
+            {p:'older_brother_son',c:myGender==='male'?'侄子':'外甥',e:'兄弟的儿子'},
+            {p:'older_brother_daughter',c:myGender==='male'?'侄女':'外甥女',e:'兄弟的女儿'},
+            {p:'younger_brother_son',c:myGender==='male'?'侄子':'外甥',e:'兄弟的儿子'},
+            {p:'younger_brother_daughter',c:myGender==='male'?'侄女':'外甥女',e:'兄弟的女儿'},
+            {p:'older_sister_son',c:myGender==='male'?'外甥':'侄子',e:'姐妹的儿子'},
+            {p:'older_sister_daughter',c:myGender==='male'?'外甥女':'侄女',e:'姐妹的女儿'},
+            {p:'younger_sister_son',c:myGender==='male'?'外甥':'侄子',e:'姐妹的儿子'},
+            {p:'younger_sister_daughter',c:myGender==='male'?'外甥女':'侄女',e:'姐妹的女儿'},
+
+            // Son/Daughter-in-law
+            {p:'son_wife',c:'儿媳',e:'儿子的妻子'},
+            {p:'daughter_husband',c:'女婿',e:'女儿的丈夫'},
+        ];
+
+        // Clean up path: remove older_/younger_ prefixes for matching
+        var cleanPath=pathStr.replace(/_older/g,'_').replace(/_younger/g,'_');
+
+        for(var i=0;i<patterns.length;i++){
+            if(patterns[i].p===cleanPath && patterns[i].c){
+                return patterns[i];
+            }
+        }
+        // Try with original path
+        for(var j=0;j<patterns.length;j++){
+            if(patterns[j].p===pathStr && patterns[j].c){
+                return patterns[j];
+            }
+        }
+        return {c:'不清楚',e:'这个关系链暂无数据，可以尝试更简单的路径'};
+    }
+
+    function updateChainUI(){
+        var row=document.getElementById('chainRow');
+        var html='<span>我的</span>';
+        for(var i=0;i<=chain.length;i++){
+            if(i>0){
+                var selected=chain[i-1];
+                html+='<span>的</span>';
+                html+='<select class="chain-sel" data-idx="'+(i-1)+'"><option value="">--</option>';
+                // show options for a person
+                relOptions.forEach(function(o){
+                    var sel=selected===o.k?' selected':'';
+                    html+='<option value="'+o.k+'"'+sel+'>'+o.v+'</option>';
+                });
+                html+='</select>';
+            }
+            if(i===chain.length){
+                html+='<span>的</span>';
+                html+='<select class="chain-sel" data-idx="new"><option value="">--</option>';
+                relOptions.forEach(function(o){
+                    html+='<option value="'+o.k+'">'+o.v+'</option>';
+                });
+                html+='</select>';
+            }
+        }
+        row.innerHTML=html;
+        bindSelects();
+        updateResult();
+    }
+
+    function bindSelects(){
+        document.querySelectorAll('.chain-sel').forEach(function(sel){
+            sel.addEventListener('change',function(){
+                var idx=this.dataset.idx;
+                var val=this.value;
+                if(idx==='new'){
+                    if(val)chain.push(val);
+                }else{
+                    var i=parseInt(idx);
+                    if(val){
+                        chain[i]=val;
+                        // remove anything after
+                        chain=chain.slice(0,i+1);
+                    }else{
+                        chain=chain.slice(0,i);
+                    }
+                }
+                updateChainUI();
+            });
+        });
+    }
+
+    function updateResult(){
+        if(chain.length===0){
+            document.getElementById('callResult').textContent='-';
+            document.getElementById('explainResult').textContent='请选择关系链';
+            return;
+        }
+        var pathStr=chain.join('_');
+        var res=resolveCall('',pathStr);
+        document.getElementById('callResult').textContent=res.c;
+        document.getElementById('explainResult').textContent=res.e;
+    }
+
+    // Gender toggle
+    document.querySelectorAll('.gender-btn').forEach(function(b){
+        b.addEventListener('click',function(){
+            document.querySelectorAll('.gender-btn').forEach(function(x){x.classList.remove('active')});
+            this.classList.add('active');
+            myGender=this.dataset.g;
+            updateResult();
+        });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click',function(){chain=[];updateChainUI()});
+    document.getElementById('removeLastBtn').addEventListener('click',function(){chain.pop();updateChainUI()});
+
+    updateChainUI();
+})();
 </script>
 </body>
 </html>
