@@ -7,87 +7,97 @@
 
 ## 📌 项目简介
 
-`html-lab` 是一个基于 **GitHub Pages** 的在线工具集合，旨在提供日常开发、调试及隐私保护所需的简洁小工具。每个工具都是独立的 HTML 页面，无需后端，不依赖第三方库（仅 QR 生成使用轻量开源库），开箱即用。
+`html-lab` 是一个基于 **GitHub Pages** 的在线工具集合，提供日常开发、调试及隐私保护所需的小工具。每个工具都是独立的 HTML 页面，无需后端，数据永不离开你的浏览器。
 
-## 🛠️ 当前工具
+## 🚀 如何使用（直接访问）
 
-| 工具 | 访问路径 | 功能描述 |
-|------|----------|----------|
-| **Base64 编码/解码** | `/base64-tool/` | 支持 UTF-8 文本（含中文、emoji），本地编码解码，一键复制结果。 |
-| **二维码生成器** | `/qrcode-tool/` | 输入文本或网址，实时生成 QR Code，支持下载为 PNG 图片。 |
+### 主站首页
+**[https://ace-trump-tech.github.io/html-lab/](https://ace-trump-tech.github.io/html-lab/)**  
+首页以卡片形式展示所有可用工具，点击卡片上的按钮即可跳转到对应工具。
 
-更多工具正在开发中……（JSON 格式化、时间戳转换、颜色工具等）
+### 当前已上线工具
 
-## 🚀 在线访问
+| 工具名称 | 直达链接 | 功能说明 |
+|---------|----------|----------|
+| **Base64 编码/解码** | [base64-tool/](https://ace-trump-tech.github.io/html-lab/base64-tool/) | 支持 UTF-8 文本（中文、emoji），在线编码解码，一键复制结果。 |
+| **二维码生成器** | [qrcode-tool/](https://ace-trump-tech.github.io/html-lab/qrcode-tool/) | 输入文本或网址，实时生成 QR Code，可下载为 PNG 图片。 |
 
-🔗 **主站**：[https://ace-trump-tech.github.io/html-lab/](https://ace-trump-tech.github.io/html-lab/)
+> 💡 所有工具完全在浏览器本地运行，**不会上传任何数据**，可放心使用。
 
-每个子工具均可通过 `https://ace-trump-tech.github.io/html-lab/工具名/` 直接访问。
+## 📅 计划中的工具
 
-## 🧪 本地运行
+- JSON 格式化与校验
+- Unix 时间戳转换
+- 颜色拾取器（HEX/RGB/HSL 互转）
+- Markdown 在线预览
+- 随机密码生成器
+- …（更多根据社区反馈添加）
 
-如果你想在本地预览或修改这些工具：
+## 🧪 本地运行与开发（适合想要自己部署或贡献代码的开发者）
 
 ```bash
 git clone https://github.com/ace-trump-tech/html-lab.git
 cd html-lab
 # 使用任意 HTTP 服务器，例如 Python 3
 python -m http.server 8080
-打开浏览器访问 http://localhost:8080 即可。
+```
+打开浏览器访问 `http://localhost:8080` 即可预览。
 
-📁 项目结构
-text
+## 📁 项目结构
+
+```
 html-lab/
 ├── index.html              # 工具集首页（导航卡片）
 ├── base64-tool/
 │   └── index.html          # Base64 编解码工具
 ├── qrcode-tool/
 │   └── index.html          # 二维码生成器
-├── README.md               # 项目说明
+├── README.md
 └── (未来新增工具的文件夹)
-✨ 如何添加一个新工具？
-在根目录下创建新文件夹，例如 json-formatter/。
+```
 
-在该文件夹内新建 index.html，编写你的工具代码（完全前端实现）。
+## ✨ 如何添加一个新工具？
 
-在根目录的 index.html 的 .tools-grid 中添加一个指向新工具的卡片链接。
+1. 在根目录下创建新文件夹，例如 `json-formatter/`。
+2. 在该文件夹内新建 `index.html`，编写工具代码（纯前端）。
+3. 在根目录 `index.html` 的 `.tools-grid` 中添加指向新工具的卡片。
+4. 提交并推送：
+   ```bash
+   git add .
+   git commit -m "feat: add new tool"
+   git push origin main
+   ```
+5. GitHub Pages 会自动部署，新工具即可通过 `https://ace-trump-tech.github.io/html-lab/新文件夹名/` 访问。
 
-提交并推送：
+## 📜 技术栈
 
-bash
-git add .
-git commit -m "feat: add json formatter tool"
-git push origin main
-GitHub Pages 会自动部署，访问 https://ace-trump-tech.github.io/html-lab/新文件夹名/ 即可。
+- 原生 HTML5 / CSS3 / JavaScript（ES6+）
+- 二维码生成使用轻量库 `qrcode-generator`（MIT）
+- 其他工具尽量无第三方依赖
+- 响应式设计，支持移动端
 
-📜 技术栈
-原生 HTML5 / CSS3 / JavaScript（ES6+）
+## 🤝 贡献指南
 
-二维码生成使用轻量库 qrcode-generator（MIT 许可证，内嵌 CDN）
+- **纯前端实现**，不依赖外部 API，不收集用户数据。
+- 每个工具独立成文件夹，内含 `index.html`。
+- 保持界面简洁、风格统一。
+- 提交前请在主流浏览器（Chrome / Firefox / Edge）测试。
 
-其余工具尽量无第三方依赖（保持轻量）
+提交方式：Fork → 创建分支 → PR。
 
-使用 TextEncoder / TextDecoder 处理 UTF-8 Base64
+## 📄 许可证
 
-响应式设计，支持移动端
+[MIT](LICENSE) © ace-trump-tech
 
-🤝 贡献指南
-欢迎提交新工具或改进现有工具！请遵守以下原则：
+## 🙏 致谢
 
-纯前端实现，不依赖外部 API，不收集用户数据。
+感谢开源社区，让在线工具回归干净、安全。
 
-每个工具独立成一个文件夹，内含 index.html。
+---
 
-保持界面简洁、易用，风格与现有工具大致统一。
+**⭐ 如果这个工具箱对你有帮助，请给仓库点个 Star！**
+```
 
-提交前请测试工具在主流浏览器（Chrome / Firefox / Edge）上的兼容性。
+- **保留了开发相关内容**：本地运行、项目结构、贡献指南依然存在，方便想二次开发的人。
 
-提交方式：Fork 仓库 → 创建新分支 → 提交 Pull Request。
-
-📄 许可证
-MIT © ace-trump-tech
-
-🙏 致谢
-项目受开源社区启发，旨在打造一个干净、可信赖的在线工具站点。
-
-⭐ 如果你觉得有用，请给仓库点个 Star！
+你可以直接用这个内容替换仓库中的 `README.md`。推送后，访客就能一目了然地知道怎么用这个项目了。
