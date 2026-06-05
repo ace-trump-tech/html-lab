@@ -29,12 +29,11 @@
     let game = { dead:false, week:1, lu:0, zhang:0, qian:0, hong:0, weird:0, clues:[] };
     let hidden = { 
         luLoved: false, qianRevenge: false, hongDebt: false, zhangSabotage: false, ritualParticipated: false,
-        partyTriggered: false,  // 是否已经触发过派对支线
-        killOrder: []            // 记录在支线中杀掉的室友顺序
+        partyTriggered: false,
+        killOrder: []
     };
 
     const ENDINGS = {
-        // 原有结局
         LU_GAY:"【结局·拥抱深渊】鲁健毕业前向你表白，你拒绝后被他用键盘线勒死。",
         LU_ADDICT:"【结局·提瓦特亡灵】陪鲁健连肝七日，精神失常，延毕疯癫。",
         ZHANG_OVERDOSE:"【结局·卷死图书馆】跟随内卷节奏，心脏骤停死在考场。",
@@ -50,14 +49,12 @@
         FLESH:"【结局·肉馅】偷吃和牛，被做成饺子。",
         SHRINE:"【结局·贡品】被室友献祭给宿管大妈之神。",
         TRUE:"⭐⭐⭐ 【真结局·白澜的毕业证】⭐⭐⭐ <br>你精准拿捏了每个人的分寸。毕业典礼上四人破例为你鼓掌。你拿着鲜红毕业证走出桃苑401，阳光洒落——自此，桃苑再无诅咒。",
-        // 隐藏结局
         HIDDEN_MARRY: "【隐藏结局·原神婚礼】你和鲁健的关系超越了友情。毕业那天他穿着西装向你求婚，你含泪答应。婚后你们每天一起刷原神，但三年后他为了满命角色借了高利贷，你们一起被追债，最终跳海殉情。",
         HIDDEN_KILL_QIAN: "【隐藏结局·正义的囚徒】你成功反杀了钱嘉乐，在他准备给你下毒时用刀捅了他。警察赶到，你因故意杀人被判无期。监狱里，你收到了张晨斌寄来的考研资料，上面写着“在里面也要卷”。",
         HIDDEN_HONG_SWINDLE: "【隐藏结局·反杀富哥】你设计让洪增珏投资虚假项目，卷走他五百万。他破产后精神失常，你却因诈骗罪被通缉，永远无法毕业。",
         HIDDEN_ZHANG_BURN: "【隐藏结局·焚书坑儒】你趁张晨斌不在烧光了他所有的考研资料。他崩溃后举报你纵火，你被开除学籍，流浪街头。",
         HIDDEN_CULT_LEADER: "【隐藏结局·新任教祖】你彻底融入了宿舍的邪教，凭借口才成为新任教祖。毕业前你带领室友献祭了宿管大妈，被警方抓捕，判处死刑。",
         HIDDEN_POLICE_INFORMANT: "【隐藏结局·卧底英雄】你暗中收集了所有室友的犯罪证据，毕业时交给警方。四人全部入狱，你获得见义勇为奖，但被他们的家属报复，打断了腿。虽未毕业，但成了英雄。",
-        // ========== 新增支线结局（参加贾金灵派对，必死） ==========
         PARTY_WRONG_ORDER: "【派对结局·猎杀反噬】你试图挑拨室友们的关系，但顺序错了。被你针对的室友察觉了你的意图，联合其他人将你按在地上。贾金灵在一旁冷笑：“可惜啊，你选错了顺序。” 你被室友们乱拳打死，尸体丢进了东湖。",
         PARTY_STAND_WRONG: "【派对结局·站队错误】你在派对上试图站在贾金灵一边，但室友们早已看穿他的诡计。他们把你和贾金灵一起绑了起来，然后用刀慢慢折磨。你最后听见的一句话是：“白澜，你居然信外人？”",
         PARTY_NEUTRAL: "【派对结局·墙头草】你两边都不敢得罪，试图保持中立。贾金灵和室友们都不信任你，派对上你被灌了毒酒，七窍流血而死。",
@@ -105,7 +102,6 @@
         if(game.dead) return;
         game.week++;
         if(game.week>16) { finalGraduation(); return; }
-        // 第10周特殊检查：是否触发派对支线（条件：所有室友数值>0 且 未触发过）
         if(game.week === 10 && !hidden.partyTriggered && game.lu>0 && game.zhang>0 && game.qian>0 && game.hong>0) {
             triggerPartyBranch();
             return;
@@ -114,7 +110,6 @@
         if(game.dead) return;
         dispatchEvent();
     }
-    // 主剧情正常事件分发
     function startGame() {
         renderGame("九月初，你站在桃苑401门前。传闻无人正常毕业。\n推开门，四人盯着你：\n🔨鲁健：原神60级？\n📖张晨斌：四级过了吗？\n🐍钱嘉乐：祭品来了。\n💎洪增珏：缺钱找我。", [
             {text:"🎮 和鲁健聊原神", action:()=>{ game.lu+=1; advanceWeek(); }},
@@ -127,11 +122,11 @@
     function dispatchEvent() {
         const w=game.week;
         if(w===2) week2(); else if(w===3) week3(); else if(w===4) week4(); else if(w===5) week5(); else if(w===6) week6();
-        else if(w===7) week7(); else if(w===8) week8(); else if(w===9) week9(); else if(w===10) week10(); // 但第10周已被派对拦截，正常情况不会到这里，但留作备胎
+        else if(w===7) week7(); else if(w===8) week8(); else if(w===9) week9(); else if(w===10) week10();
         else if(w===11) week11(); else if(w===12) week12(); else if(w===13) week13(); else if(w===14) week14();
         else if(w===15) week15(); else advanceWeek();
     }
-    // ========== 正常周事件（与原版一致） ==========
+    // ========== 正常周事件 ==========
     function week2() { renderGame("第2周，鲁健凌晨邀你打深渊，桌上放着美工刀。", [
         {text:"陪他打游戏", action:()=>{ game.lu+=1; advanceWeek(); }},
         {text:"劝他睡觉", action:()=>{ game.lu-=1; game.weird+=1; advanceWeek(); }},
@@ -203,13 +198,7 @@
         {text:"拒绝并撕毁", action:()=>{ game.hong+=1; advanceWeek(); }},
         {text:"偷走烧掉", action:()=>{ game.hong+=1; game.weird+=1; advanceWeek(); }}
     ]);}
-    // ========== 隐藏支线事件（原） ==========
-    function week8_hidden_lu() { /* 省略，同上版 */ }
-    function week10_hidden_qian() { /* 省略 */ }
-    function week12_hidden_hong() { /* 省略 */ }
-    function week14_hidden_zhang() { /* 省略 */ }
-    function week15_hidden_cult() { /* 省略 */ }
-    // ========== 新增支线：贾金灵生日派对 ==========
+    // ========== 贾金灵生日派对支线（修改版：无顺序提示，剧情更详细） ==========
     function triggerPartyBranch() {
         hidden.partyTriggered = true;
         renderGame("第10周，隔壁宿舍的贾金灵笑嘻嘻地来敲门：“白澜，今晚我生日，你们宿舍一起来我房间开派对吧！有好酒好菜哦～”\n你看向室友们，鲁健两眼放光，张晨斌犹豫着说“会不会耽误学习”，钱嘉乐冷笑，洪增珏则掏出一沓钱：“我包红包。”\n贾金灵看似和善，但你总觉得他眼神里藏着刀子。", [
@@ -219,44 +208,43 @@
     }
     function partyStart() {
         renderGame("派对在贾金灵的房间举行。屋里灯光昏暗，桌上摆满了酒菜。贾金灵殷勤地给每个人倒酒。\n酒过三巡，贾金灵凑近你耳边说：“白澜，我听说你们宿舍四个人都不是好东西。你想不想……除掉他们？我可以帮你。”\n你心中一惊，表面却不动声色。", [
-            {text:"🤝 接受贾金灵的提议，联手除掉室友", action:()=> partyPlot() },
-            {text:"😡 拒绝，并警告室友", action:()=> partyRefuseAndWarn() },
-            {text:"🤐 假装没听见，保持中立", action:()=> partyNeutral() }
+            {text:"🤝 低声答应，决定跟他联手", action:()=> partyPlot() },
+            {text:"😡 猛地站起来，警告室友‘这家伙要挑拨离间！’", action:()=> partyRefuseAndWarn() },
+            {text:"🍷 装作没听见，继续喝酒吃菜", action:()=> partyNeutral() }
         ]);
     }
     function partyPlot() {
-        renderGame("你和贾金灵密谋，他答应提供迷药和武器。你需要按顺序挑拨室友之间的关系，让他们互相猜忌，然后逐个击破。\n贾金灵说：“记住，顺序很重要。你必须先对付钱嘉乐，他嘴最毒，然后鲁健，接着张晨斌，最后洪增珏。错一步，全盘皆输。”\n今晚，你第一个目标：钱嘉乐。他正在阳台上抽烟。", [
-            {text:"🔪 对钱嘉乐下手（按正确顺序）", action:()=> killQian() },
-            {text:"🤔 先对付鲁健（错误顺序）", action:()=> partyWrongOrder() },
-            {text:"😨 犹豫不决，什么也不做", action:()=> partyNeutral() }
+        renderGame("你和贾金灵密谋，他答应提供迷药和武器，并告诉你室友们各自的弱点。\n“钱嘉乐嘴最毒，容易惹众怒；鲁健一根筋，酒后好下手；张晨斌心思细，但贪睡；洪增珏最精明，得先引开他。”\n贾金灵递给你一块湿毛巾：“今晚你第一个目标，就是正在阳台抽烟的钱嘉乐。”\n你深吸一口气，走向阳台。", [
+            {text:"🔪 拿起湿毛巾，悄悄靠近钱嘉乐背后", action:()=> killQian() },
+            {text:"😰 觉得太冒险，先去找鲁健套近乎", action:()=> partyWrongOrder() },
+            {text:"🤔 犹豫不决，在走廊里来回踱步", action:()=> partyNeutral() }
         ]);
     }
-    // 按照正确顺序逐步杀人
     function killQian() {
-        renderGame("你悄悄走到钱嘉乐身后，用贾金灵给的湿毛巾捂住他的口鼻。他挣扎了几下就瘫软了。你把他拖进卫生间，伪造了醉酒溺亡的现场。\n贾金灵竖起大拇指：“干得漂亮。下一个，鲁健。”\n鲁健正在和洪增珏拼酒。", [
-            {text:"🍺 趁鲁健喝醉，用枕头闷死他", action:()=> killLu() },
-            {text:"先不管鲁健，去对付张晨斌（错误顺序）", action:()=> partyWrongOrder() }
+        renderGame("你悄悄走到钱嘉乐身后，趁他不备，用湿毛巾死死捂住他的口鼻。他拼命挣扎，指甲抓破了你的手背，但几分钟后身体逐渐瘫软。你把他拖进卫生间，伪造了醉酒溺亡的现场。\n贾金灵竖起大拇指：“干得漂亮。接下来，鲁健正在和洪增珏拼酒，他快醉了。”\n你看着醉醺醺的鲁健，心中盘算着下一步。", [
+            {text:"🍺 等鲁健喝醉，扶他到床上用枕头闷死他", action:()=> killLu() },
+            {text:"📚 趁鲁健不注意，先去对付角落里的张晨斌", action:()=> partyWrongOrder() }
         ]);
     }
     function killLu() {
-        renderGame("鲁健醉得不省人事，你把他扶到床上，用枕头捂住了他的脸。他双脚踢了几下就没了动静。\n贾金灵帮你处理了尸体。现在剩下张晨斌和洪增珏。张晨斌正在角落里背单词，洪增珏在数钱。", [
-            {text:"📖 去张晨斌那边，用迷药放倒他", action:()=> killZhang() },
-            {text:"💰 先对付洪增珏（错误顺序）", action:()=> partyWrongOrder() }
+        renderGame("鲁健醉得不省人事，你把他扶到床上，用枕头捂住了他的脸。他双脚踢了几下就没了动静，嘴角还挂着傻笑。\n贾金灵帮你处理了尸体，擦干地上的酒渍。现在房间里只剩下张晨斌和洪增珏。张晨斌正在角落里背单词，洪增珏在数钱。\n贾金灵低声道：“张晨斌警惕性低，你去他水杯里下点东西。”", [
+            {text:"📖 往张晨斌的水杯里倒入安眠药粉末", action:()=> killZhang() },
+            {text:"💰 先对付洪增珏，偷走他的钱包引开注意力", action:()=> partyWrongOrder() }
         ]);
     }
     function killZhang() {
-        renderGame("你在张晨斌的水杯里下了安眠药，他喝下后很快昏睡。你用塑料袋套住他的头，几分钟后他停止了呼吸。\n贾金灵笑道：“只剩最后一个了。” 洪增珏似乎察觉到了什么，想要逃跑。", [
-            {text:"💵 追上去，用花瓶砸死洪增珏", action:()=> killHong() },
-            {text:"让贾金灵帮忙，一起抓他", action:()=> partyWrongOrder() }
+        renderGame("张晨斌喝了你的水后，很快趴在桌上昏睡过去。你用塑料袋套住他的头，几分钟后他停止了呼吸。\n贾金灵笑道：“只剩最后一个了。” 洪增珏似乎察觉到了什么，猛地起身往门口跑。", [
+            {text:"💵 抄起桌上的花瓶，追上去猛砸他的后脑", action:()=> killHong() },
+            {text:"🏃 让贾金灵去追，自己躲在角落", action:()=> partyWrongOrder() }
         ]);
     }
     function killHong() {
-        renderGame("你追上洪增珏，在他开门的一瞬间用花瓶猛砸他的后脑。他倒地抽搐了几下就死了。\n房间内一片死寂。你大口喘着气，看着满地的尸体。贾金灵站在你身后，轻轻鼓掌。\n“完美，白澜，你真是天生的杀手。” 他嘴角翘起，弯成一个V字。“不过嘛……现在轮到你了，小宝贝～”\n他猛地掏出一把匕首，刺进了你的心脏。你瞪大眼睛，倒下前看见他狰狞的笑容。", [
+        renderGame("你追上洪增珏，在他开门的一瞬间用花瓶猛砸他的后脑。花瓶碎裂，洪增珏倒地抽搐了几下就死了。\n房间内一片死寂。你大口喘着气，看着满地的尸体。贾金灵站在你身后，轻轻鼓掌。\n“完美，白澜，你真是天生的杀手。” 他嘴角翘起，弯成一个V字。“不过嘛……现在轮到你了，小宝贝～”\n他猛地掏出一把匕首，刺进了你的心脏。你瞪大眼睛，倒下前看见他狰狞的笑容。", [
             {text:"💀 结局", action:()=> setEnding("PARTY_KILL_ALL") }
         ]);
     }
     function partyWrongOrder() {
-        renderGame("你选错了目标。室友们察觉了你的异常，联合起来反制。鲁健一键盘拍晕你，张晨斌用考研书捂住你的口鼻，钱嘉乐往你嘴里灌毒药，洪增珏则用钱砸晕你。贾金灵见势不妙早就溜了。你死得不明不白。", [
+        renderGame("你的行动被室友察觉。鲁健第一个暴起：“白澜，你在干什么？！” 张晨斌尖叫着报警，钱嘉乐抄起酒瓶砸向你的头，洪增珏则用钱捆住你的手脚。\n贾金灵见势不妙早就溜了。你被四人按在地上，拳脚相加。最后你听见一句：“送他去东湖喂鱼。” 意识陷入黑暗。", [
             {text:"💀 结局", action:()=> setEnding("PARTY_WRONG_ORDER") }
         ]);
     }
@@ -270,7 +258,6 @@
             {text:"💀 结局", action:()=> setEnding("PARTY_NEUTRAL") }
         ]);
     }
-    // 第16周最终判定（与原版一致）
     function finalGraduation() {
         let condLu = (game.lu>=-2 && game.lu<=2);
         let condZhang = (game.zhang>=-2 && game.zhang<=2);
