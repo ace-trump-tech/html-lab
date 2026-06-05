@@ -92,9 +92,9 @@
         <div class="format-grid">
             <div class="format-card">
                 <h3>🔴🟢🔵 RGB</h3>
-                <div class="format-row"><label>R</label><input type="number" id="rgbR" min="0" max="255" value="59"><span class="color-swatch" style="background:rgb(59,0,0);"></span></div>
-                <div class="format-row"><label>G</label><input type="number" id="rgbG" min="0" max="255" value="130"><span class="color-swatch" style="background:rgb(0,130,0);"></span></div>
-                <div class="format-row"><label>B</label><input type="number" id="rgbB" min="0" max="255" value="246"><span class="color-swatch" style="background:rgb(0,0,246);"></span></div>
+                <div class="format-row"><label>R</label><input type="number" id="rgbR" min="0" max="255" value="59"><span class="color-swatch" id="swatchR" style="background:rgb(59,0,0);"></span></div>
+                <div class="format-row"><label>G</label><input type="number" id="rgbG" min="0" max="255" value="130"><span class="color-swatch" id="swatchG" style="background:rgb(0,130,0);"></span></div>
+                <div class="format-row"><label>B</label><input type="number" id="rgbB" min="0" max="255" value="246"><span class="color-swatch" id="swatchB" style="background:rgb(0,0,246);"></span></div>
                 <div style="margin-top:6px;"><span style="font-size:0.75rem;color:#64748b;">rgb(<span id="rgbPreview">59, 130, 246</span>)</span></div>
             </div>
             <div class="format-card">
@@ -203,6 +203,9 @@
         document.getElementById('colorPicker').value = '#' + hex;
         document.getElementById('colorPreview').style.background = '#' + hex;
         document.getElementById('hexSwatch').style.background = '#' + hex;
+        document.getElementById('swatchR').style.background = 'rgb(' + r + ',0,0)';
+        document.getElementById('swatchG').style.background = 'rgb(0,' + g + ',0)';
+        document.getElementById('swatchB').style.background = 'rgb(0,0,' + b + ')';
         document.getElementById('cssPreview').innerHTML = 'CSS: <span style="color:#93c5fd;">color</span>: <span style="color:#86efac;">#' + hex + '</span>; <span style="color:#93c5fd;">background</span>: <span style="color:#86efac;">rgb(' + r + ', ' + g + ', ' + b + ')</span>;';
         updating = false;
     }

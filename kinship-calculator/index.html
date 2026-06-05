@@ -92,110 +92,234 @@
         return info;
     }
 
-    // Determine what to call the final person based on accumulated path
+    // Recursive resolver: given what we call current person, and their gender, apply a relation step
+    // Returns {name, gender} for the new person
+    function applyRelation(curName, curGender, relKey){
+        // Build a transition map
+        var map={};
+
+        // Helper: define transition from a known position
+        function def(fromName, fromG, rel, toName, toG){
+            var k=fromName+'|'+rel;
+            map[k]=map[k]||{};
+            map[k][fromG||'*']={n:toName,g:toG};
+        }
+        function defG(fromName, fromG, rel, toName, toG){
+            var k=fromName+'|'+rel;
+            map[k]=map[k]||{};
+            map[k][fromG]={n:toName,g:toG};
+        }
+
+        var M='male',F='female',B='*';
+
+        // ====== 直系亲属 ======
+        def('我',B,'father','爸爸',M); def('我',B,'mother','妈妈',F);
+        def('我',B,'husband','老公',M); def('我',B,'wife','老婆',F);
+        def('我',B,'older_brother','哥哥',M); def('我',B,'younger_brother','弟弟',M);
+        def('我',B,'older_sister','姐姐',F); def('我',B,'younger_sister','妹妹',F);
+        def('我',B,'son','儿子',M); def('我',B,'daughter','女儿',F);
+
+        // Parents
+        def('爸爸',M,'father','爷爷',M); def('爸爸',M,'mother','奶奶',F);
+        def('爸爸',M,'older_brother','伯父',M); def('爸爸',M,'younger_brother','叔叔',M);
+        def('爸爸',M,'older_sister','大姑',F); def('爸爸',M,'younger_sister','小姑',F);
+        def('爸爸',M,'husband','爸爸',M); def('爸爸',M,'wife','妈妈',F);
+        def('妈妈',F,'father','外公',M); def('妈妈',F,'mother','外婆',F);
+        def('妈妈',F,'older_brother','大舅',M); def('妈妈',F,'younger_brother','小舅',M);
+        def('妈妈',F,'older_sister','大姨',F); def('妈妈',F,'younger_sister','小姨',F);
+
+        // Grandfathers
+        def('爷爷',M,'father','曾祖父',M); def('爷爷',M,'mother','曾祖母',F);
+        def('爷爷',M,'older_brother','大爷爷',M); def('爷爷',M,'younger_brother','小爷爷',M);
+        def('爷爷',M,'older_sister','姑奶奶',F); def('爷爷',M,'younger_sister','姑奶奶',F);
+        def('奶奶',F,'father','外曾祖父',M); def('奶奶',F,'mother','外曾祖母',F);
+        def('奶奶',F,'older_brother','舅公',M); def('奶奶',F,'younger_brother','舅公',M);
+        def('外公',M,'father','外曾祖父',M); def('外公',M,'mother','外曾祖母',F);
+        def('外公',M,'older_brother','大外公',M); def('外公',M,'younger_brother','小外公',M);
+        def('外公',M,'older_sister','姨婆',F); def('外公',M,'younger_sister','姨婆',F);
+        def('外婆',F,'father','外曾祖父',M); def('外婆',F,'mother','外曾祖母',F);
+        def('外婆',F,'older_brother','舅公',M); def('外婆',F,'younger_brother','舅公',M);
+        def('外婆',F,'older_sister','姨婆',F); def('外婆',F,'younger_sister','姨婆',F);
+
+        // Great-grandparents
+        def('曾祖父',M,'father','高祖父',M); def('曾祖父',M,'mother','高祖母',F);
+        def('曾祖父',M,'older_brother','曾伯祖父',M); def('曾祖父',M,'younger_brother','曾叔祖父',M);
+        def('曾祖母',F,'father','高外祖父',M); def('曾祖母',F,'mother','高外祖母',F);
+        def('外曾祖父',M,'father','高外祖父',M); def('外曾祖父',M,'mother','高外祖母',F);
+        def('外曾祖母',F,'father','高外曾祖父',M); def('外曾祖母',F,'mother','高外曾祖母',F);
+
+        // Great-grandfathers (symmetric for both paternal and maternal)
+        def('高祖父',M,'father','天祖',M); def('高祖父',M,'mother','天祖母',F);
+
+        // ====== 叔伯姑舅姨 ======
+        // From 伯父
+        def('伯父',M,'son',B,'堂兄弟',M); def('伯父',M,'daughter',B,'堂姐妹',F);
+        def('伯父',M,'father','爷爷',M); def('伯父',M,'mother','奶奶',F);
+        def('伯父',M,'wife','伯母',F);
+        def('伯母',F,'husband','伯父',M);
+        // From 叔叔
+        def('叔叔',M,'son',B,'堂兄弟',M); def('叔叔',M,'daughter',B,'堂姐妹',F);
+        def('叔叔',M,'father','爷爷',M); def('叔叔',M,'mother','奶奶',F);
+        def('叔叔',M,'wife','婶婶',F);
+        def('婶婶',F,'husband','叔叔',M);
+        // From 姑姑
+        def('大姑',F,'son',B,'表兄弟',M); def('大姑',F,'daughter',B,'表姐妹',F);
+        def('小姑',F,'son',B,'表兄弟',M); def('小姑',F,'daughter',B,'表姐妹',F);
+        def('大姑',F,'husband','姑父',M); def('小姑',F,'husband','姑父',M);
+        def('大姑',F,'father','爷爷',M); def('大姑',F,'mother','奶奶',F);
+        def('小姑',F,'father','爷爷',M); def('小姑',F,'mother','奶奶',F);
+        def('姑父',M,'wife',B,'姑',F);
+
+        // From 舅舅
+        def('大舅',M,'son',B,'表兄弟',M); def('大舅',M,'daughter',B,'表姐妹',F);
+        def('小舅',M,'son',B,'表兄弟',M); def('小舅',M,'daughter',B,'表姐妹',F);
+        def('大舅',M,'wife','舅妈',F); def('小舅',M,'wife','舅妈',F);
+        def('大舅',M,'father','外公',M); def('小舅',M,'father','外公',M);
+        def('大舅',M,'mother','外婆',F); def('小舅',M,'mother','外婆',F);
+        def('舅妈',F,'husband',B,'舅',M);
+        // From 姨妈
+        def('大姨',F,'son',B,'表兄弟',M); def('大姨',F,'daughter',B,'表姐妹',F);
+        def('小姨',F,'son',B,'表兄弟',M); def('小姨',F,'daughter',B,'表姐妹',F);
+        def('大姨',F,'husband','姨父',M); def('小姨',F,'husband','姨父',M);
+        def('大姨',F,'father','外公',M); def('小姨',F,'father','外公',M);
+        def('大姨',F,'mother','外婆',F); def('小姨',F,'mother','外婆',F);
+        def('姨父',M,'wife',B,'姨',F);
+
+        // ====== 爷爷/奶奶的兄弟姐妹 (从爷爷视角) ======
+        def('大爷爷',M,'son',B,'堂伯/堂叔',M); def('大爷爷',M,'daughter',B,'堂姑',F);
+        def('小爷爷',M,'son',B,'堂伯/堂叔',M); def('小爷爷',M,'daughter',B,'堂姑',F);
+        def('姑奶奶',F,'son',B,'表伯/表叔',M); def('姑奶奶',F,'daughter',B,'表姑',F);
+        def('舅公',M,'son',B,'表舅',M); def('舅公',M,'daughter',B,'表姨',F);
+        def('姨婆',F,'son',B,'表舅',M); def('姨婆',F,'daughter',B,'表姨',F);
+        def('大外公',M,'son',B,'堂舅',M); def('大外公',M,'daughter',B,'堂姨',F);
+        def('小外公',M,'son',B,'堂舅',M); def('小外公',M,'daughter',B,'堂姨',F);
+
+        // ====== 兄弟姐妹的子女 ======
+        def('哥哥',M,'son',B,'侄子',M); def('哥哥',M,'daughter',B,'侄女',F);
+        def('哥哥',M,'wife','嫂子',F);
+        def('弟弟',M,'son',B,'侄子',M); def('弟弟',M,'daughter',B,'侄女',F);
+        def('弟弟',M,'wife','弟媳',F);
+        def('姐姐',F,'son',B,'外甥',M); def('姐姐',F,'daughter',B,'外甥女',F);
+        def('姐姐',F,'husband','姐夫',M);
+        def('妹妹',F,'son',B,'外甥',M); def('妹妹',F,'daughter',B,'外甥女',F);
+        def('妹妹',F,'husband','妹夫',M);
+        def('嫂子',F,'husband','哥哥',M);
+        def('弟媳',F,'husband','弟弟',M);
+        def('姐夫',M,'wife','姐姐',F);
+        def('妹夫',M,'wife','妹妹',F);
+
+        // 侄子/外甥的下一代
+        def('侄子',M,'son',B,'侄孙',M); def('侄子',M,'daughter',B,'侄孙女',F);
+        def('侄女',F,'son',B,'外侄孙',M); def('侄女',F,'daughter',B,'外侄孙女',F);
+        def('外甥',M,'son',B,'外甥孙',M); def('外甥',M,'daughter',B,'外甥孙女',F);
+        def('外甥女',F,'son',B,'外甥外孙',M); def('外甥女',F,'daughter',B,'外甥外孙女',F);
+
+        // ====== 堂/表兄弟姐妹 ======
+        def('堂兄弟',M,'father',B,'伯父/叔叔',M);
+        def('堂兄弟',M,'son',B,'堂侄',M); def('堂兄弟',M,'daughter',B,'堂侄女',F);
+        def('表兄弟',M,'father',B,'舅/姨父',M);
+        def('表兄弟',M,'son',B,'表侄',M); def('表兄弟',M,'daughter',B,'表侄女',F);
+        def('堂姐妹',F,'father',B,'伯父/叔叔',M);
+        def('表姐妹',F,'father',B,'舅/姨父',M);
+
+        // ====== 配偶 ======
+        def('老公',M,'father','公公',M); def('老公',M,'mother','婆婆',F);
+        def('老公',M,'older_brother','大伯子',M); def('老公',M,'younger_brother','小叔子',M);
+        def('老公',M,'older_sister','大姑子',F); def('老公',M,'younger_sister','小姑子',F);
+        def('老婆',F,'father','岳父',M); def('老婆',F,'mother','岳母',F);
+        def('老婆',F,'older_brother','大舅子',M); def('老婆',F,'younger_brother','小舅子',M);
+        def('老婆',F,'older_sister','大姨子',F); def('老婆',F,'younger_sister','小姨子',F);
+
+        // 公婆岳父母
+        def('公公',M,'father','太公公',M); def('公公',M,'mother','太婆婆',F);
+        def('婆婆',F,'father','外太公公',M); def('婆婆',F,'mother','外太婆婆',F);
+        def('岳父',M,'father','太岳父',M); def('岳父',M,'mother','太岳母',F);
+        def('岳母',F,'father','外太岳父',M); def('岳母',F,'mother','外太岳母',F);
+        def('公公',M,'older_brother','伯公公',M); def('公公',M,'younger_brother','叔公公',M);
+        def('婆婆',F,'older_sister','大婆婆',F); def('婆婆',F,'younger_sister','小婆婆',F);
+        def('岳父',M,'older_brother','伯岳父',M); def('岳父',M,'younger_brother','叔岳父',M);
+        def('岳母',F,'older_sister','大岳母',F); def('岳母',F,'younger_sister','小岳母',F);
+
+        // 配偶的兄弟姐妹
+        def('大伯子',M,'son',B,'侄辈',M); def('大伯子',M,'wife','妯娌',F);
+        def('小叔子',M,'son',B,'侄辈',M); def('小叔子',M,'wife','妯娌',F);
+        def('大姑子',F,'son',B,'外甥辈',M); def('大姑子',F,'husband','姑爷',M);
+        def('小姑子',F,'son',B,'外甥辈',M); def('小姑子',F,'husband','姑爷',M);
+        def('大舅子',M,'son',B,'外甥辈',M); def('大舅子',M,'wife','舅嫂',F);
+        def('小舅子',M,'son',B,'外甥辈',M); def('小舅子',M,'wife','舅嫂',F);
+        def('大姨子',F,'son',B,'外甥辈',M); def('大姨子',F,'husband','连襟',M);
+        def('小姨子',F,'son',B,'外甥辈',M); def('小姨子',F,'husband','连襟',M);
+
+        // ====== 子女的配偶 ======
+        def('儿子',M,'wife','儿媳',F); def('儿子',M,'son',B,'孙子',M); def('儿子',M,'daughter',B,'孙女',F);
+        def('女儿',F,'husband','女婿',M); def('女儿',F,'son',B,'外孙',M); def('女儿',F,'daughter',B,'外孙女',F);
+        def('儿媳',F,'husband','儿子',M); def('儿媳',F,'father','亲家公',M); def('儿媳',F,'mother','亲家母',F);
+        def('女婿',M,'wife','女儿',F); def('女婿',M,'father','亲家公',M); def('女婿',M,'mother','亲家母',F);
+        // Grandchildren
+        def('孙子',M,'father','儿子',M); def('孙子',M,'mother','儿媳',F);
+        def('孙女',F,'father','儿子',M); def('孙女',F,'mother','儿媳',F);
+        def('外孙',M,'father','女婿',M); def('外孙',M,'mother','女儿',F);
+        def('外孙女',F,'father','女婿',M); def('外孙女',F,'mother','女儿',F);
+
+        // ====== Fallback for common ancestors (parents/children of unknown) ======
+        function fallback(curName, curGender, relKey){
+            // Generic fallback based on gender patterns
+            if(relKey==='father'){
+                // For a female curPerson, this person is "curPerson的父亲"
+                // The title depends on who curPerson is relative to us
+                return {n:curName+'的父亲',g:M};
+            }
+            if(relKey==='mother') return {n:curName+'的母亲',g:F};
+            if(relKey==='husband') return {n:curName+'的丈夫',g:M};
+            if(relKey==='wife') return {n:curName+'的妻子',g:F};
+            if(relKey==='son') return {n:curName+'的儿子',g:M};
+            if(relKey==='daughter') return {n:curName+'的女儿',g:F};
+            if(relKey==='older_brother'||relKey==='younger_brother') return {n:curName+'的兄弟',g:M};
+            if(relKey==='older_sister'||relKey==='younger_sister') return {n:curName+'的姐妹',g:F};
+            return {n:'未知',g:B};
+        }
+
+        var key=curName+'|'+relKey;
+        var entry=map[key];
+        if(entry){
+            // Try gender-specific first, then wildcard
+            if(entry[curGender]) return entry[curGender];
+            if(entry[B]) return entry[B];
+            // Try any
+            var keys=Object.keys(entry);
+            if(keys.length>0) return entry[keys[0]];
+        }
+        return fallback(curName, curGender, relKey);
+    }
+
     function resolveCall(finalGender, pathStr){
-        // pathStr is a string like "husband_mother_younger_brother_daughter"
-        // We'll match against known patterns
-
-        var patterns=[
-            // Direct
-            {p:'father',c:'爸爸 / 父亲',e:'父亲'},
-            {p:'mother',c:'妈妈 / 母亲',e:'母亲'},
-            {p:'husband',c:myGender==='female'?'老公 / 先生':'（同性不能有丈夫）',e:'丈夫'},
-            {p:'wife',c:myGender==='male'?'老婆 / 太太':'（同性不能有妻子）',e:'妻子'},
-            {p:'older_brother',c:'哥哥',e:'同父母的兄长'},
-            {p:'younger_brother',c:'弟弟',e:'同父母的弟弟'},
-            {p:'older_sister',c:'姐姐',e:'同父母的姐姐'},
-            {p:'younger_sister',c:'妹妹',e:'同父母的妹妹'},
-            {p:'son',c:'儿子',e:'你的孩子'},
-            {p:'daughter',c:'女儿',e:'你的孩子'},
-
-            // Grandparents
-            {p:'father_father',c:'爷爷',e:'父亲的父亲'},
-            {p:'father_mother',c:'奶奶',e:'父亲的母亲'},
-            {p:'mother_father',c:'外公 / 姥爷',e:'母亲的父亲'},
-            {p:'mother_mother',c:'外婆 / 姥姥',e:'母亲的母亲'},
-
-            // Parents' siblings
-            {p:'father_older_brother',c:'伯父 / 伯伯',e:'父亲的哥哥'},
-            {p:'father_younger_brother',c:'叔叔',e:'父亲的弟弟'},
-            {p:'father_older_sister',c:'姑姑',e:'父亲的姐姐'},
-            {p:'father_younger_sister',c:'姑姑',e:'父亲的妹妹'},
-            {p:'mother_older_brother',c:'大舅',e:'母亲的哥哥'},
-            {p:'mother_younger_brother',c:'舅舅',e:'母亲的弟弟'},
-            {p:'mother_older_sister',c:'大姨',e:'母亲的姐姐'},
-            {p:'mother_younger_sister',c:'小姨',e:'母亲的妹妹'},
-
-            // Spouse's parents
-            {p:'husband_father',c:myGender==='female'?'公公 / 爸爸':'',e:'丈夫的父亲'},
-            {p:'husband_mother',c:myGender==='female'?'婆婆 / 妈妈':'',e:'丈夫的母亲'},
-            {p:'wife_father',c:myGender==='male'?'岳父 / 爸爸':'',e:'妻子的父亲'},
-            {p:'wife_mother',c:myGender==='male'?'岳母 / 妈妈':'',e:'妻子的母亲'},
-
-            // Spouse's siblings
-            {p:'husband_older_brother',c:myGender==='female'?'大伯子':'',e:'丈夫的哥哥'},
-            {p:'husband_younger_brother',c:myGender==='female'?'小叔子':'',e:'丈夫的弟弟'},
-            {p:'husband_older_sister',c:myGender==='female'?'大姑子':'',e:'丈夫的姐姐'},
-            {p:'husband_younger_sister',c:myGender==='female'?'小姑子':'',e:'丈夫的妹妹'},
-            {p:'wife_older_brother',c:myGender==='male'?'大舅子':'',e:'妻子的哥哥'},
-            {p:'wife_younger_brother',c:myGender==='male'?'小舅子':'',e:'妻子的弟弟'},
-            {p:'wife_older_sister',c:myGender==='male'?'大姨子':'',e:'妻子的姐姐'},
-            {p:'wife_younger_sister',c:myGender==='male'?'小姨子':'',e:'妻子的妹妹'},
-
-            // Father's brothers' children (堂 siblings)
-            {p:'father_older_brother_son',c:'堂哥/堂弟',e:'伯父的儿子'},
-            {p:'father_older_brother_daughter',c:'堂姐/堂妹',e:'伯父的女儿'},
-            {p:'father_younger_brother_son',c:'堂哥/堂弟',e:'叔叔的儿子'},
-            {p:'father_younger_brother_daughter',c:'堂姐/堂妹',e:'叔叔的女儿'},
-
-            // Father's sisters' children (表 siblings)
-            {p:'father_older_sister_son',c:'表哥/表弟',e:'姑姑的儿子'},
-            {p:'father_older_sister_daughter',c:'表姐/表妹',e:'姑姑的女儿'},
-            {p:'father_younger_sister_son',c:'表哥/表弟',e:'姑姑的儿子'},
-            {p:'father_younger_sister_daughter',c:'表姐/表妹',e:'姑姑的女儿'},
-
-            // Mother's brothers' children
-            {p:'mother_older_brother_son',c:'表哥/表弟',e:'舅舅的儿子'},
-            {p:'mother_older_brother_daughter',c:'表姐/表妹',e:'舅舅的女儿'},
-            {p:'mother_younger_brother_son',c:'表哥/表弟',e:'舅舅的儿子'},
-            {p:'mother_younger_brother_daughter',c:'表姐/表妹',e:'舅舅的女儿'},
-
-            // Mother's sisters' children
-            {p:'mother_older_sister_son',c:'表哥/表弟',e:'姨妈的儿子'},
-            {p:'mother_older_sister_daughter',c:'表姐/表妹',e:'姨妈的女儿'},
-            {p:'mother_younger_sister_son',c:'表哥/表弟',e:'姨妈的儿子'},
-            {p:'mother_younger_sister_daughter',c:'表姐/表妹',e:'姨妈的女儿'},
-
-            // Nephew/Niece
-            {p:'older_brother_son',c:myGender==='male'?'侄子':'外甥',e:'兄弟的儿子'},
-            {p:'older_brother_daughter',c:myGender==='male'?'侄女':'外甥女',e:'兄弟的女儿'},
-            {p:'younger_brother_son',c:myGender==='male'?'侄子':'外甥',e:'兄弟的儿子'},
-            {p:'younger_brother_daughter',c:myGender==='male'?'侄女':'外甥女',e:'兄弟的女儿'},
-            {p:'older_sister_son',c:myGender==='male'?'外甥':'侄子',e:'姐妹的儿子'},
-            {p:'older_sister_daughter',c:myGender==='male'?'外甥女':'侄女',e:'姐妹的女儿'},
-            {p:'younger_sister_son',c:myGender==='male'?'外甥':'侄子',e:'姐妹的儿子'},
-            {p:'younger_sister_daughter',c:myGender==='male'?'外甥女':'侄女',e:'姐妹的女儿'},
-
-            // Son/Daughter-in-law
-            {p:'son_wife',c:'儿媳',e:'儿子的妻子'},
-            {p:'daughter_husband',c:'女婿',e:'女儿的丈夫'},
-        ];
-
-        // Clean up path: remove older_/younger_ prefixes for matching
-        var cleanPath=pathStr.replace(/_older/g,'_').replace(/_younger/g,'_');
-
-        for(var i=0;i<patterns.length;i++){
-            if(patterns[i].p===cleanPath && patterns[i].c){
-                return patterns[i];
+        if(!chain.length) return {c:'-',e:'请选择关系链'};
+        var cur={n:'我',g:myGender};
+        for(var i=0;i<chain.length;i++){
+            var relKey=chain[i];
+            // Remove older/younger prefix for lookup
+            var lookupKey=relKey.replace(/_older|_younger/g,'');
+            cur=applyRelation(cur.n, cur.g, relKey);
+            // if not found with specific prefix, try generic
+            if(!cur||cur.n.indexOf('的')>=0){
+                // try generic lookup
+                cur=applyRelation(cur.n.split('的')[0], cur.g, lookupKey)||cur;
             }
         }
-        // Try with original path
-        for(var j=0;j<patterns.length;j++){
-            if(patterns[j].p===pathStr && patterns[j].c){
-                return patterns[j];
-            }
+        if(!cur||cur.n==='未知') return {c:'不清楚',e:'这个关系链暂无称呼数据，可尝试更短的路径'};
+        // Build explanation
+        var explainParts=[];
+        var tmp={n:'我',g:myGender};
+        for(var j=0;j<chain.length;j++){
+            var rk=chain[j];
+            var rn=relOptions.find(function(o){return o.k===rk});
+            var label=rn?rn.v:rk;
+            explainParts.push(label);
         }
-        return {c:'不清楚',e:'这个关系链暂无数据，可以尝试更简单的路径'};
+        var e=explainParts.join(' → ');
+        // Clean up display name
+        var displayName=cur.n.replace(/_older/g,'').replace(/_younger/g,'');
+        return {c:displayName,e:e};
     }
 
     function updateChainUI(){

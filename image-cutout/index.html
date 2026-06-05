@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>图片抠图 | 在线工具</title>
+    <style>
+        *{box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif}
+        body{background:linear-gradient(145deg,#f5f7fc,#e9eef5);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:20px;margin:0}
+        .card{max-width:900px;width:100%;background:rgba(255,255,255,.92);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,.2);overflow:hidden;margin-top:20px}
+        .header{background:#0f172a;padding:1.2rem 2rem;color:#fff}
+        .header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px}
+        .badge{background:#2dd4bf20;border-radius:40px;padding:.2rem .8rem;font-size:.8rem;border:1px solid #2dd4bf50}
+        .container{padding:2rem}
+        .upload-area{border:2px dashed #cbd5e1;border-radius:1.5rem;padding:1rem;text-align:center;margin-bottom:1rem;cursor:pointer}
+        .upload-area:hover{border-color:#0f172a;background:#f8fafc}
+        .upload-area input{display:none}
+        .workspace{display:none}
+        .preview-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+        .preview-col{flex:1;min-width:250px;text-align:center}
+        .preview-col .label{font-size:.8rem;color:#64748b;margin-bottom:4px;font-weight:600}
+        .canvas-wrap{position:relative;display:inline-block;max-width:100%;cursor:crosshair}
+        .canvas-wrap canvas{max-width:100%;max-height:350px;border-radius:1rem;border:1px solid #e2e8f0;display:block}
+        .ctrl-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:1rem}
+        .ctrl-row label{font-size:.8rem;color:#64748b;font-weight:600}
+        .ctrl-row input[type="range"]{flex:1;min-width:100px;accent-color:#0f172a}
+        .ctrl-row .val{font-family:'SF Mono',monospace;min-width:32px;text-align:right;font-size:.85rem}
+        .color-pick{display:flex;align-items:center;gap:8px}
+        .color-dot{width:32px;height:32px;border-radius:8px;border:2px solid #cbd5e1;cursor:pointer}
+        .btn{padding:10px 20px;border-radius:60px;font-weight:500;cursor:pointer;transition:.2s;font-size:.9rem;background:#fff;border:1px solid #cbd5e1}
+        .btn-primary{background:#0f172a;color:#fff;border-color:#0f172a}
+        .btn-primary:hover{background:#1e293b}
+        .btn-outline:hover{background:#f1f5f9}
+        .toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:.5rem}
+        .footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:.8rem;color:#475569;border-top:1px solid #e2e8f0}
+        .footer a{color:#15607a;text-decoration:none}
+        @media(max-width:600px){.container{padding:1rem}}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>✂️ 图片抠图 <span class="badge">色键抠图 · 纯前端</span></h1><p style="margin:2px 0 0;font-size:.8rem;opacity:.8">点击图片中要移除的背景色，调整容差，即可抠出主体。适合纯色背景图片。</p></div>
+    <div class="container">
+        <div class="upload-area" id="uploadArea">📁 点击或拖拽上传图片（纯色背景效果最佳）<input type="file" id="fileInput" accept="image/*"></div>
+        <div class="workspace" id="workspace">
+            <div class="preview-row">
+                <div class="preview-col">
+                    <div class="label">🖱️ 点击背景色取样（可多点）</div>
+                    <div class="canvas-wrap" id="canvasWrap"><canvas id="srcCanvas"></canvas></div>
+                </div>
+                <div class="preview-col">
+                    <div class="label">✨ 抠图预览</div>
+                    <canvas id="previewCanvas" style="max-width:100%;max-height:350px;border-radius:1rem;border:1px solid #e2e8f0;"></canvas>
+                </div>
+            </div>
+            <div class="ctrl-row">
+                <label>🎯 容差</label>
+                <input type="range" id="tolerance" min="5" max="150" value="40">
+                <span class="val" id="tolVal">40</span>
+                <label>🧹 平滑</label>
+                <input type="range" id="smooth" min="0" max="5" value="1">
+                <span class="val" id="smoothVal">1</span>
+            </div>
+            <div class="ctrl-row">
+                <span style="font-size:.8rem;color:#64748b;font-weight:600;">已选背景色：</span>
+                <div class="color-dot" id="colorDisplay" style="background:#fff;"></div>
+                <span id="colorCount" style="font-size:.8rem;color:#64748b;">0 个采样点</span>
+                <button class="btn btn-outline" id="resetColorsBtn" style="font-size:.8rem;padding:6px 14px;">🔄 重置采样</button>
+            </div>
+            <div class="toolbar">
+                <button class="btn btn-primary" id="downloadBtn">⬇️ 下载 PNG（透明背景）</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a> &nbsp;| <a href="../"><strong>← 返回首页</strong></a></div>
+</div>
+<script>
+(function(){
+    var img=null,sampledColors=[],srcCanvas,srcCtx,previewCanvas,previewCtx;
+
+    document.getElementById('uploadArea').addEventListener('click',function(){document.getElementById('fileInput').click()});
+    document.getElementById('uploadArea').addEventListener('dragover',function(e){e.preventDefault()});
+    document.getElementById('uploadArea').addEventListener('drop',function(e){e.preventDefault();if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])});
+    document.getElementById('fileInput').addEventListener('change',function(){if(this.files[0])loadFile(this.files[0])});
+
+    function loadFile(file){
+        var r=new FileReader();
+        r.onload=function(e){
+            img=new Image();
+            img.onload=function(){
+                sampledColors=[];
+                initCanvas();
+                document.getElementById('workspace').style.display='block';
+                updatePreview();
+            };
+            img.src=e.target.result;
+        };
+        r.readAsDataURL(file);
+    }
+
+    function initCanvas(){
+        srcCanvas=document.getElementById('srcCanvas');srcCtx=srcCanvas.getContext('2d');
+        previewCanvas=document.getElementById('previewCanvas');previewCtx=previewCanvas.getContext('2d');
+        var maxW=Math.min(img.width,500);
+        var scale=maxW/img.width;
+        srcCanvas.width=maxW;srcCanvas.height=img.height*scale;
+        previewCanvas.width=maxW;previewCanvas.height=img.height*scale;
+        srcCtx.drawImage(img,0,0,srcCanvas.width,srcCanvas.height);
+    }
+
+    srcCanvas=document.getElementById('srcCanvas');
+    document.getElementById('canvasWrap').addEventListener('click',function(e){
+        if(!srcCanvas||!img)return;
+        var r=srcCanvas.getBoundingClientRect();
+        var x=Math.floor((e.clientX-r.left)*(srcCanvas.width/r.width));
+        var y=Math.floor((e.clientY-r.top)*(srcCanvas.height/r.height));
+        if(x<0||y<0||x>=srcCanvas.width||y>=srcCanvas.height)return;
+        var pixel=srcCtx.getImageData(x,y,1,1).data;
+        sampledColors.push([pixel[0],pixel[1],pixel[2]]);
+        updatePreview();
+        updateColorDisplay();
+    });
+
+    function updateColorDisplay(){
+        if(sampledColors.length===0){
+            document.getElementById('colorDisplay').style.background='#fff';
+            document.getElementById('colorCount').textContent='0 个采样点';
+            return;
+        }
+        var last=sampledColors[sampledColors.length-1];
+        document.getElementById('colorDisplay').style.background='rgb('+last[0]+','+last[1]+','+last[2]+')';
+        document.getElementById('colorCount').textContent=sampledColors.length+' 个采样点';
+    }
+
+    function colorDist(c1,c2){
+        var dr=c1[0]-c2[0],dg=c1[1]-c2[1],db=c1[2]-c2[2];
+        return Math.sqrt(dr*dr+dg*dg+db*db);
+    }
+
+    function isBackground(r,g,b,tolerance){
+        for(var i=0;i<sampledColors.length;i++){
+            if(colorDist([r,g,b],sampledColors[i])<=tolerance)return true;
+        }
+        return false;
+    }
+
+    function updatePreview(){
+        if(!img||sampledColors.length===0){
+            previewCtx.clearRect(0,0,previewCanvas.width,previewCanvas.height);
+            // Draw checkerboard
+            var sz=8;
+            for(var y=0;y<previewCanvas.height;y+=sz){
+                for(var x=0;x<previewCanvas.width;x+=sz){
+                    previewCtx.fillStyle=(Math.floor(x/sz)+Math.floor(y/sz))%2===0?'#e2e8f0':'#f8fafc';
+                    previewCtx.fillRect(x,y,sz,sz);
+                }
+            }
+            previewCtx.drawImage(srcCanvas,0,0);
+            updateColorDisplay();
+            return;
+        }
+        var tolerance=parseInt(document.getElementById('tolerance').value);
+        var smoothLevel=parseInt(document.getElementById('smooth').value);
+        document.getElementById('tolVal').textContent=tolerance;
+        document.getElementById('smoothVal').textContent=smoothLevel;
+        var srcData=srcCtx.getImageData(0,0,srcCanvas.width,srcCanvas.height);
+        var outData=previewCtx.createImageData(srcCanvas.width,srcCanvas.height);
+        // Build mask
+        var mask=new Uint8Array(srcCanvas.width*srcCanvas.height);
+        for(var i=0;i<srcData.data.length;i+=4){
+            var idx=i/4;
+            if(isBackground(srcData.data[i],srcData.data[i+1],srcData.data[i+2],tolerance)){
+                mask[idx]=0; // transparent
+            }else{
+                mask[idx]=1; // keep
+            }
+        }
+        // Simple smoothing: dilate/erode
+        if(smoothLevel>0){
+            for(var pass=0;pass<smoothLevel;pass++){
+                var newMask=new Uint8Array(mask);
+                var w=srcCanvas.width,h=srcCanvas.height;
+                for(var y=1;y<h-1;y++){
+                    for(var x=1;x<w-1;x++){
+                        var sum=0;
+                        for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++)sum+=mask[(y+dy)*w+(x+dx)];
+                        newMask[y*w+x]=sum>=5?1:0;
+                    }
+                }
+                mask=newMask;
+            }
+        }
+        for(var i=0;i<srcData.data.length;i+=4){
+            var idx=i/4;
+            outData.data[i]=srcData.data[i];
+            outData.data[i+1]=srcData.data[i+1];
+            outData.data[i+2]=srcData.data[i+2];
+            outData.data[i+3]=mask[idx]?255:0;
+        }
+        previewCtx.clearRect(0,0,previewCanvas.width,previewCanvas.height);
+        // Draw checkerboard background for transparency preview
+        var sz=8;
+        for(var y=0;y<previewCanvas.height;y+=sz){
+            for(var x=0;x<previewCanvas.width;x+=sz){
+                previewCtx.fillStyle=(Math.floor(x/sz)+Math.floor(y/sz))%2===0?'#cbd5e1':'#fff';
+                previewCtx.fillRect(x,y,sz,sz);
+            }
+        }
+        previewCtx.putImageData(outData,0,0);
+        updateColorDisplay();
+    }
+
+    document.getElementById('tolerance').addEventListener('input',updatePreview);
+    document.getElementById('smooth').addEventListener('input',updatePreview);
+    document.getElementById('resetColorsBtn').addEventListener('click',function(){sampledColors=[];updatePreview()});
+
+    document.getElementById('downloadBtn').addEventListener('click',function(){
+        if(!img||sampledColors.length===0)return;
+        // Re-render at full resolution
+        var tolerance=parseInt(document.getElementById('tolerance').value);
+        var smoothLevel=parseInt(document.getElementById('smooth').value);
+        var bigCanvas=document.createElement('canvas');bigCanvas.width=img.width;bigCanvas.height=img.height;
+        var bigCtx=bigCanvas.getContext('2d');bigCtx.drawImage(img,0,0);
+        var srcData=bigCtx.getImageData(0,0,bigCanvas.width,bigCanvas.height);
+        var outData=bigCtx.createImageData(bigCanvas.width,bigCanvas.height);
+        var mask=new Uint8Array(bigCanvas.width*bigCanvas.height);
+        for(var i=0;i<srcData.data.length;i+=4){
+            if(isBackground(srcData.data[i],srcData.data[i+1],srcData.data[i+2],tolerance))mask[i/4]=0;else mask[i/4]=1;
+        }
+        if(smoothLevel>0){
+            for(var pass=0;pass<smoothLevel;pass++){
+                var nm=new Uint8Array(mask);var w=bigCanvas.width,h=bigCanvas.height;
+                for(var y=1;y<h-1;y++)for(var x=1;x<w-1;x++){var s=0;for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++)s+=mask[(y+dy)*w+(x+dx)];nm[y*w+x]=s>=5?1:0;}
+                mask=nm;
+            }
+        }
+        for(var i=0;i<srcData.data.length;i+=4){
+            outData.data[i]=srcData.data[i];outData.data[i+1]=srcData.data[i+1];outData.data[i+2]=srcData.data[i+2];outData.data[i+3]=mask[i/4]?255:0;
+        }
+        bigCtx.putImageData(outData,0,0);
+        var a=document.createElement('a');a.href=bigCanvas.toDataURL();a.download='cutout.png';a.click();
+    });
+})();
+</script>
+</body>
+</html>
