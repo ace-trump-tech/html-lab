@@ -105,6 +105,19 @@
             content: "🔄";
         }
 
+        .update-list a {
+            color: #15607a;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px dotted #90b4cc;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .update-list a:hover {
+            color: #0a4f2a;
+            border-bottom-color: #0a4f2a;
+        }
+
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -237,19 +250,19 @@
         <p><strong>摆烂仙君</strong> 闭关修炼，已炼成<strong>十三件仙器</strong>（在线工具），涵盖编解码、格式化、生成器、预览器诸般法门。所有仙法皆以 HTML/CSS/JS 为根基，不借外力，道友的数据绝不出仙府。</p>
         <p><strong>🚀 炼器总览</strong></p>
         <ul class="update-list">
-            <li><strong>✅ 已炼成</strong> – Base64 编码/解码（支持 UTF-8 / 中文 / Emoji）</li>
-            <li><strong>✅ 已炼成</strong> – 二维码生成器（文本/URL 转 QR Code，可下载 PNG）</li>
-            <li><strong>✅ 已炼成</strong> – JSON 格式化 & 校验（语法高亮、压缩、转义、错误定位）</li>
-            <li><strong>✅ 已炼成</strong> – URL 编码/解码（encodeURIComponent / encodeURI 双模式）</li>
-            <li><strong>✅ 已炼成</strong> – Unix 时间戳转换（实时显示、互转、秒/毫秒自动识别）</li>
-            <li><strong>✅ 已炼成</strong> – Markdown 在线预览（编辑实时渲染、快捷插入、导出 HTML）</li>
-            <li><strong>✅ 已炼成</strong> – 颜色工具（HEX / RGB / HSL 互转、随机色、CSS 复制）</li>
-            <li><strong>✅ 已炼成</strong> – 随机密码生成器（可配长度字符集、密码强度显示）</li>
-            <li><strong>✅ 已炼成</strong> – 正则表达式测试器（实时高亮、捕获分组、匹配位置）</li>
-            <li><strong>✅ 已炼成</strong> – JWT 解码器（Header/Payload/Claims 解析、过期检测）</li>
-            <li><strong>✅ 已炼成</strong> – 哈希生成器（MD5 / SHA-1 / SHA-256 / SHA-512）</li>
-            <li><strong>✅ 已炼成</strong> – 文本差异对比（逐行 Diff、增删高亮、行数统计）</li>
-            <li><strong>✅ 已炼成</strong> – 字数 & 字节统计器（UTF-8 字节、阅读时间、中文字符）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="base64/">Base64 编码/解码</a>（支持 UTF-8 / 中文 / Emoji）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="qrcode/">二维码生成器</a>（文本/URL 转 QR Code，可下载 PNG）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="json-formatter/">JSON 格式化 & 校验</a>（语法高亮、压缩、转义、错误定位）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="url-codec/">URL 编码/解码</a>（encodeURIComponent / encodeURI 双模式）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="unix-timestamp/">Unix 时间戳转换</a>（实时显示、互转、秒/毫秒自动识别）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="markdown-preview/">Markdown 在线预览</a>（编辑实时渲染、快捷插入、导出 HTML）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="color-tools/">颜色工具</a>（HEX / RGB / HSL 互转、随机色、CSS 复制）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="password-generator/">随机密码生成器</a>（可配长度字符集、密码强度显示）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="regex-tester/">正则表达式测试器</a>（实时高亮、捕获分组、匹配位置）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="jwt-decoder/">JWT 解码器</a>（Header/Payload/Claims 解析、过期检测）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="hash-generator/">哈希生成器</a>（MD5 / SHA-1 / SHA-256 / SHA-512）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="diff-checker/">文本差异对比</a>（逐行 Diff、增删高亮、行数统计）</li>
+            <li><strong>✅ 已炼成</strong> – <a href="word-counter/">字数 & 字节统计器</a>（UTF-8 字节、阅读时间、中文字符）</li>
             <li><strong>⭐ 道友若喜爱，可点 Star 助我飞升</strong> – 若有想要的仙器，可至 Issues 中留言。</li>
         </ul>
     </div>
