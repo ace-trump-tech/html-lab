@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>HTML 格式化 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body { background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; margin: 0; }
+        .card { max-width: 1200px; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(2px); border-radius: 2rem; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2); overflow: hidden; }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; justify-content: center; }
+        .btn { background: white; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .btn-primary { background: #0f172a; border-color: #0f172a; color: white; }
+        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .row-2col { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+        .col { flex: 1; min-width: 280px; }
+        .label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-weight: 600; color: #0f172a; }
+        textarea { width: 100%; padding: 1rem; font-family: 'SF Mono', 'Cascadia Code', monospace; font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 1.2rem; background: white; resize: vertical; line-height: 1.5; tab-size: 2; }
+        textarea:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px #0f172a20; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px; font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999; }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } .btn { padding: 6px 14px; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>🌐 HTML 格式化 <span class="badge">美化 · 压缩 · 纯前端</span></h1>
+        <p>格式化美化 HTML 代码，也可压缩为单行。基于 DOMParser 解析缩进。</p>
+    </div>
+    <div class="container">
+        <div class="toolbar">
+            <button class="btn btn-primary" id="formatBtn">✨ 格式化</button>
+            <button class="btn btn-primary" id="minifyBtn">📦 压缩</button>
+            <button class="btn btn-outline" id="copyBtn">📋 复制结果</button>
+            <button class="btn btn-outline" id="clearBtn">🗑️ 清空</button>
+        </div>
+        <div class="row-2col">
+            <div class="col">
+                <div class="label"><span>📝 HTML 输入</span></div>
+                <textarea id="inputText" rows="12" placeholder="粘贴 HTML 代码...&#10;例如：<div><p>Hello</p></div>"></textarea>
+            </div>
+            <div class="col">
+                <div class="label"><span>✨ 输出结果</span></div>
+                <textarea id="outputText" rows="12" readonly placeholder="格式化/压缩后的结果..."></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<div id="toastMsg" class="toast-msg">✨ 已复制</div>
+<script>
+(function() {
+    var inputTa = document.getElementById('inputText');
+    var outputTa = document.getElementById('outputText');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+    function showToast(msg, isErr) { if (toastTimer) clearTimeout(toastTimer); toast.textContent = msg; toast.style.background = isErr ? '#be123c' : '#0f172a'; toast.style.opacity = '1'; toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1800); }
+
+    function formatHTML(html, indent) {
+        indent = indent || 2;
+        var sp = ' '.repeat(indent);
+        var result = '';
+        var level = 0;
+        // Simple regex-based formatter
+        var tags = html.replace(/</g, '\n<').replace(/>/g, '>\n');
+        var lines = tags.split('\n').filter(function(l) { return l.trim(); });
+        lines.forEach(function(line) {
+            var trimmed = line.trim();
+            if (!trimmed) return;
+            // closing tag
+            if (trimmed.match(/^<\/\w/)) {
+                level = Math.max(0, level - 1);
+                result += sp.repeat(level) + trimmed + '\n';
+            }
+            // self-closing
+            else if (trimmed.match(/\/>$/) || trimmed.match(/^<(meta|link|img|input|br|hr|area|base|col|embed|source|track|wbr)/i)) {
+                result += sp.repeat(level) + trimmed + '\n';
+            }
+            // opening tag
+            else if (trimmed.match(/^<\w/)) {
+                result += sp.repeat(level) + trimmed + '\n';
+                if (!trimmed.match(/<\/\w+>/)) level++;
+            }
+            // text content
+            else {
+                result += sp.repeat(level) + trimmed + '\n';
+            }
+        });
+        return result.trim();
+    }
+
+    function doFormat() {
+        var val = inputTa.value.trim();
+        if (!val) { outputTa.value = '⚠️ 输入为空'; return; }
+        try { outputTa.value = formatHTML(val); }
+        catch(e) { outputTa.value = '❌ 格式化错误: ' + e.message; }
+    }
+    function doMinify() {
+        var val = inputTa.value.trim();
+        if (!val) { outputTa.value = '⚠️ 输入为空'; return; }
+        outputTa.value = val.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
+    }
+    function doCopy() {
+        var text = outputTa.value;
+        if (!text) { showToast('⚠️ 没有可复制的内容', true); return; }
+        navigator.clipboard.writeText(text).then(function() { showToast('📋 结果已复制'); })
+            .catch(function() { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('📋 已复制'); });
+    }
+    document.getElementById('formatBtn').addEventListener('click', doFormat);
+    document.getElementById('minifyBtn').addEventListener('click', doMinify);
+    document.getElementById('copyBtn').addEventListener('click', doCopy);
+    document.getElementById('clearBtn').addEventListener('click', function() { inputTa.value = ''; outputTa.value = ''; showToast('🧹 已清空'); });
+})();
+</script>
+</body>
+</html>

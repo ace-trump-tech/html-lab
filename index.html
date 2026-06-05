@@ -91,18 +91,21 @@
 
         .update-list {
             list-style: none;
-            margin-top: 1rem;
+            margin-top: 0.3rem;
+            margin-bottom: 0.6rem;
         }
 
         .update-list li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.9rem;
         }
 
         .update-list li::before {
-            content: "🔄";
+            content: "✅";
+            font-size: 0.7rem;
         }
 
         .update-list a {
@@ -116,6 +119,31 @@
         .update-list a:hover {
             color: #0a4f2a;
             border-bottom-color: #0a4f2a;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 2rem;
+        }
+
+        .overview-group {
+            break-inside: avoid;
+        }
+
+        .overview-group .group-title {
+            font-weight: 600;
+            margin: 0.6rem 0 0;
+            color: #0b3b4f;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #e2edf2;
+            padding-bottom: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .tools-grid {
@@ -203,6 +231,133 @@
             background: #8ba0ae;
         }
 
+        .category-section {
+            margin: 2.5rem 0 1rem;
+        }
+
+        .category-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.6rem;
+            color: #0b3b4f;
+        }
+
+        .category-folder {
+            margin-bottom: 1rem;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid #e2edf2;
+            background: white;
+            transition: box-shadow 0.2s;
+        }
+
+        .category-folder:hover {
+            box-shadow: 0 8px 24px -6px rgba(0,0,0,0.08);
+        }
+
+        .folder-header {
+            background: #0f172a;
+            color: white;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .folder-header:hover {
+            background: #1e293b;
+        }
+
+        .folder-arrow {
+            margin-left: auto;
+            font-size: 0.7rem;
+            transition: transform 0.25s;
+        }
+
+        .category-folder.collapsed .folder-arrow {
+            transform: rotate(-90deg);
+        }
+
+        .folder-count {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+        .folder-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+            padding: 1.5rem;
+        }
+
+        .category-folder.collapsed .folder-body {
+            display: none;
+        }
+
+        .mini-card {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem 1.2rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .mini-card:hover {
+            background: white;
+            border-color: #bdd4e0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px -6px rgba(0,0,0,0.1);
+        }
+
+        .mini-card-icon {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .mini-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .mini-card-info h4 {
+            font-size: 0.95rem;
+            color: #0b3b4f;
+            margin: 0 0 2px;
+        }
+
+        .mini-card-info span {
+            font-size: 0.78rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        .mini-card-placeholder {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem 1.2rem;
+            border: 1px dashed #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.6;
+        }
+
+        .mini-card-placeholder .mini-card-info h4 {
+            color: #94a3b8;
+        }
+
         .footer {
             text-align: center;
             padding-top: 2rem;
@@ -247,24 +402,84 @@
 
     <div class="intro-card">
         <h2>📜 仙府简介</h2>
-        <p><strong>摆烂仙君</strong> 闭关修炼，已炼成<strong>十三件仙器</strong>（在线工具），涵盖编解码、格式化、生成器、预览器诸般法门。所有仙法皆以 HTML/CSS/JS 为根基，不借外力，道友的数据绝不出仙府。</p>
+        <p><strong>摆烂仙君</strong> 闭关修炼，已炼成<strong>三十件仙器</strong>（在线工具），涵盖编解码、格式化、生成器、图片处理、文本处理诸般法门。所有仙法皆以 HTML/CSS/JS 为根基，不借外力，道友的数据绝不出仙府。</p>
         <p><strong>🚀 炼器总览</strong></p>
-        <ul class="update-list">
-            <li><strong>✅ 已炼成</strong> – <a href="base64/">Base64 编码/解码</a>（支持 UTF-8 / 中文 / Emoji）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="qrcode/">二维码生成器</a>（文本/URL 转 QR Code，可下载 PNG）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="json-formatter/">JSON 格式化 & 校验</a>（语法高亮、压缩、转义、错误定位）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="url-codec/">URL 编码/解码</a>（encodeURIComponent / encodeURI 双模式）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="unix-timestamp/">Unix 时间戳转换</a>（实时显示、互转、秒/毫秒自动识别）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="markdown-preview/">Markdown 在线预览</a>（编辑实时渲染、快捷插入、导出 HTML）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="color-tools/">颜色工具</a>（HEX / RGB / HSL 互转、随机色、CSS 复制）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="password-generator/">随机密码生成器</a>（可配长度字符集、密码强度显示）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="regex-tester/">正则表达式测试器</a>（实时高亮、捕获分组、匹配位置）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="jwt-decoder/">JWT 解码器</a>（Header/Payload/Claims 解析、过期检测）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="hash-generator/">哈希生成器</a>（MD5 / SHA-1 / SHA-256 / SHA-512）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="diff-checker/">文本差异对比</a>（逐行 Diff、增删高亮、行数统计）</li>
-            <li><strong>✅ 已炼成</strong> – <a href="word-counter/">字数 & 字节统计器</a>（UTF-8 字节、阅读时间、中文字符）</li>
-            <li><strong>⭐ 道友若喜爱，可点 Star 助我飞升</strong> – 若有想要的仙器，可至 Issues 中留言。</li>
-        </ul>
+        <div class="overview-grid">
+
+        <div class="overview-group">
+            <p class="group-title">🪄 镇阁仙器</p>
+            <ul class="update-list">
+                <li><a href="base64/">Base64 编码/解码</a>（UTF-8 / 中文 / Emoji）</li>
+                <li><a href="qrcode/">二维码生成器</a>（QR Code · 下载 PNG）</li>
+                <li><a href="markdown-preview/">Markdown 在线预览</a>（实时渲染 · 导出 HTML）</li>
+                <li><a href="diff-checker/">文本差异对比</a>（逐行 Diff · 增删高亮）</li>
+                <li><a href="word-counter/">字数 & 字节统计器</a>（UTF-8 · 阅读时间）</li>
+            </ul>
+        </div>
+
+        <div class="overview-group">
+            <p class="group-title">🖼️ 图片处理</p>
+            <ul class="update-list">
+                <li><a href="image-compressor/">图片压缩</a>（质量/缩放可调）</li>
+                <li><a href="image-converter/">图片格式转换</a>（PNG / JPEG / WebP）</li>
+                <li><a href="image-base64/">图片 Base64 转换</a>（图片 ⇄ Base64）</li>
+            </ul>
+        </div>
+
+        <div class="overview-group">
+            <p class="group-title">🔤 编码/解码</p>
+            <ul class="update-list">
+                <li><a href="url-codec/">URL 编码/解码</a>（encodeURIComponent / encodeURI）</li>
+                <li><a href="html-entity/">HTML 实体编解码</a>（&amp;lt; ⇄ &lt;）</li>
+                <li><a href="unicode-codec/">Unicode 编解码</a>（\\uXXXX ⇄ 原文）</li>
+                <li><a href="morse-code/">摩斯电码</a>（文本 ⇄ Morse Code）</li>
+                <li><a href="jwt-decoder/">JWT 解码器</a>（Header / Payload / Claims）</li>
+            </ul>
+        </div>
+
+        <div class="overview-group">
+            <p class="group-title">🎲 生成器</p>
+            <ul class="update-list">
+                <li><a href="password-generator/">随机密码生成器</a>（Crypto API · 强度显示）</li>
+                <li><a href="uuid-generator/">UUID 生成器</a>（v4 · 批量生成）</li>
+                <li><a href="lorem-ipsum/">Lorem Ipsum 生成器</a>（拉丁/中文假文）</li>
+                <li><a href="hash-generator/">哈希生成器</a>（MD5 / SHA-1 / SHA-256 / SHA-512）</li>
+            </ul>
+        </div>
+
+        <div class="overview-group">
+            <p class="group-title">📐 格式化/校验</p>
+            <ul class="update-list">
+                <li><a href="json-formatter/">JSON 格式化 & 校验</a>（语法高亮 · 压缩 · 转义）</li>
+                <li><a href="html-formatter/">HTML 格式化</a>（美化 · 压缩）</li>
+                <li><a href="css-formatter/">CSS 格式化</a>（美化 · 压缩）</li>
+                <li><a href="js-formatter/">JavaScript 格式化</a>（美化 · 压缩）</li>
+                <li><a href="sql-formatter/">SQL 格式化</a>（关键字大写 · 换行缩进）</li>
+            </ul>
+        </div>
+
+        <div class="overview-group">
+            <p class="group-title">📝 文本处理</p>
+            <ul class="update-list">
+                <li><a href="regex-tester/">正则表达式测试器</a>（实时高亮 · 捕获分组）</li>
+                <li><a href="case-converter/">大小写转换</a>（UPPER / lower / Title / 驼峰等）</li>
+                <li><a href="text-dedup/">文本去重</a>（逐行去重 · 可选空行）</li>
+                <li><a href="text-sorter/">文本排序</a>（字母/数字/随机）</li>
+            </ul>
+        </div>
+
+        <div class="overview-group">
+            <p class="group-title">🧰 其他工具</p>
+            <ul class="update-list">
+                <li><a href="unix-timestamp/">Unix 时间戳转换</a>（实时 · 秒/毫秒）</li>
+                <li><a href="color-tools/">颜色工具</a>（HEX / RGB / HSL 互转）</li>
+                <li><a href="base-converter/">进制转换</a>（2 / 8 / 10 / 16）</li>
+                <li><a href="unit-converter/">单位换算</a>（长度/重量/温度/数据）</li>
+            </ul>
+        </div>
+
+        </div>
+        <p style="margin-top:0.8rem;"><strong>⭐ 道友若喜爱，可点 Star 助我飞升</strong> – 若有想要的仙器，可至 Issues 中留言。</p>
     </div>
 
     <h2 style="margin-bottom: 0.5rem;">🪄 仙器阁</h2>
@@ -287,33 +502,6 @@
             <a href="qrcode/" class="tool-btn">📲 施法 →</a>
         </div>
 
-        <!-- JSON 格式化仙器 -->
-        <div class="tool-card">
-            <div class="card-icon">📋</div>
-            <h3>JSON 天书·格式化</h3>
-            <span class="tool-tag"># 语法高亮 · 压缩 · 转义</span>
-            <p>格式化、压缩、校验 JSON 天书，带语法高亮与乱码定位。解读天机，一目了然。</p>
-            <a href="json-formatter/" class="tool-btn">🔍 施法 →</a>
-        </div>
-
-        <!-- URL 编解码仙器 -->
-        <div class="tool-card">
-            <div class="card-icon">🔗</div>
-            <h3>URL 遁术·编解码</h3>
-            <span class="tool-tag"># encodeURIComponent · 参数加密</span>
-            <p>对天网地址进行编码与解码，支持中土文字与特殊符号，双诀切换自如。</p>
-            <a href="url-codec/" class="tool-btn">🌐 施法 →</a>
-        </div>
-
-        <!-- 时间戳仙器 -->
-        <div class="tool-card">
-            <div class="card-icon">⏱️</div>
-            <h3>时辰·时间戳互转</h3>
-            <span class="tool-tag"># 实时 · 秒/毫秒 · 互转</span>
-            <p>实时展示当前时辰（Unix时间戳），凡间历法与天界时辰随心互转。</p>
-            <a href="unix-timestamp/" class="tool-btn">🕐 施法 →</a>
-        </div>
-
         <!-- Markdown 仙器 -->
         <div class="tool-card">
             <div class="card-icon">📝</div>
@@ -321,51 +509,6 @@
             <span class="tool-tag"># 编撰 · 实时预览 · 导出HTML</span>
             <p>左栏编撰 Markdown 道经，右栏即时显化。附快捷插入法术，可复制 HTML 真言。</p>
             <a href="markdown-preview/" class="tool-btn">📄 施法 →</a>
-        </div>
-
-        <!-- 颜色仙器 -->
-        <div class="tool-card">
-            <div class="card-icon">🎨</div>
-            <h3>五色·神光变幻</h3>
-            <span class="tool-tag"># HEX · RGB · HSL 互转</span>
-            <p>取色仙器，HEX / RGB / HSL 三色法随心互转，随机取色与 CSS 真言一键凝练。</p>
-            <a href="color-tools/" class="tool-btn">🎯 施法 →</a>
-        </div>
-
-        <!-- 密码仙器 -->
-        <div class="tool-card">
-            <div class="card-icon">🔐</div>
-            <h3>密令·随机生成</h3>
-            <span class="tool-tag"># 天机 · 可配置 · 强弱感知</span>
-            <p>借 Web Crypto 天机之术锻造秘钥，可调长短、选符文，实时感知密令强弱。</p>
-            <a href="password-generator/" class="tool-btn">🔑 施法 →</a>
-        </div>
-
-        <!-- 正则仙器 -->
-        <div class="tool-card">
-            <div class="card-icon">🔍</div>
-            <h3>天罡·正则试炼</h3>
-            <span class="tool-tag"># RegExp · 实时高亮 · 捕获分组</span>
-            <p>输入天罡正则与试炼文本，实时高亮匹配之物，显示捕获分组及方位。</p>
-            <a href="regex-tester/" class="tool-btn">🧪 施法 →</a>
-        </div>
-
-        <!-- JWT 仙器 -->
-        <div class="tool-card">
-            <div class="card-icon">🔓</div>
-            <h3>JWT 令牌·解读</h3>
-            <span class="tool-tag"># Header · Payload · Claims</span>
-            <p>解读 JWT 通界令牌的 Header 与 Payload，解析标准 Claims 并检测是否过期。</p>
-            <a href="jwt-decoder/" class="tool-btn">🔎 施法 →</a>
-        </div>
-
-        <!-- 哈希仙器 -->
-        <div class="tool-card">
-            <div class="card-icon">🧬</div>
-            <h3>真言·哈希凝练</h3>
-            <span class="tool-tag"># MD5 · SHA-1 · SHA-256 · SHA-512</span>
-            <p>凝练文本真言为摘要哈希，支持 MD5 / SHA 诸般法门，本地炼化不泄天机。</p>
-            <a href="hash-generator/" class="tool-btn">🔬 施法 →</a>
         </div>
 
         <!-- 差异对比仙器 -->
@@ -393,6 +536,182 @@
             <span class="tool-tag"># 即将点化</span>
             <p>更多仙器炼制中…… 贫道正在闭关修炼，敬请期待。</p>
             <span class="tool-btn" style="background:#8ba0ae;">⏳ 炼丹中</span>
+        </div>
+    </div>
+
+    <div class="category-section">
+        <h2>📂 分类仙器</h2>
+
+        <!-- 图片处理 -->
+        <div class="category-folder collapsed">
+            <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                🖼️ 图片处理 <span class="folder-count">6 件仙器</span>
+                <span class="folder-arrow">▼</span>
+            </div>
+            <div class="folder-body">
+                <a href="image-compressor/" class="mini-card">
+                    <span class="mini-card-icon">🗜️</span>
+                    <div class="mini-card-info"><h4>图片压缩</h4><span>有损/无损压缩，调节质量</span></div>
+                </a>
+                <a href="image-converter/" class="mini-card">
+                    <span class="mini-card-icon">🔄</span>
+                    <div class="mini-card-info"><h4>图片格式转换</h4><span>PNG / JPEG / WebP 互转</span></div>
+                </a>
+                <a href="image-base64/" class="mini-card">
+                    <span class="mini-card-icon">📇</span>
+                    <div class="mini-card-info"><h4>图片Base64转换</h4><span>图片 ⇄ Base64 字符串</span></div>
+                </a>
+                <div class="mini-card-placeholder">
+                    <span class="mini-card-icon">✂️</span>
+                    <div class="mini-card-info"><h4>图片裁剪</h4><span>炼丹中...</span></div>
+                </div>
+                <div class="mini-card-placeholder">
+                    <span class="mini-card-icon">📐</span>
+                    <div class="mini-card-info"><h4>图片尺寸调整</h4><span>炼丹中...</span></div>
+                </div>
+                <div class="mini-card-placeholder">
+                    <span class="mini-card-icon">🪞</span>
+                    <div class="mini-card-info"><h4>图片旋转/翻转</h4><span>炼丹中...</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编码/解码 -->
+        <div class="category-folder collapsed">
+            <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                🔤 编码/解码 <span class="folder-count">5 件仙器</span>
+                <span class="folder-arrow">▼</span>
+            </div>
+            <div class="folder-body">
+                <a href="url-codec/" class="mini-card">
+                    <span class="mini-card-icon">🔗</span>
+                    <div class="mini-card-info"><h4>URL 编解码</h4><span>encodeURIComponent / encodeURI</span></div>
+                </a>
+                <a href="html-entity/" class="mini-card">
+                    <span class="mini-card-icon">🏷️</span>
+                    <div class="mini-card-info"><h4>HTML 实体编解码</h4><span>&amp;lt; ⇄ &lt; 互转</span></div>
+                </a>
+                <a href="unicode-codec/" class="mini-card">
+                    <span class="mini-card-icon">🔣</span>
+                    <div class="mini-card-info"><h4>Unicode 编解码</h4><span>\\uXXXX ⇄ 原文互转</span></div>
+                </a>
+                <a href="morse-code/" class="mini-card">
+                    <span class="mini-card-icon">📡</span>
+                    <div class="mini-card-info"><h4>摩斯电码</h4><span>文本 ⇄ 摩斯电码互转</span></div>
+                </a>
+                <a href="jwt-decoder/" class="mini-card">
+                    <span class="mini-card-icon">🔓</span>
+                    <div class="mini-card-info"><h4>JWT 解码器</h4><span>Header/Payload/Claims 解析</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 生成器 -->
+        <div class="category-folder collapsed">
+            <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                🎲 生成器 <span class="folder-count">4 件仙器</span>
+                <span class="folder-arrow">▼</span>
+            </div>
+            <div class="folder-body">
+                <a href="password-generator/" class="mini-card">
+                    <span class="mini-card-icon">🔐</span>
+                    <div class="mini-card-info"><h4>随机密码生成器</h4><span>可配长度字符集、强度显示</span></div>
+                </a>
+                <a href="uuid-generator/" class="mini-card">
+                    <span class="mini-card-icon">🆔</span>
+                    <div class="mini-card-info"><h4>UUID 生成器</h4><span>UUID v1/v4 批量生成</span></div>
+                </a>
+                <a href="lorem-ipsum/" class="mini-card">
+                    <span class="mini-card-icon">📝</span>
+                    <div class="mini-card-info"><h4>Lorem Ipsum 生成器</h4><span>占位文本批量生成</span></div>
+                </a>
+                <a href="hash-generator/" class="mini-card">
+                    <span class="mini-card-icon">🧬</span>
+                    <div class="mini-card-info"><h4>哈希生成器</h4><span>MD5 / SHA-1 / SHA-256 / SHA-512</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 格式化/校验 -->
+        <div class="category-folder collapsed">
+            <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                📐 格式化/校验 <span class="folder-count">5 件仙器</span>
+                <span class="folder-arrow">▼</span>
+            </div>
+            <div class="folder-body">
+                <a href="json-formatter/" class="mini-card">
+                    <span class="mini-card-icon">📋</span>
+                    <div class="mini-card-info"><h4>JSON 格式化 & 校验</h4><span>语法高亮、压缩、转义</span></div>
+                </a>
+                <a href="html-formatter/" class="mini-card">
+                    <span class="mini-card-icon">🌐</span>
+                    <div class="mini-card-info"><h4>HTML 格式化</h4><span>缩进美化 HTML 代码</span></div>
+                </a>
+                <a href="css-formatter/" class="mini-card">
+                    <span class="mini-card-icon">🎨</span>
+                    <div class="mini-card-info"><h4>CSS 格式化</h4><span>压缩/美化 CSS 样式</span></div>
+                </a>
+                <a href="js-formatter/" class="mini-card">
+                    <span class="mini-card-icon">📜</span>
+                    <div class="mini-card-info"><h4>JS 格式化</h4><span>压缩/美化 JavaScript</span></div>
+                </a>
+                <a href="sql-formatter/" class="mini-card">
+                    <span class="mini-card-icon">🗄️</span>
+                    <div class="mini-card-info"><h4>SQL 格式化</h4><span>美化 SQL 查询语句</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 文本处理 -->
+        <div class="category-folder collapsed">
+            <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                📝 文本处理 <span class="folder-count">4 件仙器</span>
+                <span class="folder-arrow">▼</span>
+            </div>
+            <div class="folder-body">
+                <a href="regex-tester/" class="mini-card">
+                    <span class="mini-card-icon">🔍</span>
+                    <div class="mini-card-info"><h4>正则表达式测试器</h4><span>实时高亮匹配、捕获分组</span></div>
+                </a>
+                <a href="case-converter/" class="mini-card">
+                    <span class="mini-card-icon">🔠</span>
+                    <div class="mini-card-info"><h4>大小写转换</h4><span>大写/小写/首字母大写等</span></div>
+                </a>
+                <a href="text-dedup/" class="mini-card">
+                    <span class="mini-card-icon">🧹</span>
+                    <div class="mini-card-info"><h4>文本去重</h4><span>去除重复行, 保留/去除空行</span></div>
+                </a>
+                <a href="text-sorter/" class="mini-card">
+                    <span class="mini-card-icon">🔤</span>
+                    <div class="mini-card-info"><h4>文本排序</h4><span>字母/数字/随机排序</span></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 其他工具 -->
+        <div class="category-folder collapsed">
+            <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                🧰 其他工具 <span class="folder-count">4 件仙器</span>
+                <span class="folder-arrow">▼</span>
+            </div>
+            <div class="folder-body">
+                <a href="unix-timestamp/" class="mini-card">
+                    <span class="mini-card-icon">⏱️</span>
+                    <div class="mini-card-info"><h4>Unix 时间戳转换</h4><span>实时显示、互转、秒/毫秒</span></div>
+                </a>
+                <a href="color-tools/" class="mini-card">
+                    <span class="mini-card-icon">🎨</span>
+                    <div class="mini-card-info"><h4>颜色工具</h4><span>HEX / RGB / HSL 互转</span></div>
+                </a>
+                <a href="base-converter/" class="mini-card">
+                    <span class="mini-card-icon">🔢</span>
+                    <div class="mini-card-info"><h4>进制转换</h4><span>2/8/10/16 进制互转</span></div>
+                </a>
+                <a href="unit-converter/" class="mini-card">
+                    <span class="mini-card-icon">📏</span>
+                    <div class="mini-card-info"><h4>单位换算</h4><span>长度/重量/温度/数据</span></div>
+                </a>
+            </div>
         </div>
     </div>
 

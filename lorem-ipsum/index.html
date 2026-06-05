@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Lorem Ipsum 生成器 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body { background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; margin: 0; }
+        .card { max-width: 800px; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(2px); border-radius: 2rem; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2); overflow: hidden; }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        .output-area {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1.2rem; padding: 1.2rem 1.5rem;
+            min-height: 150px; margin-bottom: 1.2rem; line-height: 1.8; color: #0f172a; word-break: break-word; font-size: 0.95rem;
+        }
+        .config-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 1.2rem; align-items: center; }
+        .config-row label { font-weight: 600; color: #0f172a; font-size: 0.9rem; }
+        .config-row input, .config-row select { padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 0.8rem; font-size: 0.9rem; }
+        .btn { background: white; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .btn-primary { background: #0f172a; border-color: #0f172a; color: white; }
+        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px; font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999; }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>📝 Lorem Ipsum 生成器 <span class="badge">占位文本 · 中/英</span></h1>
+        <p>生成 Lorem Ipsum 或中文乱数假文占位文本，支持段落/句子/单词模式</p>
+    </div>
+    <div class="container">
+        <div class="config-row">
+            <label>语言</label>
+            <select id="langSelect">
+                <option value="latin">Lorem Ipsum (拉丁)</option>
+                <option value="zh">乱数假文 (中文)</option>
+            </select>
+            <label>模式</label>
+            <select id="modeSelect">
+                <option value="paragraphs">段落</option>
+                <option value="sentences">句子</option>
+                <option value="words">单词</option>
+            </select>
+            <label>数量</label>
+            <input type="number" id="countInput" value="3" min="1" max="50" style="width:70px;">
+        </div>
+        <div class="toolbar">
+            <button class="btn btn-primary" id="generateBtn">🔄 生成</button>
+            <button class="btn btn-outline" id="copyBtn">📋 复制文本</button>
+        </div>
+        <div class="output-area" id="outputArea"></div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<div id="toastMsg" class="toast-msg">📋 已复制</div>
+<script>
+(function() {
+    var latinWords = ['lorem','ipsum','dolor','sit','amet','consectetur','adipiscing','elit','sed','do','eiusmod','tempor','incididunt','ut','labore','et','dolore','magna','aliqua','ut','enim','ad','minim','veniam','quis','nostrud','exercitation','ullamco','laboris','nisi','ut','aliquip','ex','ea','commodo','consequat','duis','aute','irure','dolor','in','reprehenderit','in','voluptate','velit','esse','cillum','dolore','eu','fugiat','nulla','pariatur','excepteur','sint','occaecat','cupidatat','non','proident','sunt','in','culpa','qui','officia','deserunt','mollit','anim','id','est','laborum'];
+
+    var zhChars = '的一是不了在有人我他这中大来上个国为和地出要时以就到们说会也那可对下生能子过自得而于家长成如后学去为用方天同开心没法从如都二只起当看三见两使等样高现重工前各加经力本实全又手题意通机里道之物品小命关把其应外自合此相很或组位向已门看路山回正被日明间十公特美体果长水政点战法性者部定行代平电机从情者度光元年面公力线制新数有些先知头它党无主与';
+
+    var outputArea = document.getElementById('outputArea');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+
+    function showToast(msg) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg; toast.style.background = '#0f172a';
+        toast.style.opacity = '1'; toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1500);
+    }
+
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function latinWord() { return pick(latinWords); }
+    function latinSentence() {
+        var len = 5 + Math.floor(Math.random() * 12);
+        var words = [];
+        for (var i = 0; i < len; i++) words.push(latinWord());
+        return words[0].charAt(0).toUpperCase() + words[0].slice(1) + ' ' + words.slice(1).join(' ') + '.';
+    }
+    function latinParagraph() {
+        var len = 3 + Math.floor(Math.random() * 5);
+        var sentences = [];
+        for (var i = 0; i < len; i++) sentences.push(latinSentence());
+        return sentences.join(' ');
+    }
+
+    function zhWord() {
+        var len = 1 + Math.floor(Math.random() * 3);
+        var w = '';
+        for (var i = 0; i < len; i++) w += pick(zhChars);
+        return w;
+    }
+    function zhSentence() {
+        var len = 8 + Math.floor(Math.random() * 20);
+        var words = [];
+        for (var i = 0; i < len; i++) words.push(zhWord());
+        return words.join('') + '。';
+    }
+    function zhParagraph() {
+        var len = 2 + Math.floor(Math.random() * 4);
+        var sentences = [];
+        for (var i = 0; i < len; i++) sentences.push(zhSentence());
+        return sentences.join('');
+    }
+
+    function doGenerate() {
+        var lang = document.getElementById('langSelect').value;
+        var mode = document.getElementById('modeSelect').value;
+        var count = parseInt(document.getElementById('countInput').value) || 3;
+        count = Math.max(1, Math.min(50, count));
+        var results = [];
+        for (var i = 0; i < count; i++) {
+            if (lang === 'latin') {
+                if (mode === 'words') results.push(latinWord());
+                else if (mode === 'sentences') results.push(latinSentence());
+                else results.push(latinParagraph());
+            } else {
+                if (mode === 'words') results.push(zhWord());
+                else if (mode === 'sentences') results.push(zhSentence());
+                else results.push(zhParagraph());
+            }
+        }
+        var sep = mode === 'paragraphs' ? '\n\n' : ' ';
+        outputArea.textContent = results.join(sep);
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', doGenerate);
+    document.getElementById('copyBtn').addEventListener('click', function() {
+        var text = outputArea.textContent;
+        if (!text) { showToast('⚠️ 请先生成文本'); return; }
+        navigator.clipboard.writeText(text).then(function() { showToast('📋 文本已复制'); })
+            .catch(function() { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('📋 已复制'); });
+    });
+    doGenerate();
+})();
+</script>
+</body>
+</html>

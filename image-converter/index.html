@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>图片格式转换 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body { background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; margin: 0; }
+        .card { max-width: 700px; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(2px); border-radius: 2rem; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2); overflow: hidden; }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        .upload-area { border: 2px dashed #cbd5e1; border-radius: 1.5rem; padding: 2rem; text-align: center; margin-bottom: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .upload-area:hover { border-color: #0f172a; background: #f8fafc; }
+        .upload-area input[type="file"] { display: none; }
+        .config-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 1rem; justify-content: center; }
+        .config-row label { font-weight: 600; color: #0f172a; font-size: 0.9rem; }
+        .config-row select { padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 0.8rem; font-size: 0.9rem; background: white; }
+        .format-arrow { font-size: 1.5rem; color: #64748b; }
+        .preview-area { text-align: center; margin-bottom: 1rem; }
+        .preview-area img { max-width: 100%; max-height: 300px; border-radius: 1rem; border: 1px solid #e2e8f0; }
+        .preview-area .info { font-size: 0.8rem; color: #64748b; margin-top: 4px; }
+        .btn { background: white; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .btn-primary { background: #0f172a; border-color: #0f172a; color: white; }
+        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px; font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999; }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>🔄 图片格式转换 <span class="badge">PNG · JPEG · WebP</span></h1>
+        <p>上传图片，在 PNG / JPEG / WebP 之间互相转换，纯前端 Canvas 处理</p>
+    </div>
+    <div class="container">
+        <div class="upload-area" id="uploadArea">
+            📁 点击或拖拽上传图片
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+        <div class="config-row">
+            <label>源格式</label>
+            <span style="font-family:'SF Mono',monospace;color:#64748b;" id="srcFmt">-</span>
+            <span class="format-arrow">→</span>
+            <label>目标格式</label>
+            <select id="targetFmt">
+                <option value="image/png">PNG</option>
+                <option value="image/jpeg">JPEG</option>
+                <option value="image/webp">WebP</option>
+            </select>
+        </div>
+        <div class="preview-area" id="previewArea" style="display:none;">
+            <img id="previewImg">
+            <div class="info" id="previewInfo"></div>
+        </div>
+        <div class="toolbar">
+            <button class="btn btn-primary" id="convertBtn">🔄 转换</button>
+            <button class="btn btn-outline" id="downloadBtn">⬇️ 下载</button>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<div id="toastMsg" class="toast-msg">✅ 转换完成</div>
+<script>
+(function() {
+    var originalImg = null;
+    var convertedBlob = null;
+    var originalFile = null;
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+    function showToast(msg, isErr) { if (toastTimer) clearTimeout(toastTimer); toast.textContent = msg; toast.style.background = isErr ? '#be123c' : '#0f172a'; toast.style.opacity = '1'; toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1500); }
+    function fmtSize(bytes) { if (bytes < 1024) return bytes + ' B'; if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB'; return (bytes/1048576).toFixed(2) + ' MB'; }
+
+    document.getElementById('uploadArea').addEventListener('click', function() { document.getElementById('fileInput').click(); });
+    document.getElementById('uploadArea').addEventListener('dragover', function(e) { e.preventDefault(); });
+    document.getElementById('uploadArea').addEventListener('drop', function(e) { e.preventDefault(); var f = e.dataTransfer.files[0]; if (f) loadFile(f); });
+    document.getElementById('fileInput').addEventListener('change', function() { if (this.files[0]) loadFile(this.files[0]); });
+
+    function loadFile(file) {
+        originalFile = file;
+        document.getElementById('srcFmt').textContent = file.type || '未知';
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            originalImg = new Image();
+            originalImg.onload = function() {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('previewInfo').textContent = fmtSize(file.size) + ' | ' + originalImg.width + 'x' + originalImg.height;
+                document.getElementById('previewArea').style.display = 'block';
+                doConvert();
+            };
+            originalImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function doConvert() {
+        if (!originalImg) { showToast('⚠️ 请先上传图片', true); return; }
+        var fmt = document.getElementById('targetFmt').value;
+        var canvas = document.createElement('canvas');
+        canvas.width = originalImg.width;
+        canvas.height = originalImg.height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(originalImg, 0, 0);
+        canvas.toBlob(function(blob) {
+            convertedBlob = blob;
+            var url = URL.createObjectURL(blob);
+            document.getElementById('previewImg').src = url;
+            document.getElementById('previewInfo').textContent = fmtSize(blob.size) + ' | ' + canvas.width + 'x' + canvas.height;
+            showToast('✅ 转换完成');
+        }, fmt, 0.92);
+    }
+
+    document.getElementById('convertBtn').addEventListener('click', doConvert);
+    document.getElementById('targetFmt').addEventListener('change', doConvert);
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+        if (!convertedBlob) { showToast('⚠️ 请先转换图片', true); return; }
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(convertedBlob);
+        var ext = document.getElementById('targetFmt').value.split('/')[1];
+        a.download = (originalFile ? originalFile.name.replace(/\.[^.]+$/, '') : 'converted') + '.' + ext;
+        a.click();
+        showToast('📸 下载完成');
+    });
+})();
+</script>
+</body>
+</html>

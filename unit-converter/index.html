@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>单位换算 | 在线工具</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body { background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; margin: 0; }
+        .card { max-width: 700px; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(2px); border-radius: 2rem; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2); overflow: hidden; }
+        .header { background: #0f172a; padding: 1.2rem 2rem; color: white; }
+        .header h1 { margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .badge { background: #2dd4bf20; border-radius: 40px; padding: 0.2rem 0.8rem; font-size: 0.8rem; border: 1px solid #2dd4bf50; }
+        .container { padding: 2rem; }
+        .cat-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.2rem; }
+        .cat-btn { padding: 8px 16px; border-radius: 60px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        .cat-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
+        .cat-btn:hover { background: #f1f5f9; }
+        .cat-btn.active:hover { background: #1e293b; }
+        .convert-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 1.2rem; }
+        .convert-row input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 0.8rem; font-size: 1rem; width: 160px; font-family: 'SF Mono', monospace; }
+        .convert-row select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 0.8rem; font-size: 0.9rem; background: white; }
+        .convert-row span { font-size: 1.2rem; color: #64748b; }
+        .result-text { font-size: 1.2rem; font-weight: 600; color: #0f172a; font-family: 'SF Mono', monospace; }
+        .btn { background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
+        .btn-outline:hover { background: #f1f5f9; }
+        .footer { background: #f1f5f9; padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #475569; border-top: 1px solid #e2e8f0; }
+        .footer a { color: #15607a; text-decoration: none; }
+        .toast-msg { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 8px 20px; border-radius: 40px; font-size: 0.8rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999; }
+        @media (max-width: 680px) { .container { padding: 1.2rem; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>📏 单位换算 <span class="badge">长度 · 重量 · 温度 · 数据</span></h1>
+        <p>常用单位换算，支持长度、重量、温度、数据存储等类别</p>
+    </div>
+    <div class="container">
+        <div class="cat-row" id="catRow">
+            <button class="cat-btn active" data-cat="length">📏 长度</button>
+            <button class="cat-btn" data-cat="weight">⚖️ 重量</button>
+            <button class="cat-btn" data-cat="temp">🌡️ 温度</button>
+            <button class="cat-btn" data-cat="data">💾 数据存储</button>
+        </div>
+        <div class="convert-row">
+            <input type="number" id="fromVal" value="1" step="any">
+            <select id="fromUnit"></select>
+            <span>=</span>
+            <span class="result-text" id="resultDisplay">-</span>
+            <select id="toUnit"></select>
+            <button class="btn btn-outline" id="swapUnitsBtn">⇄</button>
+        </div>
+        <div class="toolbar" style="margin-top:0.5rem;">
+            <button class="btn btn-outline" id="copyBtn">📋 复制结果</button>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<div id="toastMsg" class="toast-msg">📋 已复制</div>
+<script>
+(function() {
+    var units = {
+        length: [
+            { name: '米 (m)', toBase: function(v){return v;}, fromBase: function(v){return v;} },
+            { name: '千米 (km)', toBase: function(v){return v*1000;}, fromBase: function(v){return v/1000;} },
+            { name: '厘米 (cm)', toBase: function(v){return v/100;}, fromBase: function(v){return v*100;} },
+            { name: '毫米 (mm)', toBase: function(v){return v/1000;}, fromBase: function(v){return v*1000;} },
+            { name: '英寸 (in)', toBase: function(v){return v*0.0254;}, fromBase: function(v){return v/0.0254;} },
+            { name: '英尺 (ft)', toBase: function(v){return v*0.3048;}, fromBase: function(v){return v/0.3048;} },
+            { name: '英里 (mi)', toBase: function(v){return v*1609.344;}, fromBase: function(v){return v/1609.344;} }
+        ],
+        weight: [
+            { name: '千克 (kg)', toBase: function(v){return v;}, fromBase: function(v){return v;} },
+            { name: '克 (g)', toBase: function(v){return v/1000;}, fromBase: function(v){return v*1000;} },
+            { name: '毫克 (mg)', toBase: function(v){return v/1000000;}, fromBase: function(v){return v*1000000;} },
+            { name: '磅 (lb)', toBase: function(v){return v*0.453592;}, fromBase: function(v){return v/0.453592;} },
+            { name: '盎司 (oz)', toBase: function(v){return v*0.0283495;}, fromBase: function(v){return v/0.0283495;} },
+            { name: '吨 (t)', toBase: function(v){return v*1000;}, fromBase: function(v){return v/1000;} }
+        ],
+        temp: [
+            { name: '摄氏度 (°C)', toBase: function(v){return v;}, fromBase: function(v){return v;} },
+            { name: '华氏度 (°F)', toBase: function(v){return (v-32)*5/9;}, fromBase: function(v){return v*9/5+32;} },
+            { name: '开尔文 (K)', toBase: function(v){return v-273.15;}, fromBase: function(v){return v+273.15;} }
+        ],
+        data: [
+            { name: '字节 (B)', toBase: function(v){return v;}, fromBase: function(v){return v;} },
+            { name: 'KB', toBase: function(v){return v*1024;}, fromBase: function(v){return v/1024;} },
+            { name: 'MB', toBase: function(v){return v*1048576;}, fromBase: function(v){return v/1048576;} },
+            { name: 'GB', toBase: function(v){return v*1073741824;}, fromBase: function(v){return v/1073741824;} },
+            { name: 'TB', toBase: function(v){return v*1099511627776;}, fromBase: function(v){return v/1099511627776;} }
+        ]
+    };
+    var currentCat = 'length';
+    var fromUnit = document.getElementById('fromUnit');
+    var toUnit = document.getElementById('toUnit');
+    var fromVal = document.getElementById('fromVal');
+    var resultDisplay = document.getElementById('resultDisplay');
+    var toast = document.getElementById('toastMsg');
+    var toastTimer = null;
+    function showToast(msg) { if (toastTimer) clearTimeout(toastTimer); toast.textContent = msg; toast.style.background = '#0f172a'; toast.style.opacity = '1'; toastTimer = setTimeout(function() { toast.style.opacity = '0'; }, 1500); }
+
+    function populateUnits(cat) {
+        var list = units[cat];
+        var options = '';
+        list.forEach(function(u) { options += '<option value="' + u.name + '">' + u.name + '</option>'; });
+        fromUnit.innerHTML = options;
+        toUnit.innerHTML = options;
+        if (list.length > 1) toUnit.selectedIndex = 1;
+        doConvert();
+    }
+
+    function doConvert() {
+        var val = parseFloat(fromVal.value);
+        if (isNaN(val)) { resultDisplay.textContent = '-'; return; }
+        var list = units[currentCat];
+        var fromU = list[fromUnit.selectedIndex];
+        var toU = list[toUnit.selectedIndex];
+        var baseVal = fromU.toBase(val);
+        var result = toU.fromBase(baseVal);
+        resultDisplay.textContent = Number(result.toPrecision(12)).toString();
+    }
+
+    document.getElementById('catRow').addEventListener('click', function(e) {
+        if (e.target.classList.contains('cat-btn')) {
+            document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active');});
+            e.target.classList.add('active');
+            currentCat = e.target.dataset.cat;
+            populateUnits(currentCat);
+        }
+    });
+    fromVal.addEventListener('input', doConvert);
+    fromUnit.addEventListener('change', doConvert);
+    toUnit.addEventListener('change', doConvert);
+    document.getElementById('swapUnitsBtn').addEventListener('click', function() {
+        var tmp = fromUnit.selectedIndex;
+        fromUnit.selectedIndex = toUnit.selectedIndex;
+        toUnit.selectedIndex = tmp;
+        doConvert();
+        showToast('🔄 已交换单位');
+    });
+    document.getElementById('copyBtn').addEventListener('click', function() {
+        var text = fromVal.value + ' ' + fromUnit.options[fromUnit.selectedIndex].text + ' = ' + resultDisplay.textContent + ' ' + toUnit.options[toUnit.selectedIndex].text;
+        navigator.clipboard.writeText(text).then(function() { showToast('📋 已复制'); });
+    });
+    populateUnits('length');
+})();
+</script>
+</body>
+</html>
