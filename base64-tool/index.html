@@ -1,1 +1,299 @@
-1
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Base64 编码解码器 | 在线工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #e9eef5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .card {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: #0f172a;
+            padding: 1.2rem 2rem;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: #2dd4bf20;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.8rem;
+            border: 1px solid #2dd4bf50;
+        }
+        .container {
+            padding: 2rem;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-primary {
+            background: #0f172a;
+            border-color: #0f172a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+        .row-2col {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        .col {
+            flex: 1;
+            min-width: 250px;
+        }
+        .label {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.9rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 1.2rem;
+            background: white;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #0f172a;
+            box-shadow: 0 0 0 3px #0f172a20;
+        }
+        .footer {
+            background: #f1f5f9;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+            border-top: 1px solid #e2e8f0;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        @media (max-width: 680px) {
+            .container { padding: 1.2rem; }
+            .btn { padding: 6px 14px; }
+        }
+        .error-border {
+            border-color: #f43f5e !important;
+            background-color: #fff1f2 !important;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <h1>
+            📦 Base64 在线编码 / 解码器
+            <span class="badge">支持 UTF-8 · 纯前端</span>
+        </h1>
+        <p>所有操作在本地完成，不会上传任何数据，安全处理中文/Emoji/特殊字符</p>
+    </div>
+    <div class="container">
+        <div class="toolbar">
+            <button class="btn btn-primary" id="encodeBtn">✨ 文本 → Base64</button>
+            <button class="btn btn-primary" id="decodeBtn">🔓 Base64 → 文本</button>
+            <button class="btn btn-outline" id="swapBtn">⇄ 交换内容</button>
+            <button class="btn btn-outline" id="clearBtn">🗑️ 清空</button>
+        </div>
+        <div class="row-2col">
+            <div class="col">
+                <div class="label">
+                    <span>📝 输入区域</span>
+                    <button class="btn" id="copyInputBtn" style="padding:4px 12px; font-size:0.75rem;">📋 复制输入</button>
+                </div>
+                <textarea id="inputText" rows="8" placeholder="在这里输入普通文本 或 Base64 字符串...&#10;例如：你好世界 或 SGVsbG8gV29ybGQh"></textarea>
+            </div>
+            <div class="col">
+                <div class="label">
+                    <span>✨ 输出结果</span>
+                    <button class="btn" id="copyOutputBtn" style="padding:4px 12px; font-size:0.75rem;">📋 复制输出</button>
+                </div>
+                <textarea id="outputText" rows="8" readonly placeholder="编码/解码后的结果会显示在这里..."></textarea>
+            </div>
+        </div>
+        <div style="font-size:0.85rem; background:#f8fafc; border-radius:1rem; padding:0.8rem 1rem; margin-top:1rem;">
+            💡 提示：Ctrl+Enter 快速编码，Ctrl+D 快速解码。完全本地运行，无服务端。
+        </div>
+    </div>
+    <div class="footer">
+        🔧 开源工具 · 部署于 GitHub Pages | 基于原生 JavaScript + TextEncoder/TextDecoder
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">✨ 已复制</div>
+
+<script>
+    (function() {
+        const inputTa = document.getElementById('inputText');
+        const outputTa = document.getElementById('outputText');
+        const encodeBtn = document.getElementById('encodeBtn');
+        const decodeBtn = document.getElementById('decodeBtn');
+        const swapBtn = document.getElementById('swapBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyInputBtn = document.getElementById('copyInputBtn');
+        const copyOutputBtn = document.getElementById('copyOutputBtn');
+        const toast = document.getElementById('toastMsg');
+        let toastTimer = null;
+
+        function showToast(msg, isErr = false) {
+            if (toastTimer) clearTimeout(toastTimer);
+            toast.textContent = msg;
+            toast.style.background = isErr ? '#be123c' : '#0f172a';
+            toast.style.opacity = '1';
+            toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 1800);
+        }
+
+        function setErrorBorder(elem) {
+            elem.classList.add('error-border');
+            setTimeout(() => elem.classList.remove('error-border'), 1500);
+        }
+
+        function utf8ToBase64(str) {
+            const bytes = new TextEncoder().encode(str);
+            let bin = '';
+            for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+            return btoa(bin);
+        }
+
+        function base64ToUtf8(b64) {
+            const cleaned = b64.trim();
+            const bin = atob(cleaned);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return new TextDecoder('utf-8').decode(bytes);
+        }
+
+        function doEncode() {
+            const val = inputTa.value;
+            if (!val) { outputTa.value = '⚠️ 输入为空'; setErrorBorder(outputTa); return; }
+            try {
+                outputTa.value = utf8ToBase64(val);
+                outputTa.classList.remove('error-border');
+            } catch (e) {
+                outputTa.value = `❌ 编码错误: ${e.message}`;
+                setErrorBorder(outputTa);
+            }
+        }
+
+        function doDecode() {
+            const val = inputTa.value;
+            if (!val) { outputTa.value = '⚠️ 输入为空'; setErrorBorder(outputTa); return; }
+            try {
+                outputTa.value = base64ToUtf8(val);
+                outputTa.classList.remove('error-border');
+            } catch (e) {
+                outputTa.value = `❌ 解码失败，请检查是否为合法 Base64\n${e.message}`;
+                setErrorBorder(outputTa);
+            }
+        }
+
+        function swap() {
+            const inVal = inputTa.value;
+            const outVal = outputTa.value;
+            if (outVal !== undefined) inputTa.value = outVal;
+            outputTa.value = inVal;
+            showToast('🔄 已交换内容');
+        }
+
+        function clearAll() {
+            inputTa.value = '';
+            outputTa.value = '';
+            showToast('🧹 已清空');
+        }
+
+        async function copyText(text, label) {
+            if (!text) { showToast(`⚠️ 没有可复制的${label}`, true); return; }
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(`📋 ${label}已复制`);
+            } catch {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast(`📋 ${label}已复制 (fallback)`);
+            }
+        }
+
+        encodeBtn.addEventListener('click', doEncode);
+        decodeBtn.addEventListener('click', doDecode);
+        swapBtn.addEventListener('click', swap);
+        clearBtn.addEventListener('click', clearAll);
+        copyInputBtn.addEventListener('click', () => copyText(inputTa.value, '输入内容'));
+        copyOutputBtn.addEventListener('click', () => copyText(outputTa.value, '输出内容'));
+        inputTa.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); doEncode(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); doDecode(); }
+        });
+    })();
+</script>
+</body>
+</html>
