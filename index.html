@@ -1,10 +1,16 @@
+
+---
+
+## 修改后的根目录 `index.html`
+
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ACE 实验室 | 在线工具集</title>
-    <meta name="description" content="持续更新的前端工具集，Base64编解码现已上线，更多工具陆续推出。纯前端，零数据收集。">
+    <meta name="description" content="持续更新的前端工具集，Base64编解码、二维码生成器已上线，更多工具陆续推出。纯前端，零数据收集。">
     <style>
         * {
             margin: 0;
@@ -243,14 +249,15 @@
         <p><strong>🚀 持续更新路线图</strong></p>
         <ul class="update-list">
             <li><strong>✅ 已上线</strong> – Base64 编码/解码（支持 UTF-8 / 中文 / Emoji）</li>
-            <li><strong>📅 计划中</strong> – JSON 格式化与校验、Unix 时间戳转换、二维码生成器、颜色拾取器、Markdown 预览……</li>
+            <li><strong>✅ 已上线</strong> – 二维码生成器（文本/URL 转 QR Code，可下载 PNG）</li>
+            <li><strong>📅 计划中</strong> – JSON 格式化与校验、Unix 时间戳转换、颜色拾取器、Markdown 预览……</li>
             <li><strong>⭐ 欢迎 Star & 贡献</strong> – 如果你有想要的小工具，可以在 Issues 中提出建议。</li>
         </ul>
     </div>
 
     <h2 style="margin-bottom: 0.5rem;">🛠️ 使用工具</h2>
     <div class="tools-grid">
-        <!-- Base64 工具卡片（带显眼按钮） -->
+        <!-- Base64 工具卡片 -->
         <div class="tool-card">
             <div class="card-icon">📦</div>
             <h3>Base64 编码/解码</h3>
@@ -259,12 +266,21 @@
             <a href="base64-tool/" class="tool-btn">🔓 立即使用 →</a>
         </div>
 
-        <!-- 占位卡片：更多工具即将推出，按钮不可点击 -->
+        <!-- 二维码生成器卡片 -->
+        <div class="tool-card">
+            <div class="card-icon">📱</div>
+            <h3>二维码生成器</h3>
+            <span class="tool-tag"># QR Code · 实时生成</span>
+            <p>输入文本或网址，自动生成二维码，支持下载为 PNG 图片。纯前端实现，不泄露内容。</p>
+            <a href="qrcode-tool/" class="tool-btn">📲 立即使用 →</a>
+        </div>
+
+        <!-- 占位卡片：更多工具即将推出 -->
         <div class="tool-card placeholder">
             <div class="card-icon">✨</div>
             <h3>更多工具</h3>
             <span class="tool-tag"># 即将到来</span>
-            <p>JSON 格式化、时间戳转换、二维码生成…… 保持关注，每周更新。</p>
+            <p>JSON 格式化、时间戳转换、颜色工具…… 保持关注，持续更新。</p>
             <span class="tool-btn" style="background:#8ba0ae;">⏳ 敬请期待</span>
         </div>
     </div>
