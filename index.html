@@ -146,6 +146,75 @@
             }
         }
 
+        .overview-toggle {
+            font-weight: 600; color: #0b3b4f; cursor: pointer; user-select: none;
+            display: inline-flex; align-items: center; gap: 6px; font-size: 1rem;
+        }
+
+        .overview-toggle .arrow {
+            display: inline-block; font-size: 0.6rem; transition: transform 0.2s;
+        }
+
+        .overview-toggle.open .arrow {
+            transform: rotate(90deg);
+        }
+
+        .overview-content.collapsed {
+            display: none;
+        }
+
+        .overview-links {
+            font-size: 0.85rem; line-height: 2; color: #2c5a74;
+        }
+
+        .overview-links .cat-label {
+            font-weight: 600; color: #0b3b4f;
+        }
+
+        .overview-links a {
+            color: #15607a; text-decoration: none; font-weight: 500;
+            border-bottom: 1px dotted #90b4cc;
+        }
+
+        .overview-links a:hover {
+            color: #0a4f2a; border-bottom-color: #0a4f2a;
+        }
+
+        .ov-cat {
+            font-weight: 600; color: #0b3b4f; cursor: pointer; user-select: none;
+            padding-left: 1.2rem; line-height: 2; font-size: 0.9rem;
+        }
+
+        .ov-cat .arrow {
+            font-size: 0.55rem; margin-right: 4px; display: inline-block;
+            transition: transform 0.2s; vertical-align: middle;
+        }
+
+        .ov-cat.open .arrow {
+            transform: rotate(90deg);
+        }
+
+        .ov-detail {
+            padding-left: 2.5rem; font-size: 0.82rem; line-height: 2; color: #2c5a74;
+        }
+
+        .ov-detail.collapsed {
+            display: none;
+        }
+
+        .ov-detail .dl-name {
+            display: inline-block; width: 8em; font-weight: 600; color: #15607a;
+            text-decoration: none; border-bottom: 1px dotted #90b4cc;
+        }
+
+        .ov-detail .dl-name:hover {
+            color: #0a4f2a; border-bottom-color: #0a4f2a;
+        }
+
+        .ov-detail .dl-desc {
+            color: #4a6f8a;
+        }
+
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -402,84 +471,25 @@
 
     <div class="intro-card">
         <h2>📜 仙府简介</h2>
-        <p><strong>摆烂仙君</strong> 闭关修炼，已炼成<strong>三十件仙器</strong>（在线工具），涵盖编解码、格式化、生成器、图片处理、文本处理诸般法门。所有仙法皆以 HTML/CSS/JS 为根基，不借外力，道友的数据绝不出仙府。</p>
-        <p><strong>🚀 炼器总览</strong></p>
-        <div class="overview-grid">
-
-        <div class="overview-group">
-            <p class="group-title">🪄 镇阁仙器</p>
-            <ul class="update-list">
-                <li><a href="base64/">Base64 编码/解码</a>（UTF-8 / 中文 / Emoji）</li>
-                <li><a href="qrcode/">二维码生成器</a>（QR Code · 下载 PNG）</li>
-                <li><a href="markdown-preview/">Markdown 在线预览</a>（实时渲染 · 导出 HTML）</li>
-                <li><a href="diff-checker/">文本差异对比</a>（逐行 Diff · 增删高亮）</li>
-                <li><a href="word-counter/">字数 & 字节统计器</a>（UTF-8 · 阅读时间）</li>
-            </ul>
+        <p><strong>摆烂仙君</strong> 闭关修炼，已炼成<strong>四十七件仙器</strong>（在线工具），涵盖编解码、格式化、生成器、图片处理、文本处理诸般法门。所有仙法皆以 HTML/CSS/JS 为根基，不借外力，道友的数据绝不出仙府。</p>
+        <p><strong>🚀 炼器总览（47 件）</strong></p>
+        <div class="overview-content">
+            <div class="ov-cat" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('collapsed')"><span class="arrow">▸</span>🪄 镇阁仙器（5件）：<a href="base64/">Base64</a>、<a href="qrcode/">二维码</a>、<a href="markdown-preview/">Markdown</a>、<a href="diff-checker/">文本对比</a>、<a href="word-counter/">字数统计</a></div>
+            <div class="ov-detail collapsed"><a class="dl-name" href="base64/">Base64 编解码</a><span class="dl-desc">支持 UTF-8 文本，中文/Emoji 在线编码解码，一键复制结果</span><br><a class="dl-name" href="qrcode/">二维码生成器</a><span class="dl-desc">输入文本或网址，实时生成 QR Code，可下载为 PNG 图片</span><br><a class="dl-name" href="markdown-preview/">Markdown 预览</a><span class="dl-desc">左栏编辑右栏实时渲染，快捷插入工具栏，可复制渲染后的 HTML</span><br><a class="dl-name" href="diff-checker/">文本差异对比</a><span class="dl-desc">两段文本逐行 Diff，新增绿色标记、删除红色标记，统计增删行数</span><br><a class="dl-name" href="word-counter/">字数 & 字节统计</a><span class="dl-desc">实时统计字符数、字节数（UTF-8）、单词数、中文字符数、阅读时间</span></div>
+            <div class="ov-cat" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('collapsed')"><span class="arrow">▸</span>🖼️ 图片处理（11件）：<a href="image-compressor/">图片压缩</a>、<a href="image-converter/">格式转换</a>、<a href="image-base64/">图片Base64</a>、<a href="image-cropper/">图片裁剪</a>、<a href="image-resizer/">尺寸调整</a>、<a href="image-rotator/">旋转翻转</a>、<a href="image-watermark/">添加水印</a>、<a href="image-9grid/">九格切图</a>、<a href="gradient-generator/">渐变图</a>、<a href="text-to-image/">文字转图</a>、<a href="image-editor/">简易编辑</a></div>
+            <div class="ov-detail collapsed"><a class="dl-name" href="image-compressor/">图片压缩</a><span class="dl-desc">调节质量与缩放比例，实时预览压缩效果，Canvas 纯前端处理</span><br><a class="dl-name" href="image-converter/">格式转换</a><span class="dl-desc">PNG / JPEG / WebP 之间互相转换，上传即可下载</span><br><a class="dl-name" href="image-base64/">图片 Base64</a><span class="dl-desc">图片文件与 Base64 字符串互转，支持 Data URI 格式</span><br><a class="dl-name" href="image-cropper/">图片裁剪</a><span class="dl-desc">鼠标拖拽自由选择裁剪区域，实时预览并下载</span><br><a class="dl-name" href="image-resizer/">尺寸调整</a><span class="dl-desc">按像素/百分比缩放，支持等比例锁定，内置常用预设尺寸</span><br><a class="dl-name" href="image-rotator/">旋转/翻转</a><span class="dl-desc">90°/180° 旋转，水平/垂直镜像翻转，实时预览</span><br><a class="dl-name" href="image-watermark/">图片水印</a><span class="dl-desc">添加文字水印，可自定义文字、位置、透明度及字号</span><br><a class="dl-name" href="image-9grid/">九格切图</a><span class="dl-desc">将图片切割为 3×3 九宫格，每格可单独下载</span><br><a class="dl-name" href="gradient-generator/">渐变图制作</a><span class="dl-desc">可视化生成 CSS 线性/径向渐变，可复制代码或下载图片</span><br><a class="dl-name" href="text-to-image/">文字转图</a><span class="dl-desc">将文字渲染为 PNG 图片，可自定义颜色、字号和背景色</span><br><a class="dl-name" href="image-editor/">简易图片编辑</a><span class="dl-desc">调节亮度、对比度、饱和度、模糊等基础参数滤镜</span></div>
+            <div class="ov-cat" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('collapsed')"><span class="arrow">▸</span>🔤 编码/解码（5件）：<a href="url-codec/">URL编解码</a>、<a href="html-entity/">HTML实体</a>、<a href="unicode-codec/">Unicode</a>、<a href="morse-code/">摩斯电码</a>、<a href="jwt-decoder/">JWT解码</a></div>
+            <div class="ov-detail collapsed"><a class="dl-name" href="url-codec/">URL 编解码</a><span class="dl-desc">encodeURIComponent / encodeURI 双模式，处理中文及特殊字符</span><br><a class="dl-name" href="html-entity/">HTML 实体</a><span class="dl-desc">&amp;lt; ⇄ &lt; 互转，安全处理 HTML 标签和特殊符号</span><br><a class="dl-name" href="unicode-codec/">Unicode</a><span class="dl-desc">\\uXXXX / &#x / &# / U+ 多种编码格式互相转换</span><br><a class="dl-name" href="morse-code/">摩斯电码</a><span class="dl-desc">文本与摩斯电码互相转换，含字母和数字对照表</span><br><a class="dl-name" href="jwt-decoder/">JWT 解码器</a><span class="dl-desc">解码 JWT Token 的 Header 与 Payload，解析标准 Claims 并检测过期</span></div>
+            <div class="ov-cat" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('collapsed')"><span class="arrow">▸</span>🎲 生成器（5件）：<a href="password-generator/">随机密码</a>、<a href="uuid-generator/">UUID生成</a>、<a href="lorem-ipsum/">Lorem Ipsum</a>、<a href="hash-generator/">哈希摘要</a>、<a href="random-number/">随机数</a></div>
+            <div class="ov-detail collapsed"><a class="dl-name" href="password-generator/">随机密码</a><span class="dl-desc">基于 Web Crypto API 安全生成，可配置长度与字符集，实时显示密码强度</span><br><a class="dl-name" href="uuid-generator/">UUID 生成</a><span class="dl-desc">使用 crypto.randomUUID()，支持小写/大写/无连字符，可批量生成</span><br><a class="dl-name" href="lorem-ipsum/">Lorem Ipsum</a><span class="dl-desc">生成拉丁 Lorem Ipsum 或中文乱数假文，支持段落/句子/单词模式</span><br><a class="dl-name" href="hash-generator/">哈希生成</a><span class="dl-desc">MD5 / SHA-1 / SHA-256 / SHA-512 摘要生成，基于 CryptoJS 本地计算</span><br><a class="dl-name" href="random-number/">随机数</a><span class="dl-desc">指定范围内生成随机整数或小数，支持批量生成多个随机数</span></div>
+            <div class="ov-cat" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('collapsed')"><span class="arrow">▸</span>📐 格式化/校验（5件）：<a href="json-formatter/">JSON</a>、<a href="html-formatter/">HTML</a>、<a href="css-formatter/">CSS</a>、<a href="js-formatter/">JS</a>、<a href="sql-formatter/">SQL</a></div>
+            <div class="ov-detail collapsed"><a class="dl-name" href="json-formatter/">JSON 格式化</a><span class="dl-desc">格式化、压缩、校验 JSON，带语法高亮与错误定位，支持转义/去转义</span><br><a class="dl-name" href="html-formatter/">HTML 格式化</a><span class="dl-desc">美化/压缩 HTML 代码，自动缩进换行</span><br><a class="dl-name" href="css-formatter/">CSS 格式化</a><span class="dl-desc">美化/压缩 CSS 样式代码，自动缩进与换行处理</span><br><a class="dl-name" href="js-formatter/">JS 格式化</a><span class="dl-desc">美化/压缩 JavaScript 代码，支持去除注释</span><br><a class="dl-name" href="sql-formatter/">SQL 格式化</a><span class="dl-desc">关键字大写、子句换行缩进，支持 SELECT/INSERT/UPDATE/DELETE</span></div>
+            <div class="ov-cat" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('collapsed')"><span class="arrow">▸</span>📝 文本处理（6件）：<a href="regex-tester/">正则测试</a>、<a href="case-converter/">大小写转换</a>、<a href="text-dedup/">文本去重</a>、<a href="text-sorter/">文本排序</a>、<a href="number-to-chinese/">数字转中文</a>、<a href="chinese-to-pinyin/">中文转拼音</a></div>
+            <div class="ov-detail collapsed"><a class="dl-name" href="regex-tester/">正则测试器</a><span class="dl-desc">输入正则与测试文本，实时高亮匹配结果，显示捕获分组与匹配位置</span><br><a class="dl-name" href="case-converter/">大小写转换</a><span class="dl-desc">全大写/全小写/首字母大写/句首大写/驼峰/蛇形/短横等多种转法</span><br><a class="dl-name" href="text-dedup/">文本去重</a><span class="dl-desc">按行去除重复文本，支持大小写敏感、去除空格、保留空行等选项</span><br><a class="dl-name" href="text-sorter/">文本排序</a><span class="dl-desc">字母升序/降序、数字排序、随机打乱、反转顺序</span><br><a class="dl-name" href="number-to-chinese/">数字转中文</a><span class="dl-desc">阿拉伯数字 → 中文简体小写/繁体大写/人民币金额大写</span><br><a class="dl-name" href="chinese-to-pinyin/">中文转拼音</a><span class="dl-desc">中文汉字转拼音，支持带声调/数字声调/无声调三种模式</span></div>
+            <div class="ov-cat" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('collapsed')"><span class="arrow">▸</span>🧰 其他工具（10件）：<a href="unix-timestamp/">时间戳</a>、<a href="color-tools/">颜色</a>、<a href="base-converter/">进制</a>、<a href="unit-converter/">单位</a>、<a href="qr-decoder/">QR解析</a>、<a href="url-parser/">URL解析</a>、<a href="calculator/">计算器</a>、<a href="date-calculator/">日期</a>、<a href="bmi-calculator/">BMI</a>、<a href="kinship-calculator/">亲戚</a></div>
+            <div class="ov-detail collapsed"><a class="dl-name" href="unix-timestamp/">Unix 时间戳</a><span class="dl-desc">实时显示当前时间戳，时间戳与日期时间双向互转，秒/毫秒自动识别</span><br><a class="dl-name" href="color-tools/">颜色工具</a><span class="dl-desc">颜色拾取器，HEX / RGB / HSL 三者实时联动互转，CSS 一键复制</span><br><a class="dl-name" href="base-converter/">进制转换</a><span class="dl-desc">二进制、八进制、十进制、十六进制实时联动互转</span><br><a class="dl-name" href="unit-converter/">单位换算</a><span class="dl-desc">长度、重量、温度、数据存储等常用单位之间互相换算</span><br><a class="dl-name" href="qr-decoder/">二维码解析</a><span class="dl-desc">上传含二维码的图片，使用 jsQR 解析出编码的文本或网址内容</span><br><a class="dl-name" href="url-parser/">URL 解析器</a><span class="dl-desc">解析 URL 的各组成部分：协议、主机、端口、路径、查询参数、片段</span><br><a class="dl-name" href="calculator/">计算器</a><span class="dl-desc">四则运算，支持括号和百分比，支持键盘输入及快捷键操作</span><br><a class="dl-name" href="date-calculator/">日期计算器</a><span class="dl-desc">计算两个日期之间相差的天数，支持日期加减天数推算未来/过去日期</span><br><a class="dl-name" href="bmi-calculator/">BMI 计算器</a><span class="dl-desc">身体质量指数计算，含理想体重和体脂率估算，可视化显示健康区间</span><br><a class="dl-name" href="kinship-calculator/">亲戚称呼</a><span class="dl-desc">中国式亲戚关系查询，根据亲属路径计算出正确的称呼方式</span></div>
+        <p style="margin-top:0.6rem;"><strong>⭐ 道友若喜爱，可点 Star 助我飞升</strong> – 若有想要的仙器，可至 Issues 中留言。</p>
         </div>
-
-        <div class="overview-group">
-            <p class="group-title">🖼️ 图片处理</p>
-            <ul class="update-list">
-                <li><a href="image-compressor/">图片压缩</a>（质量/缩放可调）</li>
-                <li><a href="image-converter/">图片格式转换</a>（PNG / JPEG / WebP）</li>
-                <li><a href="image-base64/">图片 Base64 转换</a>（图片 ⇄ Base64）</li>
-            </ul>
-        </div>
-
-        <div class="overview-group">
-            <p class="group-title">🔤 编码/解码</p>
-            <ul class="update-list">
-                <li><a href="url-codec/">URL 编码/解码</a>（encodeURIComponent / encodeURI）</li>
-                <li><a href="html-entity/">HTML 实体编解码</a>（&amp;lt; ⇄ &lt;）</li>
-                <li><a href="unicode-codec/">Unicode 编解码</a>（\\uXXXX ⇄ 原文）</li>
-                <li><a href="morse-code/">摩斯电码</a>（文本 ⇄ Morse Code）</li>
-                <li><a href="jwt-decoder/">JWT 解码器</a>（Header / Payload / Claims）</li>
-            </ul>
-        </div>
-
-        <div class="overview-group">
-            <p class="group-title">🎲 生成器</p>
-            <ul class="update-list">
-                <li><a href="password-generator/">随机密码生成器</a>（Crypto API · 强度显示）</li>
-                <li><a href="uuid-generator/">UUID 生成器</a>（v4 · 批量生成）</li>
-                <li><a href="lorem-ipsum/">Lorem Ipsum 生成器</a>（拉丁/中文假文）</li>
-                <li><a href="hash-generator/">哈希生成器</a>（MD5 / SHA-1 / SHA-256 / SHA-512）</li>
-            </ul>
-        </div>
-
-        <div class="overview-group">
-            <p class="group-title">📐 格式化/校验</p>
-            <ul class="update-list">
-                <li><a href="json-formatter/">JSON 格式化 & 校验</a>（语法高亮 · 压缩 · 转义）</li>
-                <li><a href="html-formatter/">HTML 格式化</a>（美化 · 压缩）</li>
-                <li><a href="css-formatter/">CSS 格式化</a>（美化 · 压缩）</li>
-                <li><a href="js-formatter/">JavaScript 格式化</a>（美化 · 压缩）</li>
-                <li><a href="sql-formatter/">SQL 格式化</a>（关键字大写 · 换行缩进）</li>
-            </ul>
-        </div>
-
-        <div class="overview-group">
-            <p class="group-title">📝 文本处理</p>
-            <ul class="update-list">
-                <li><a href="regex-tester/">正则表达式测试器</a>（实时高亮 · 捕获分组）</li>
-                <li><a href="case-converter/">大小写转换</a>（UPPER / lower / Title / 驼峰等）</li>
-                <li><a href="text-dedup/">文本去重</a>（逐行去重 · 可选空行）</li>
-                <li><a href="text-sorter/">文本排序</a>（字母/数字/随机）</li>
-            </ul>
-        </div>
-
-        <div class="overview-group">
-            <p class="group-title">🧰 其他工具</p>
-            <ul class="update-list">
-                <li><a href="unix-timestamp/">Unix 时间戳转换</a>（实时 · 秒/毫秒）</li>
-                <li><a href="color-tools/">颜色工具</a>（HEX / RGB / HSL 互转）</li>
-                <li><a href="base-converter/">进制转换</a>（2 / 8 / 10 / 16）</li>
-                <li><a href="unit-converter/">单位换算</a>（长度/重量/温度/数据）</li>
-            </ul>
-        </div>
-
-        </div>
-        <p style="margin-top:0.8rem;"><strong>⭐ 道友若喜爱，可点 Star 助我飞升</strong> – 若有想要的仙器，可至 Issues 中留言。</p>
     </div>
 
     <h2 style="margin-bottom: 0.5rem;">🪄 仙器阁</h2>
@@ -545,7 +555,7 @@
         <!-- 图片处理 -->
         <div class="category-folder collapsed">
             <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                🖼️ 图片处理 <span class="folder-count">6 件仙器</span>
+                🖼️ 图片处理 <span class="folder-count">11 件仙器</span>
                 <span class="folder-arrow">▼</span>
             </div>
             <div class="folder-body">
@@ -561,18 +571,38 @@
                     <span class="mini-card-icon">📇</span>
                     <div class="mini-card-info"><h4>图片Base64转换</h4><span>图片 ⇄ Base64 字符串</span></div>
                 </a>
-                <div class="mini-card-placeholder">
+                <a href="image-cropper/" class="mini-card">
                     <span class="mini-card-icon">✂️</span>
-                    <div class="mini-card-info"><h4>图片裁剪</h4><span>炼丹中...</span></div>
-                </div>
-                <div class="mini-card-placeholder">
+                    <div class="mini-card-info"><h4>图片裁剪</h4><span>自由选区拖拽裁剪</span></div>
+                </a>
+                <a href="image-resizer/" class="mini-card">
                     <span class="mini-card-icon">📐</span>
-                    <div class="mini-card-info"><h4>图片尺寸调整</h4><span>炼丹中...</span></div>
-                </div>
-                <div class="mini-card-placeholder">
+                    <div class="mini-card-info"><h4>图片尺寸调整</h4><span>像素/百分比/等比例</span></div>
+                </a>
+                <a href="image-rotator/" class="mini-card">
                     <span class="mini-card-icon">🪞</span>
-                    <div class="mini-card-info"><h4>图片旋转/翻转</h4><span>炼丹中...</span></div>
-                </div>
+                    <div class="mini-card-info"><h4>图片旋转/翻转</h4><span>旋转90°/翻转镜像</span></div>
+                </a>
+                <a href="image-watermark/" class="mini-card">
+                    <span class="mini-card-icon">💧</span>
+                    <div class="mini-card-info"><h4>图片水印</h4><span>文字水印/位置/透明度</span></div>
+                </a>
+                <a href="image-9grid/" class="mini-card">
+                    <span class="mini-card-icon">🔲</span>
+                    <div class="mini-card-info"><h4>九格切图</h4><span>3×3宫格切割下载</span></div>
+                </a>
+                <a href="gradient-generator/" class="mini-card">
+                    <span class="mini-card-icon">🎨</span>
+                    <div class="mini-card-info"><h4>渐变图制作</h4><span>CSS渐变可视化生成</span></div>
+                </a>
+                <a href="text-to-image/" class="mini-card">
+                    <span class="mini-card-icon">📝</span>
+                    <div class="mini-card-info"><h4>文字转图</h4><span>文字渲染为PNG图片</span></div>
+                </a>
+                <a href="image-editor/" class="mini-card">
+                    <span class="mini-card-icon">🖌️</span>
+                    <div class="mini-card-info"><h4>简易图片编辑</h4><span>亮度/对比度/饱和度/模糊</span></div>
+                </a>
             </div>
         </div>
 
@@ -609,7 +639,7 @@
         <!-- 生成器 -->
         <div class="category-folder collapsed">
             <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                🎲 生成器 <span class="folder-count">4 件仙器</span>
+                🎲 生成器 <span class="folder-count">5 件仙器</span>
                 <span class="folder-arrow">▼</span>
             </div>
             <div class="folder-body">
@@ -628,6 +658,10 @@
                 <a href="hash-generator/" class="mini-card">
                     <span class="mini-card-icon">🧬</span>
                     <div class="mini-card-info"><h4>哈希生成器</h4><span>MD5 / SHA-1 / SHA-256 / SHA-512</span></div>
+                </a>
+                <a href="random-number/" class="mini-card">
+                    <span class="mini-card-icon">🎲</span>
+                    <div class="mini-card-info"><h4>随机数生成器</h4><span>整数/小数/批量生成</span></div>
                 </a>
             </div>
         </div>
@@ -665,7 +699,7 @@
         <!-- 文本处理 -->
         <div class="category-folder collapsed">
             <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                📝 文本处理 <span class="folder-count">4 件仙器</span>
+                📝 文本处理 <span class="folder-count">6 件仙器</span>
                 <span class="folder-arrow">▼</span>
             </div>
             <div class="folder-body">
@@ -685,13 +719,21 @@
                     <span class="mini-card-icon">🔤</span>
                     <div class="mini-card-info"><h4>文本排序</h4><span>字母/数字/随机排序</span></div>
                 </a>
+                <a href="number-to-chinese/" class="mini-card">
+                    <span class="mini-card-icon">🔢</span>
+                    <div class="mini-card-info"><h4>数字转中文</h4><span>大小写/人民币大写</span></div>
+                </a>
+                <a href="chinese-to-pinyin/" class="mini-card">
+                    <span class="mini-card-icon">🔤</span>
+                    <div class="mini-card-info"><h4>中文转拼音</h4><span>带声调/数字/无声调</span></div>
+                </a>
             </div>
         </div>
 
         <!-- 其他工具 -->
         <div class="category-folder collapsed">
             <div class="folder-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                🧰 其他工具 <span class="folder-count">4 件仙器</span>
+                🧰 其他工具 <span class="folder-count">10 件仙器</span>
                 <span class="folder-arrow">▼</span>
             </div>
             <div class="folder-body">
@@ -710,6 +752,30 @@
                 <a href="unit-converter/" class="mini-card">
                     <span class="mini-card-icon">📏</span>
                     <div class="mini-card-info"><h4>单位换算</h4><span>长度/重量/温度/数据</span></div>
+                </a>
+                <a href="qr-decoder/" class="mini-card">
+                    <span class="mini-card-icon">📷</span>
+                    <div class="mini-card-info"><h4>二维码解析</h4><span>上传图片解析二维码内容</span></div>
+                </a>
+                <a href="url-parser/" class="mini-card">
+                    <span class="mini-card-icon">🔍</span>
+                    <div class="mini-card-info"><h4>URL 解析器</h4><span>协议/主机/路径/参数分解</span></div>
+                </a>
+                <a href="calculator/" class="mini-card">
+                    <span class="mini-card-icon">🧮</span>
+                    <div class="mini-card-info"><h4>计算器</h4><span>四则运算/括号/键盘输入</span></div>
+                </a>
+                <a href="date-calculator/" class="mini-card">
+                    <span class="mini-card-icon">📅</span>
+                    <div class="mini-card-info"><h4>日期计算器</h4><span>日期间隔/日期加减</span></div>
+                </a>
+                <a href="bmi-calculator/" class="mini-card">
+                    <span class="mini-card-icon">⚖️</span>
+                    <div class="mini-card-info"><h4>BMI 计算器</h4><span>体重指数/理想体重</span></div>
+                </a>
+                <a href="kinship-calculator/" class="mini-card">
+                    <span class="mini-card-icon">👨‍👩‍👧‍👦</span>
+                    <div class="mini-card-info"><h4>亲戚称呼计算器</h4><span>中国式亲戚关系查询</span></div>
                 </a>
             </div>
         </div>

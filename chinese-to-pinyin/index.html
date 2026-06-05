@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>中文转拼音 | 在线工具</title>
+    <style>
+        *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;}
+        body{background:linear-gradient(145deg,#f5f7fc 0%,#e9eef5 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0;}
+        .card{max-width:800px;width:100%;background:rgba(255,255,255,0.92);backdrop-filter:blur(2px);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,0.2);overflow:hidden;}
+        .header{background:#0f172a;padding:1.2rem 2rem;color:white;}
+        .header h1{margin:0;font-size:1.8rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+        .badge{background:#2dd4bf20;border-radius:40px;padding:0.2rem 0.8rem;font-size:0.8rem;border:1px solid #2dd4bf50;}
+        .container{padding:2rem;}
+        label{display:block;font-weight:600;color:#0f172a;margin-bottom:4px;}
+        textarea{width:100%;padding:1rem;font-size:1rem;border:1px solid #cbd5e1;border-radius:1rem;resize:vertical;line-height:1.5;font-family:inherit;}
+        textarea:focus{outline:none;border-color:#0f172a;box-shadow:0 0 0 3px #0f172a20;}
+        .mode-row{display:flex;flex-wrap:wrap;gap:6px;margin:0.8rem 0;}
+        .mode-btn{padding:6px 14px;border-radius:20px;font-size:0.8rem;border:1px solid #cbd5e1;background:white;cursor:pointer;transition:0.15s;}
+        .mode-btn.active{background:#0f172a;color:white;border-color:#0f172a;}
+        .result-box{background:#1e293b;border-radius:1rem;padding:1.2rem 1.5rem;color:#86efac;font-size:1.1rem;line-height:1.8;min-height:60px;word-break:break-all;}
+        .btn{background:white;border:1px solid #cbd5e1;padding:10px 20px;border-radius:60px;font-weight:500;cursor:pointer;transition:0.2s;font-size:0.9rem;}
+        .btn-outline:hover{background:#f1f5f9;}
+        .toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:0.8rem;}
+        .footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:0.8rem;color:#475569;border-top:1px solid #e2e8f0;}
+        .footer a{color:#15607a;text-decoration:none;}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>🔤 中文转拼音 <span class="badge">带声调 · 无后端</span></h1><p style="margin:2px 0 0;font-size:0.85rem;opacity:0.8;">中文汉字转拼音，支持带声调/数字声调/无声调三种模式</p></div>
+    <div class="container">
+        <label>📝 输入中文</label>
+        <textarea id="inputText" rows="3" placeholder="输入中文文本...">你好世界，欢迎使用在线工具。</textarea>
+        <div class="mode-row">
+            <span style="font-size:0.8rem;color:#64748b;line-height:2;">声调模式：</span>
+            <button class="mode-btn active" data-mode="tone">带声调 (nǐ hǎo)</button>
+            <button class="mode-btn" data-mode="number">数字声调 (ni3 hao3)</button>
+            <button class="mode-btn" data-mode="plain">无声调 (ni hao)</button>
+        </div>
+        <div class="result-box" id="resultBox">-</div>
+        <div class="toolbar"><button class="btn btn-outline" id="copyBtn">📋 复制结果</button></div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<script>
+(function(){
+    // Embedded pinyin data - common characters only
+    var pinyinData={"你":"nǐ","好":"hǎo","世":"shì","界":"jiè","欢":"huān","迎":"yíng","使":"shǐ","用":"yòng","在":"zài","线":"xiàn","工":"gōng","具":"jù","中":"zhōng","文":"wén","转":"zhuǎn","拼":"pīn","音":"yīn","我":"wǒ","们":"men","他":"tā","她":"tā","是":"shì","的":"de","了":"le","不":"bù","有":"yǒu","人":"rén","大":"dà","小":"xiǎo","上":"shàng","下":"xià","天":"tiān","地":"dì","日":"rì","月":"yuè","水":"shuǐ","火":"huǒ","山":"shān","风":"fēng","云":"yún","雨":"yǔ","雪":"xuě","花":"huā","草":"cǎo","树":"shù","鸟":"niǎo","鱼":"yú","龙":"lóng","凤":"fèng","春":"chūn","夏":"xià","秋":"qiū","冬":"dōng","东":"dōng","西":"xī","南":"nán","北":"běi","前":"qián","后":"hòu","左":"zuǒ","右":"yòu","男":"nán","女":"nǚ","学":"xué","习":"xí","生":"shēng","活":"huó","工":"gōng","作":"zuò","家":"jiā","国":"guó","民":"mín","主":"zhǔ","自":"zì","由":"yóu","平":"píng","等":"děng","法":"fǎ","律":"lǜ","经":"jīng","济":"jì","科":"kē","技":"jì","文":"wén","化":"huà","教":"jiào","育":"yù","医":"yī","药":"yào","体":"tǐ","育":"yù","艺":"yì","术":"shù","音":"yīn","乐":"yuè","美":"měi","丽":"lì","健":"jiàn","康":"kāng","快":"kuài","乐":"lè","幸":"xìng","福":"fú","爱":"ài","情":"qíng","友":"yǒu","谊":"yì","亲":"qīn","家":"jiā","和":"hé","平":"píng","战":"zhàn","争":"zhēng","新":"xīn","旧":"jiù","高":"gāo","低":"dī","多":"duō","少":"shǎo","长":"cháng","短":"duǎn","真":"zhēn","假":"jiǎ","对":"duì","错":"cuò","开":"kāi","关":"guān","来":"lái","去":"qù","进":"jìn","出":"chū","吃":"chī","喝":"hē","说":"shuō","看":"kàn","听":"tīng","写":"xiě","读":"dú","走":"zǒu","跑":"pǎo","飞":"fēi","本":"běn","点":"diǎn","都":"dōu","还":"hái","要":"yào","会":"huì","能":"néng","可":"kě","以":"yǐ","因":"yīn","为":"wèi","所":"suǒ","如":"rú","果":"guǒ","虽":"suī","然":"rán","但":"dàn","只":"zhǐ","已":"yǐ","当":"dāng","于":"yú","之":"zhī","而":"ér","与":"yǔ","向":"xiàng","从":"cóng","被":"bèi","把":"bǎ","给":"gěi","让":"ràng","叫":"jiào","想":"xiǎng","知":"zhī","道":"dào","时":"shí","间":"jiān","年":"nián","岁":"suì","分":"fēn","秒":"miǎo","一":"yī","二":"èr","三":"sān","四":"sì","五":"wǔ","六":"liù","七":"qī","八":"bā","九":"jiǔ","十":"shí","百":"bǎi","千":"qiān","万":"wàn","亿":"yì","零":"líng","两":"liǎng","几":"jǐ","每":"měi","各":"gè","很":"hěn","太":"tài","最":"zuì","更":"gèng","非":"fēi","常":"cháng","哪":"nǎ","儿":"ér","什":"shén","么":"me","怎":"zěn","样":"yàng","啊":"a","吧":"ba","呢":"ne","吗":"ma","啦":"la","哦":"ó","嗯":"èn","唉":"āi","哈":"hā","嘿":"hēi","嗨":"hāi","喂":"wèi","噢":"ō","哟":"yō","哇":"wā","呀":"ya","嘻":"xī","呵":"hē","呵":"hē","唔":"wú","噗":"pū","咚":"dōng","叮":"dīng","咚":"dōng","呜":"wū","咕":"gū","哔":"bì","嘀":"dí","嗒":"dā","叽":"jī","喳":"zhā","喵":"miāo","汪":"wāng","咩":"miē","哞":"mōu","嘎":"gā","呱":"guā","叽":"jī","咯":"gē","啰":"luō","呗":"bei","叻":"lè","唠":"láo","嗑":"kē","嘛":"ma","嘞":"lei","噢":"ō","嘭":"pēng","嘭":"pēng","砰":"pēng","啪":"pā","噼":"pī","哩":"li","啪":"pā","唰":"shuā","嗖":"sōu","啪":"pā","哗":"huā","啦":"la","滴":"dī","答":"dá","叮":"dīng","当":"dāng","哐":"kuāng","锵":"qiāng","咣":"guāng"};
+    // Functions to remove tone marks
+    var toneMap={'ā':'a','á':'a','ǎ':'a','à':'a','ē':'e','é':'e','ě':'e','è':'e','ī':'i','í':'i','ǐ':'i','ì':'i','ō':'o','ó':'o','ǒ':'o','ò':'o','ū':'u','ú':'u','ǔ':'u','ù':'u','ǖ':'v','ǘ':'v','ǚ':'v','ǜ':'v','ü':'v'};
+    function removeTone(s){return s.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]/g,function(c){return toneMap[c]||c;});}
+    function toneToNumber(s){return s.replace(/[āáǎà]/g,'a1').replace(/[ā]/g,'a2').replace(/[á]/g,'a2').replace(/[ǎ]/g,'a3').replace(/[à]/g,'a4').replace(/[ēéěè]/g,'e').replace(/[īíǐì]/g,'i').replace(/[ōóǒò]/g,'o').replace(/[ūúǔù]/g,'u').replace(/[ǖǘǚǜ]/g,'v');}
+
+    // Simpler approach: tone number conversion
+    function toNumberTone(py){return py.replace(/[āēīōūǖ]/g,function(c){return removeTone(c)+'1';}).replace(/[áéíóúǘ]/g,function(c){return removeTone(c)+'2';}).replace(/[ǎěǐǒǔǚ]/g,function(c){return removeTone(c)+'3';}).replace(/[àèìòùǜ]/g,function(c){return removeTone(c)+'4';});}
+    function toPlain(py){return removeTone(py);}
+
+    function convert(){
+        var text=document.getElementById('inputText').value;
+        var mode=document.querySelector('.mode-btn.active').dataset.mode;
+        var result=[];
+        for(var i=0;i<text.length;i++){
+            var c=text[i];
+            var py=pinyinData[c];
+            if(py){
+                if(mode==='number')py=toNumberTone(py);
+                else if(mode==='plain')py=toPlain(py);
+                result.push(py);
+            }else if(/[一-鿿]/.test(c)){result.push('[?]');}
+            else{result.push(c);}
+        }
+        document.getElementById('resultBox').textContent=result.join(' ')||'-';
+    }
+
+    document.getElementById('inputText').addEventListener('input',convert);
+    document.querySelectorAll('.mode-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.mode-btn').forEach(function(x){x.classList.remove('active');});this.classList.add('active');convert();});});
+    document.getElementById('copyBtn').addEventListener('click',function(){var t=document.getElementById('resultBox').textContent;navigator.clipboard.writeText(t).then(function(){});});
+    convert();
+})();
+</script>
+</body>
+</html>

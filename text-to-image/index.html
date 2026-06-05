@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>文字转图 | 在线工具</title>
+    <style>*{box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif}body{background:linear-gradient(145deg,#f5f7fc,#e9eef5);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0}.card{max-width:700px;width:100%;background:rgba(255,255,255,.92);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,.2);overflow:hidden}.header{background:#0f172a;padding:1.2rem 2rem;color:#fff}.header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px}.badge{background:#2dd4bf20;border-radius:40px;padding:.2rem .8rem;font-size:.8rem;border:1px solid #2dd4bf50}.container{padding:2rem}label{display:block;font-weight:600;color:#0f172a;margin-bottom:4px;font-size:.85rem}textarea{width:100%;padding:.8rem;border:1px solid #cbd5e1;border-radius:1rem;resize:vertical;font-size:.95rem;line-height:1.5;margin-bottom:.8rem}textarea:focus{outline:none;border-color:#0f172a;box-shadow:0 0 0 3px #0f172a20}.opt-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:.8rem;align-items:flex-end}.opt-row input,.opt-row select{padding:6px 10px;border:1px solid #cbd5e1;border-radius:.6rem;font-size:.9rem}.preview{text-align:center;display:none;margin:1rem 0}.preview img{max-width:100%;border-radius:1rem;border:1px solid #e2e8f0}.btn{padding:10px 20px;border-radius:60px;font-weight:500;cursor:pointer;transition:.2s;font-size:.9rem;background:#fff;border:1px solid #cbd5e1}.btn-primary{background:#0f172a;color:#fff;border-color:#0f172a}.btn-primary:hover{background:#1e293b}.toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}.footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:.8rem;color:#475569;border-top:1px solid #e2e8f0}.footer a{color:#15607a;text-decoration:none}</style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>📝 文字转图 <span class="badge">Text → PNG</span></h1><p style="margin:2px 0 0;font-size:.8rem;opacity:.8">将文字渲染为 PNG 图片，可自定义颜色、字号、背景色</p></div>
+    <div class="container">
+        <label>📝 输入文字</label>
+        <textarea id="textInput" rows="4">Hello 你好世界
+这是一段测试文字
+用于文字转图片演示</textarea>
+        <div class="opt-row">
+            <div><label style="font-size:.75rem;">字体大小</label><input type="number" id="fontSize" value="24" min="8" max="120" style="width:70px;"></div>
+            <div><label style="font-size:.75rem;">文字颜色</label><input type="color" id="fontColor" value="#1e293b"></div>
+            <div><label style="font-size:.75rem;">背景颜色</label><input type="color" id="bgColor" value="#ffffff"></div>
+            <div><label style="font-size:.75rem;">宽度 (px)</label><input type="number" id="imgWidth" value="600" min="100" max="2000" style="width:80px;"></div>
+        </div>
+        <div class="preview" id="previewBox"><img id="previewImg"></div>
+        <div class="toolbar">
+            <button class="btn btn-primary" id="genBtn">🖼️ 生成图片</button>
+            <button class="btn" id="downloadBtn">⬇️ 下载 PNG</button>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<script>
+(function(){
+    function gen(){
+        var text=document.getElementById('textInput').value;
+        if(!text.trim())return;
+        var fontSize=parseInt(document.getElementById('fontSize').value)||24;
+        var fontColor=document.getElementById('fontColor').value;
+        var bg=document.getElementById('bgColor').value;
+        var w=parseInt(document.getElementById('imgWidth').value)||600;
+        var c=document.createElement('canvas');
+        var ctx=c.getContext('2d');
+        ctx.font=fontSize+'px system-ui,-apple-system,sans-serif';
+        var lines=[];
+        text.split('\n').forEach(function(line){
+            var words=line.split('');
+            var current='';
+            for(var i=0;i<words.length;i++){
+                var test=current+words[i];
+                if(ctx.measureText(test).width>w-40&&current){lines.push(current);current=words[i];}
+                else current=test;
+            }
+            if(current)lines.push(current);
+        });
+        var lineH=fontSize*1.6;
+        c.height=lines.length*lineH+40;
+        c.width=w;
+        ctx.fillStyle=bg;ctx.fillRect(0,0,c.width,c.height);
+        ctx.fillStyle=fontColor;ctx.font=fontSize+'px system-ui,-apple-system,sans-serif';
+        ctx.textBaseline='middle';
+        lines.forEach(function(line,i){ctx.fillText(line,20,20+i*lineH+lineH/2)});
+        var url=c.toDataURL();
+        document.getElementById('previewImg').src=url;
+        document.getElementById('previewBox').style.display='block';
+    }
+    document.getElementById('genBtn').addEventListener('click',gen);
+    document.getElementById('textInput').addEventListener('input',gen);
+    document.getElementById('fontSize').addEventListener('input',gen);
+    document.getElementById('fontColor').addEventListener('input',gen);
+    document.getElementById('bgColor').addEventListener('input',gen);
+    document.getElementById('imgWidth').addEventListener('input',gen);
+    document.getElementById('downloadBtn').addEventListener('click',function(){
+        var a=document.createElement('a');a.href=document.getElementById('previewImg').src;a.download='text-image.png';a.click();
+    });
+    gen();
+})();
+</script>
+</body>
+</html>

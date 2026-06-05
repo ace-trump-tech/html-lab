@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>九格切图 | 在线工具</title>
+    <style>*{box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif}body{background:linear-gradient(145deg,#f5f7fc,#e9eef5);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0}.card{max-width:800px;width:100%;background:rgba(255,255,255,.92);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,.2);overflow:hidden}.header{background:#0f172a;padding:1.2rem 2rem;color:#fff}.header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px}.badge{background:#2dd4bf20;border-radius:40px;padding:.2rem .8rem;font-size:.8rem;border:1px solid #2dd4bf50}.container{padding:2rem}.upload-area{border:2px dashed #cbd5e1;border-radius:1.5rem;padding:1.2rem;text-align:center;margin-bottom:1rem;cursor:pointer}.upload-area:hover{border-color:#0f172a;background:#f8fafc}.upload-area input{display:none}.preview{text-align:center;display:none}.preview img{max-width:100%;max-height:250px;border-radius:1rem;border:1px solid #e2e8f0}.grid-preview{display:none;grid-template-columns:repeat(3,1fr);gap:4px;max-width:400px;margin:1rem auto}.grid-preview img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px}.btn{padding:10px 20px;border-radius:60px;font-weight:500;cursor:pointer;transition:.2s;font-size:.9rem;background:#fff;border:1px solid #cbd5e1}.btn-primary{background:#0f172a;color:#fff;border-color:#0f172a}.btn-primary:hover{background:#1e293b}.toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:.8rem}.footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:.8rem;color:#475569;border-top:1px solid #e2e8f0}.footer a{color:#15607a;text-decoration:none}</style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>🔲 九格切图 <span class="badge">3×3 宫格 · Canvas</span></h1><p style="margin:2px 0 0;font-size:.8rem;opacity:.8">将图片切割为 3×3 九宫格，每格单独下载</p></div>
+    <div class="container">
+        <div class="upload-area" id="uploadArea">📁 点击或拖拽上传图片<input type="file" id="fileInput" accept="image/*"></div>
+        <div class="preview" id="previewBox"><img id="previewImg"></div>
+        <div class="grid-preview" id="gridPreview"></div>
+        <div class="toolbar">
+            <button class="btn btn-primary" id="sliceBtn">✂️ 切割</button>
+            <button class="btn" id="downloadAllBtn">⬇️ 下载全部 (ZIP-like)</button>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<script>
+(function(){
+    var img=null,slices=[];
+    document.getElementById('uploadArea').addEventListener('click',function(){document.getElementById('fileInput').click()});
+    document.getElementById('uploadArea').addEventListener('dragover',function(e){e.preventDefault()});
+    document.getElementById('uploadArea').addEventListener('drop',function(e){e.preventDefault();if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])});
+    document.getElementById('fileInput').addEventListener('change',function(){if(this.files[0])loadFile(this.files[0])});
+
+    function loadFile(file){
+        var r=new FileReader();
+        r.onload=function(e){img=new Image();img.onload=function(){document.getElementById('previewImg').src=e.target.result;document.getElementById('previewBox').style.display='block';doSlice()};img.src=e.target.result};
+        r.readAsDataURL(file);
+    }
+    function doSlice(){
+        if(!img)return;
+        var size=Math.floor(Math.min(img.width,img.height)/3)*3;
+        var ox=(img.width-size)/2,oy=(img.height-size)/2;
+        var cell=size/3;var grid=document.getElementById('gridPreview');grid.innerHTML='';slices=[];
+        for(var r=0;r<3;r++)for(var c=0;c<3;c++){
+            var cv=document.createElement('canvas');cv.width=cell;cv.height=cell;
+            cv.getContext('2d').drawImage(img,ox+c*cell,oy+r*cell,cell,cell,0,0,cell,cell);
+            var url=cv.toDataURL();slices.push(url);
+            var imgEl=document.createElement('img');imgEl.src=url;grid.appendChild(imgEl);
+        }
+        grid.style.display='grid';
+    }
+    document.getElementById('sliceBtn').addEventListener('click',doSlice);
+    document.getElementById('downloadAllBtn').addEventListener('click',function(){
+        slices.forEach(function(url,i){var a=document.createElement('a');a.href=url;a.download='grid_'+(i+1)+'.png';a.click()});
+    });
+})();
+</script>
+</body>
+</html>

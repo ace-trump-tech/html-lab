@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>亲戚称呼计算器 | 在线工具</title>
+    <style>*{box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif}body{background:linear-gradient(145deg,#f5f7fc,#e9eef5);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0}.card{max-width:700px;width:100%;background:rgba(255,255,255,.92);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,.2);overflow:hidden}.header{background:#0f172a;padding:1.2rem 2rem;color:#fff}.header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px}.badge{background:#2dd4bf20;border-radius:40px;padding:.2rem .8rem;font-size:.8rem;border:1px solid #2dd4bf50}.container{padding:2rem}.select-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:1rem;align-items:flex-end}.select-row label{font-size:.8rem;color:#64748b;font-weight:600;display:block}.select-row select{padding:8px 12px;border:1px solid #cbd5e1;border-radius:.6rem;font-size:.9rem;background:#fff;min-width:120px}.result-box{background:#1e293b;border-radius:1rem;padding:1.5rem;text-align:center}.result-box .call{font-size:2.5rem;color:#2dd4bf;font-weight:700}.result-box .explain{font-size:.9rem;color:#94a3b8;margin-top:8px}.path-display{font-size:.85rem;color:#64748b;margin-top:4px}.table-wrap{max-height:200px;overflow-y:auto;margin-top:1rem;background:#f8fafc;border-radius:1rem;padding:.8rem;border:1px solid #e2e8f0;font-size:.8rem}.table-wrap table{width:100%;border-collapse:collapse}.table-wrap td{padding:3px 8px;border-bottom:1px solid #e2e8f0}.table-wrap td:first-child{font-weight:600;color:#0f172a}.footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:.8rem;color:#475569;border-top:1px solid #e2e8f0}.footer a{color:#15607a;text-decoration:none}</style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>👨‍👩‍👧‍👦 亲戚称呼计算器 <span class="badge">中国式亲戚</span></h1><p style="margin:2px 0 0;font-size:.8rem;opacity:.8">选择关系路径，计算你应该如何称呼对方</p></div>
+    <div class="container">
+        <div class="select-row">
+            <div><label>我的性别</label><select id="myGender"><option value="male">男</option><option value="female">女</option></select></div>
+            <div><label>对方关系</label><select id="relation" onchange="calc()">
+                <option value="">-- 选择 --</option>
+                <optgroup label="父系">
+                    <option value="father">父亲</option><option value="mother">母亲</option>
+                    <option value="ffather">爷爷 (父亲的父亲)</option><option value="fmother">奶奶 (父亲的母亲)</option>
+                    <option value="fbrother_older">哥哥 (父亲的儿子, 比自己大)</option><option value="fbrother_younger">弟弟 (父亲的儿子, 比自己小)</option>
+                    <option value="fsister_older">姐姐 (父亲的女儿, 比自己大)</option><option value="fsister_younger">妹妹 (父亲的女儿, 比自己小)</option>
+                    <option value="funcle_father_older">伯父 (父亲的哥哥)</option><option value="funcle_father_younger">叔叔 (父亲的弟弟)</option>
+                    <option value="faunt_father">姑姑 (父亲的姐妹)</option>
+                    <option value="fscousin_male_older">堂兄 (伯父/叔叔的儿子, 比自己大)</option>
+                    <option value="fscousin_female_older">堂姐 (伯父/叔叔的女儿, 比自己大)</option>
+                    <option value="fscousin_sister">堂妹</option>
+                </optgroup>
+                <optgroup label="母系">
+                    <option value="mfather">外公 (母亲的父亲)</option><option value="mmother">外婆 (母亲的母亲)</option>
+                    <option value="muncle_father">舅舅 (母亲的兄弟)</option><option value="maunt_father">姨妈/阿姨 (母亲的姐妹)</option>
+                    <option value="mcousin_male_older">表哥 (舅舅/姨妈的儿子, 比自己大)</option><option value="mcousin_female_older">表姐 (舅舅/姨妈的女儿, 比自己大)</option>
+                </optgroup>
+                <optgroup label="姻亲">
+                    <option value="husband">丈夫</option><option value="wife">妻子</option>
+                    <option value="father_in_law">岳父/公公</option><option value="mother_in_law">岳母/婆婆</option>
+                    <option value="son">儿子</option><option value="daughter">女儿</option>
+                    <option value="nephew">侄子 (兄弟的儿子)</option><option value="niece">侄女 (兄弟的女儿)</option>
+                </optgroup>
+            </select></div>
+        </div>
+        <div class="result-box">
+            <div class="call" id="callResult">-</div>
+            <div class="explain" id="explainResult">请选择关系</div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <tr><td>父亲</td><td>爸爸/父亲</td><td>母亲</td><td>妈妈/母亲</td></tr>
+                <tr><td>爷爷</td><td>爷爷</td><td>奶奶</td><td>奶奶</td></tr>
+                <tr><td>外公</td><td>外公/姥爷</td><td>外婆</td><td>外婆/姥姥</td></tr>
+                <tr><td>哥哥</td><td>哥哥</td><td>姐姐</td><td>姐姐</td></tr>
+                <tr><td>弟弟</td><td>弟弟</td><td>妹妹</td><td>妹妹</td></tr>
+                <tr><td>伯父</td><td>伯伯/大爷</td><td>叔叔</td><td>叔叔</td></tr>
+                <tr><td>姑姑</td><td>姑姑/姑妈</td><td>舅舅</td><td>舅舅</td></tr>
+                <tr><td>姨妈</td><td>姨妈/阿姨</td><td>堂兄</td><td>堂哥</td></tr>
+                <tr><td>表哥</td><td>表哥</td><td>侄子</td><td>侄子/外甥</td></tr>
+                <tr><td>丈夫</td><td>老公/先生</td><td>妻子</td><td>老婆/太太</td></tr>
+                <tr><td>岳父</td><td>岳父/爸爸</td><td>岳母</td><td>岳母/妈妈</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<script>
+function calc(){
+    var myGender=document.getElementById('myGender').value;
+    var rel=document.getElementById('relation').value;
+    var calls={
+        father:{call:'爸爸 / 父亲',explain:'生养你的男性直系长辈'},
+        mother:{call:'妈妈 / 母亲',explain:'生养你的女性直系长辈'},
+        ffather:{call:'爷爷',explain:'父亲的父亲'},
+        fmother:{call:'奶奶',explain:'父亲的母亲'},
+        mfather:{call:'外公 / 姥爷',explain:'母亲的父亲'},
+        mmother:{call:'外婆 / 姥姥',explain:'母亲的母亲'},
+        fbrother_older:{call:'哥哥',explain:'同父母的兄长'},
+        fbrother_younger:{call:'弟弟',explain:'同父母的弟弟'},
+        fsister_older:{call:'姐姐',explain:'同父母的姐姐'},
+        fsister_younger:{call:'妹妹',explain:'同父母的妹妹'},
+        funcle_father_older:{call:'伯父 / 伯伯',explain:'父亲的哥哥'},
+        funcle_father_younger:{call:'叔叔',explain:'父亲的弟弟'},
+        faunt_father:{call:'姑姑 / 姑妈',explain:'父亲的姐妹'},
+        muncle_father:{call:'舅舅',explain:'母亲的兄弟'},
+        maunt_father:{call:'姨妈 / 阿姨',explain:'母亲的姐妹'},
+        mcousin_male_older:{call:myGender==='male'?'表哥':'表哥',explain:'舅舅/姨妈的儿子, 比自己大'},
+        mcousin_female_older:{call:'表姐',explain:'舅舅/姨妈的女儿, 比自己大'},
+        fscousin_male_older:{call:myGender==='male'?'堂哥':'堂哥',explain:'伯父/叔叔的儿子, 比自己大'},
+        fscousin_female_older:{call:'堂姐',explain:'伯父/叔叔的女儿, 比自己大'},
+        fscousin_sister:{call:'堂妹',explain:'伯父/叔叔的女儿, 比自己小'},
+        husband:{call:'老公 / 先生',explain:'你的丈夫'},
+        wife:{call:'老婆 / 太太',explain:'你的妻子'},
+        father_in_law:{call:myGender==='male'?'岳父 / 爸爸':'公公 / 爸爸',explain:myGender==='male'?'妻子的父亲':'丈夫的父亲'},
+        mother_in_law:{call:myGender==='male'?'岳母 / 妈妈':'婆婆 / 妈妈',explain:myGender==='male'?'妻子的母亲':'丈夫的母亲'},
+        son:{call:'儿子',explain:'你的男性孩子'},
+        daughter:{call:'女儿',explain:'你的女性孩子'},
+        nephew:{call:myGender==='male'?'侄子':'外甥',explain:myGender==='male'?'兄弟的儿子':'兄弟的儿子 / 姐妹的儿子'},
+        niece:{call:myGender==='male'?'侄女':'外甥女',explain:myGender==='male'?'兄弟的女儿':'兄弟的女儿 / 姐妹的女儿'}
+    };
+    if(!rel){document.getElementById('callResult').textContent='-';document.getElementById('explainResult').textContent='请选择关系';return;}
+    var r=calls[rel]||{call:'未知',explain:'暂无该关系的称呼数据'};
+    document.getElementById('callResult').textContent=r.call;
+    document.getElementById('explainResult').textContent=r.explain;
+}
+</script>
+</body>
+</html>

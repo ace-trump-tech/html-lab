@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>简易图片编辑 | 在线工具</title>
+    <style>*{box-sizing:border-box;font-family:system-ui,'Segoe UI',sans-serif}body{background:linear-gradient(145deg,#f5f7fc,#e9eef5);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0}.card{max-width:850px;width:100%;background:rgba(255,255,255,.92);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,.2);overflow:hidden}.header{background:#0f172a;padding:1.2rem 2rem;color:#fff}.header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px}.badge{background:#2dd4bf20;border-radius:40px;padding:.2rem .8rem;font-size:.8rem;border:1px solid #2dd4bf50}.container{padding:2rem}.upload-area{border:2px dashed #cbd5e1;border-radius:1.5rem;padding:1rem;text-align:center;margin-bottom:1rem;cursor:pointer}.upload-area:hover{border-color:#0f172a;background:#f8fafc}.upload-area input{display:none}.slider-row{display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1rem}.slider-item{flex:1;min-width:150px}.slider-item label{display:flex;justify-content:space-between;font-size:.8rem;color:#64748b;font-weight:600}.slider-item input{width:100%;accent-color:#0f172a}.preview{text-align:center;display:none;margin:1rem 0}.preview img{max-width:100%;max-height:300px;border-radius:1rem;border:1px solid #e2e8f0}.btn{padding:10px 20px;border-radius:60px;font-weight:500;cursor:pointer;transition:.2s;font-size:.9rem;background:#fff;border:1px solid #cbd5e1}.btn-primary{background:#0f172a;color:#fff;border-color:#0f172a}.btn-primary:hover{background:#1e293b}.toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}.footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:.8rem;color:#475569;border-top:1px solid #e2e8f0}.footer a{color:#15607a;text-decoration:none}</style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>🖌️ 简易图片编辑 <span class="badge">亮度 · 对比度 · 滤镜</span></h1><p style="margin:2px 0 0;font-size:.8rem;opacity:.8">调节亮度、对比度、饱和度、模糊等基础图片参数</p></div>
+    <div class="container">
+        <div class="upload-area" id="uploadArea">📁 点击或拖拽上传图片<input type="file" id="fileInput" accept="image/*"></div>
+        <div class="preview" id="previewBox"><img id="previewImg"></div>
+        <div class="slider-row">
+            <div class="slider-item"><label>亮度 <span id="briVal">100%</span></label><input type="range" id="brightness" min="0" max="200" value="100"></div>
+            <div class="slider-item"><label>对比度 <span id="conVal">100%</span></label><input type="range" id="contrast" min="0" max="200" value="100"></div>
+            <div class="slider-item"><label>饱和度 <span id="satVal">100%</span></label><input type="range" id="saturate" min="0" max="200" value="100"></div>
+            <div class="slider-item"><label>模糊 <span id="blurVal">0px</span></label><input type="range" id="blur" min="0" max="10" value="0"></div>
+        </div>
+        <div class="toolbar">
+            <button class="btn btn-primary" id="applyBtn">🖌️ 应用滤镜</button>
+            <button class="btn" id="downloadBtn">⬇️ 下载</button>
+            <button class="btn" id="resetBtn">🔄 重置</button>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<script>
+(function(){
+    var img=null;
+    document.getElementById('uploadArea').addEventListener('click',function(){document.getElementById('fileInput').click()});
+    document.getElementById('uploadArea').addEventListener('dragover',function(e){e.preventDefault()});
+    document.getElementById('uploadArea').addEventListener('drop',function(e){e.preventDefault();if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])});
+    document.getElementById('fileInput').addEventListener('change',function(){if(this.files[0])loadFile(this.files[0])});
+
+    function loadFile(file){
+        var r=new FileReader();
+        r.onload=function(e){img=new Image();img.onload=function(){apply()};img.src=e.target.result};
+        r.readAsDataURL(file);
+    }
+
+    function updateLabels(){
+        document.getElementById('briVal').textContent=document.getElementById('brightness').value+'%';
+        document.getElementById('conVal').textContent=document.getElementById('contrast').value+'%';
+        document.getElementById('satVal').textContent=document.getElementById('saturate').value+'%';
+        document.getElementById('blurVal').textContent=document.getElementById('blur').value+'px';
+    }
+
+    function apply(){
+        if(!img)return;
+        var bri=parseInt(document.getElementById('brightness').value)/100;
+        var con=parseInt(document.getElementById('contrast').value)/100;
+        var sat=parseInt(document.getElementById('saturate').value)/100;
+        var bl=parseInt(document.getElementById('blur').value);
+        var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+        var ctx=c.getContext('2d');
+        ctx.filter='brightness('+bri+') contrast('+con+') saturate('+sat+') blur('+bl+'px)';
+        ctx.drawImage(img,0,0);
+        document.getElementById('previewImg').src=c.toDataURL();
+        document.getElementById('previewBox').style.display='block';
+        updateLabels();
+    }
+
+    ['brightness','contrast','saturate','blur'].forEach(function(id){
+        document.getElementById(id).addEventListener('input',apply);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click',function(){
+        document.getElementById('brightness').value=100;
+        document.getElementById('contrast').value=100;
+        document.getElementById('saturate').value=100;
+        document.getElementById('blur').value=0;
+        if(img){document.getElementById('previewImg').src=img.src;updateLabels()}
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click',function(){
+        var a=document.createElement('a');a.href=document.getElementById('previewImg').src;a.download='edited.png';a.click();
+    });
+})();
+</script>
+</body>
+</html>

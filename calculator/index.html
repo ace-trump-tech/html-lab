@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>计算器 | 在线工具</title>
+    <style>
+        *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;}
+        body{background:linear-gradient(145deg,#f5f7fc 0%,#e9eef5 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0;}
+        .card{max-width:360px;width:100%;background:rgba(255,255,255,0.92);backdrop-filter:blur(2px);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,0.2);overflow:hidden;}
+        .header{background:#0f172a;padding:1rem 1.5rem;color:white;}
+        .header h1{margin:0;font-size:1.4rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+        .badge{background:#2dd4bf20;border-radius:40px;padding:0.2rem 0.6rem;font-size:0.7rem;border:1px solid #2dd4bf50;}
+        .container{padding:1.5rem;}
+        .display{background:#1e293b;border-radius:1rem;padding:0.8rem 1rem;margin-bottom:1rem;text-align:right;color:#2dd4bf;font-family:'SF Mono',monospace;font-size:1.8rem;min-height:60px;word-break:break-all;line-height:1.3;overflow-x:auto;}
+        .display .expr{font-size:0.8rem;color:#94a3b8;min-height:20px;}
+        .btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+        .btn{padding:14px 8px;border:none;border-radius:0.8rem;font-size:1.1rem;font-weight:500;cursor:pointer;transition:0.15s;}
+        .btn-num{background:#f1f5f9;color:#0f172a;}
+        .btn-num:hover{background:#e2e8f0;}
+        .btn-op{background:#e2e8f0;color:#0f172a;}
+        .btn-op:hover{background:#cbd5e1;}
+        .btn-eq{background:#0f172a;color:white;}
+        .btn-eq:hover{background:#1e293b;}
+        .btn-ac{background:#fef2f2;color:#b91c1c;}
+        .btn-ac:hover{background:#fee2e2;}
+        .footer{background:#f1f5f9;padding:0.8rem 1.5rem;text-align:center;font-size:0.75rem;color:#475569;border-top:1px solid #e2e8f0;}
+        .footer a{color:#15607a;text-decoration:none;}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>🧮 计算器 <span class="badge">四则运算</span></h1><p style="margin:2px 0 0;font-size:0.8rem;opacity:0.8;">支持加减乘除、括号、百分比</p></div>
+    <div class="container">
+        <div class="display"><div class="expr" id="expr"></div><div id="result">0</div></div>
+        <div class="btns">
+            <button class="btn btn-ac">AC</button><button class="btn btn-op">(</button><button class="btn btn-op">)</button><button class="btn btn-op">÷</button>
+            <button class="btn btn-num">7</button><button class="btn btn-num">8</button><button class="btn btn-num">9</button><button class="btn btn-op">×</button>
+            <button class="btn btn-num">4</button><button class="btn btn-num">5</button><button class="btn btn-num">6</button><button class="btn btn-op">−</button>
+            <button class="btn btn-num">1</button><button class="btn btn-num">2</button><button class="btn btn-num">3</button><button class="btn btn-op">+</button>
+            <button class="btn btn-num">0</button><button class="btn btn-num">.</button><button class="btn btn-op">%</button><button class="btn btn-eq">=</button>
+        </div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<script>
+(function(){
+    var exprEl=document.getElementById('expr'),resultEl=document.getElementById('result');
+    var expr='';
+    function update(){exprEl.textContent=expr||' ';resultEl.textContent=expr?'':'';try{var e=expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');if(e){var r=Function('"use strict";return ('+e+')')();if(!isNaN(r)&&isFinite(r))resultEl.textContent=Number(r.toPrecision(12)).toString();}}catch(_){}}
+    document.querySelector('.btns').addEventListener('click',function(e){
+        if(!e.target.classList.contains('btn'))return;
+        var t=e.target.textContent;
+        if(t==='AC'){expr='';update();}
+        else if(t==='='){try{var e=expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');var r=Function('"use strict";return ('+e+')')();expr=Number(r.toPrecision(12)).toString();resultEl.textContent='';exprEl.textContent=expr;}catch(_){resultEl.textContent='Error';}}
+        else{expr+=t;update();}
+    });
+    document.addEventListener('keydown',function(e){
+        var k=e.key;
+        if(k>='0'&&k<='9'||k==='.'||k==='+'||k==='-'||k==='*'||k==='/'||k==='('||k===')'||k==='%'){e.preventDefault();var m={'*':'×','/':'÷','-':'−'};expr+=m[k]||k;update();}
+        else if(k==='Enter'||k==='='){e.preventDefault();try{var ex=expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');var r=Function('"use strict";return ('+ex+')')();expr=Number(r.toPrecision(12)).toString();resultEl.textContent='';exprEl.textContent=expr;}catch(_){}}
+        else if(k==='Backspace'||k==='Delete'){e.preventDefault();expr=expr.slice(0,-1);update();}
+        else if(k==='Escape'){e.preventDefault();expr='';update();}
+    });
+})();
+</script>
+</body>
+</html>

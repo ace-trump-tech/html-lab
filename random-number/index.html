@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>随机数生成器 | 在线工具</title>
+    <style>
+        *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;}
+        body{background:linear-gradient(145deg,#f5f7fc 0%,#e9eef5 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0;}
+        .card{max-width:600px;width:100%;background:rgba(255,255,255,0.92);backdrop-filter:blur(2px);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,0.2);overflow:hidden;}
+        .header{background:#0f172a;padding:1.2rem 2rem;color:white;}
+        .header h1{margin:0;font-size:1.6rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+        .badge{background:#2dd4bf20;border-radius:40px;padding:0.2rem 0.8rem;font-size:0.8rem;border:1px solid #2dd4bf50;}
+        .container{padding:2rem;}
+        .result-box{background:#1e293b;border-radius:1.2rem;padding:1.5rem;text-align:center;margin-bottom:1.2rem;}
+        .result-box .num{font-size:3rem;color:#2dd4bf;font-family:'SF Mono',monospace;font-weight:700;}
+        .config-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;}
+        .config-item label{display:block;font-size:0.8rem;color:#64748b;margin-bottom:4px;font-weight:600;}
+        .config-item input{padding:8px 10px;border:1px solid #cbd5e1;border-radius:0.6rem;font-size:0.95rem;width:100%;text-align:center;font-family:'SF Mono',monospace;}
+        .config-item input:focus{outline:none;border-color:#0f172a;box-shadow:0 0 0 2px #0f172a20;}
+        .btn{background:white;border:1px solid #cbd5e1;padding:10px 20px;border-radius:60px;font-weight:500;cursor:pointer;transition:0.2s;font-size:0.9rem;}
+        .btn-primary{background:#0f172a;border-color:#0f172a;color:white;}
+        .btn-primary:hover{background:#1e293b;transform:translateY(-1px);}
+        .btn-outline:hover{background:#f1f5f9;}
+        .toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+        .batch-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:0.8rem;justify-content:center;}
+        .batch-chip{background:#f1f5f9;padding:4px 12px;border-radius:20px;font-family:'SF Mono',monospace;font-size:0.85rem;color:#0f172a;border:1px solid #e2e8f0;}
+        .footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:0.8rem;color:#475569;border-top:1px solid #e2e8f0;}
+        .footer a{color:#15607a;text-decoration:none;}
+        @media(max-width:480px){.config-grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>🎲 随机数生成器 <span class="badge">整数/小数 · 批量</span></h1><p style="margin:2px 0 0;font-size:0.85rem;opacity:0.8;">生成指定范围内的随机数，支持整数和小数</p></div>
+    <div class="container">
+        <div class="result-box"><div class="num" id="resultNum">-</div></div>
+        <div class="config-grid">
+            <div class="config-item"><label>最小值</label><input type="number" id="minVal" value="1"></div>
+            <div class="config-item"><label>最大值</label><input type="number" id="maxVal" value="100"></div>
+            <div class="config-item"><label>小数位数 (0=整数)</label><input type="number" id="decPlaces" value="0" min="0" max="10"></div>
+            <div class="config-item"><label>生成数量</label><input type="number" id="count" value="1" min="1" max="100"></div>
+        </div>
+        <div class="toolbar">
+            <button class="btn btn-primary" id="genBtn">🎲 生成</button>
+            <button class="btn btn-outline" id="copyBtn">📋 复制</button>
+        </div>
+        <div class="batch-list" id="batchList"></div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<script>
+(function(){
+    var toastTimer=null;
+    function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f172a;color:white;padding:8px 20px;border-radius:40px;font-size:0.8rem;z-index:999;';document.body.appendChild(t);setTimeout(function(){t.remove();},1500);}
+
+    function gen(){
+        var min=parseFloat(document.getElementById('minVal').value)||0;
+        var max=parseFloat(document.getElementById('maxVal').value)||100;
+        var dec=parseInt(document.getElementById('decPlaces').value)||0;
+        var cnt=parseInt(document.getElementById('count').value)||1;
+        cnt=Math.max(1,Math.min(100,cnt));
+        if(min>max){var tmp=min;min=max;max=tmp;}
+        var arr=[];
+        for(var i=0;i<cnt;i++){
+            var r=Math.random()*(max-min)+min;
+            if(dec===0)r=Math.floor(r);
+            else r=Number(r.toFixed(dec));
+            arr.push(r);
+        }
+        document.getElementById('resultNum').textContent=arr[0];
+        var html='';
+        arr.forEach(function(v){html+='<span class="batch-chip">'+v+'</span>';});
+        document.getElementById('batchList').innerHTML=html;
+    }
+    document.getElementById('genBtn').addEventListener('click',gen);
+    document.getElementById('copyBtn').addEventListener('click',function(){
+        var chips=document.querySelectorAll('.batch-chip');
+        var vals=[];chips.forEach(function(c){vals.push(c.textContent);});
+        if(!vals.length){showToast('⚠️ 请先生成');return;}
+        navigator.clipboard.writeText(vals.join(',')).then(function(){showToast('📋 已复制')});
+    });
+    gen();
+})();
+</script>
+</body>
+</html>

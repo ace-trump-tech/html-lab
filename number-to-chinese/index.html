@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>数字转中文 | 在线工具</title>
+    <style>
+        *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;}
+        body{background:linear-gradient(145deg,#f5f7fc 0%,#e9eef5 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;margin:0;}
+        .card{max-width:700px;width:100%;background:rgba(255,255,255,0.92);backdrop-filter:blur(2px);border-radius:2rem;box-shadow:0 20px 35px -12px rgba(0,0,0,0.2);overflow:hidden;}
+        .header{background:#0f172a;padding:1.2rem 2rem;color:white;}
+        .header h1{margin:0;font-size:1.8rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+        .badge{background:#2dd4bf20;border-radius:40px;padding:0.2rem 0.8rem;font-size:0.8rem;border:1px solid #2dd4bf50;}
+        .container{padding:2rem;}
+        label{display:block;font-weight:600;color:#0f172a;margin-bottom:4px;}
+        input{width:100%;padding:0.8rem 1rem;font-size:1.1rem;font-family:'SF Mono',monospace;border:1px solid #cbd5e1;border-radius:1rem;margin-bottom:1rem;}
+        input:focus{outline:none;border-color:#0f172a;box-shadow:0 0 0 3px #0f172a20;}
+        .result-box{background:#1e293b;border-radius:1rem;padding:1.2rem 1.5rem;color:#2dd4bf;font-size:1.4rem;font-family:'SF Mono',monospace;word-break:break-all;min-height:50px;}
+        .variants{margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+        .var-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.8rem;padding:0.8rem;}
+        .var-card .var-label{font-size:0.75rem;color:#64748b;}
+        .var-card .var-val{font-size:1rem;color:#0f172a;margin-top:2px;word-break:break-all;}
+        .btn{background:white;border:1px solid #cbd5e1;padding:10px 20px;border-radius:60px;font-weight:500;cursor:pointer;transition:0.2s;font-size:0.9rem;}
+        .btn-outline:hover{background:#f1f5f9;}
+        .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:0.8rem;justify-content:center;}
+        .footer{background:#f1f5f9;padding:1rem 2rem;text-align:center;font-size:0.8rem;color:#475569;border-top:1px solid #e2e8f0;}
+        .footer a{color:#15607a;text-decoration:none;}
+        @media(max-width:480px){.variants{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header"><h1>🔢 数字转中文 <span class="badge">大写 · 小写 · 金额</span></h1><p style="margin:2px 0 0;font-size:0.85rem;opacity:0.8;">阿拉伯数字转换为中文大写/小写/人民币金额</p></div>
+    <div class="container">
+        <label>🔢 输入数字</label>
+        <input type="text" id="numInput" placeholder="例如：123456789.56" value="123456789.56">
+        <div class="result-box" id="mainResult">-</div>
+        <div class="variants">
+            <div class="var-card"><div class="var-label">📝 简体小写</div><div class="var-val" id="lowerResult">-</div></div>
+            <div class="var-card"><div class="var-label">📜 繁体大写</div><div class="var-val" id="upperResult">-</div></div>
+            <div class="var-card"><div class="var-label">💰 人民币大写</div><div class="var-val" id="rmbResult">-</div></div>
+            <div class="var-card"><div class="var-label">📊 数字读数</div><div class="var-val" id="readResult">-</div></div>
+        </div>
+        <div class="toolbar"><button class="btn btn-outline" id="copyBtn">📋 复制主要结果</button></div>
+    </div>
+    <div class="footer">🧰 ACE 实验室 · 开源工具 | <a href="https://github.com/ace-trump-tech/html-lab" target="_blank">GitHub 仓库</a></div>
+</div>
+<script>
+(function(){
+    var digits='零一二三四五六七八九';
+    var digitsU='零壹贰叁肆伍陆柒捌玖';
+    var units=['','十','百','千'];
+    var unitsU=['','拾','佰','仟'];
+    var bigUnits=['','万','亿','兆'];
+    var bigUnitsU=['','萬','億','兆'];
+    var rmbUnits=['分','角','元','拾','佰','仟','萬','億'];
+
+    function toChinese(num, upper){
+        var d=upper?digitsU:digits;
+        var u=upper?unitsU:units;
+        var bu=upper?bigUnitsU:bigUnits;
+        var s=String(Math.abs(Math.floor(num))).replace(/^0+/,'')||'0';
+        var result='';
+        var len=s.length;
+        for(var i=0;i<len;i++){
+            var n=parseInt(s[len-1-i]);
+            var pos=i%4;
+            if(pos===0&&i>0){
+                if(i%4===0&&(i/4)%bu.length===0&&i>0)result=bu[bu.length-1]+result;
+                else result=bu[Math.floor(i/4)%bu.length]+result;
+            }
+            if(n===0){
+                if(result&&result[0]!=='零'&&result[0]!==bu[0]&&result[0]!==bu[1]&&result[0]!==bu[2]&&result[0]!==bu[3])result='零'+result;
+            }else{
+                result=d[n]+u[pos]+result;
+            }
+        }
+        result=result.replace(/零+$/,'').replace(/零+/g,'零');
+        if(result==='')result=d[0];
+        if(num<0)result='负'+result;
+        // decimals
+        var dec='';
+        var decStr=String(Math.abs(num)).split('.')[1];
+        if(decStr){
+            for(var i=0;i<Math.min(decStr.length,4);i++)dec+=d[parseInt(decStr[i])];
+            if(dec)result+='点'+dec;
+        }
+        return result;
+    }
+
+    function toRMB(amount){
+        var d=digitsU;
+        var s=Math.abs(amount).toFixed(2);
+        var parts=s.split('.');
+        var intPart=parseInt(parts[0]);
+        var decPart=parts[1];
+        var result='';
+        if(intPart===0)result=d[0]+'元';
+        else{
+            var intStr=String(intPart);
+            var jiao=parseInt(decPart[0]);
+            var fen=parseInt(decPart[1]);
+            var ci=0;
+            for(var i=intStr.length-1;i>=0;i--){
+                var n=parseInt(intStr[i]);
+                if(ci===0)result=rmbUnits[2]+result;
+                else if(ci===1)result=rmbUnits[3]+result;
+                else if(ci===2)result=rmbUnits[4]+result;
+                else if(ci===3)result=rmbUnits[5]+result;
+                else if(ci===4)result=rmbUnits[6]+result;
+                else if(ci===8)result=rmbUnits[7]+result;
+                if(n!==0)result=d[n]+result;
+                else{if(result&&result[0]!=='零')result='零'+result;}
+                ci++;
+            }
+            result=result.replace(/零+/g,'零').replace(/零元/,'元').replace(/零万/g,'万');
+            if(jiao===0&&fen===0)result+='整';
+            else{if(jiao>0)result+=d[jiao]+'角';if(fen>0)result+=d[fen]+'分';}
+        }
+        if(amount<0)result='负'+result;
+        return result;
+    }
+
+    function update(){
+        var val=document.getElementById('numInput').value.replace(/,/g,'').trim();
+        var num=parseFloat(val);
+        if(isNaN(num)){document.getElementById('mainResult').textContent='请输入有效数字';return;}
+        var lower=toChinese(num,false);
+        var upper=toChinese(num,true);
+        var rmb=toRMB(num);
+        document.getElementById('mainResult').textContent=lower;
+        document.getElementById('lowerResult').textContent=lower;
+        document.getElementById('upperResult').textContent=upper;
+        document.getElementById('rmbResult').textContent=rmb;
+        document.getElementById('readResult').textContent=lower.replace(/点/g,' 点 ');
+    }
+    document.getElementById('numInput').addEventListener('input',update);
+    document.getElementById('copyBtn').addEventListener('click',function(){
+        var t=document.getElementById('mainResult').textContent;
+        navigator.clipboard.writeText(t).then(function(){});
+    });
+    update();
+})();
+</script>
+</body>
+</html>
