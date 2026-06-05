@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ACE 实验室 | 在线工具集</title>
-    <meta name="description" content="收集实用前端小工具，Base64编解码等，所有代码本地运行，安全可靠。">
-    <!-- 现代、干净、无依赖的样式，强调工具集导航 -->
+    <meta name="description" content="持续更新的前端工具集，Base64编解码现已上线，更多工具陆续推出。纯前端，零数据收集。">
     <style>
         * {
             margin: 0;
@@ -22,16 +21,15 @@
             min-height: 100vh;
         }
 
-        /* 主容器 - 响应式最大宽度，居中 */
         .container {
             max-width: 1280px;
             margin: 0 auto;
         }
 
-        /* 头部区域：项目名称 + 说明 */
+        /* 头部 */
         .hero {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
 
         .hero h1 {
@@ -64,42 +62,80 @@
         .hero p {
             font-size: 1.2rem;
             color: #2c4c6c;
-            max-width: 650px;
+            max-width: 700px;
             margin: 1rem auto 0;
-            opacity: 0.85;
         }
 
-        /* 工具网格 — 卡片式布局，柔和悬停 */
+        /* 项目介绍卡片 */
+        .intro-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2edf2;
+        }
+
+        .intro-card h2 {
+            font-size: 1.6rem;
+            color: #0b3b4f;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .intro-card p {
+            color: #2c5a74;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .update-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .update-list li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .update-list li::before {
+            content: "🔄";
+        }
+
+        /* 工具网格 */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 2rem;
-            margin: 2rem 0 3rem;
+            margin: 2rem 0 2.5rem;
         }
 
         .tool-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(0px);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 2rem;
             padding: 1.8rem;
             box-shadow: 0 12px 28px -8px rgba(0, 20, 40, 0.08);
             transition: all 0.25s ease;
             border: 1px solid #e2edf2;
-            text-decoration: none;
             display: flex;
             flex-direction: column;
         }
 
         .tool-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-4px);
             background: white;
-            box-shadow: 0 24px 36px -12px rgba(0, 32, 64, 0.2);
+            box-shadow: 0 20px 30px -12px rgba(0, 32, 64, 0.15);
             border-color: #bdd4e0;
         }
 
         .card-icon {
             font-size: 2.8rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .tool-card h3 {
@@ -113,7 +149,7 @@
             color: #2c5a74;
             font-size: 0.95rem;
             line-height: 1.4;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             flex-grow: 1;
         }
 
@@ -122,19 +158,47 @@
             background: #e6f0f5;
             color: #1b6b8f;
             border-radius: 40px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 500;
             padding: 0.2rem 0.8rem;
             width: fit-content;
-            letter-spacing: 0.3px;
+            margin-bottom: 1rem;
         }
 
-        /* 底部信息区：开源链接，说明页脚 */
+        .tool-btn {
+            display: inline-block;
+            background: #0f6b3a;
+            color: white;
+            text-decoration: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            width: fit-content;
+        }
+
+        .tool-btn:hover {
+            background: #0a4f2a;
+        }
+
+        /* 占位卡片样式调整 */
+        .placeholder .tool-btn {
+            background: #8ba0ae;
+            cursor: default;
+        }
+        .placeholder .tool-btn:hover {
+            background: #8ba0ae;
+        }
+
         .footer {
             text-align: center;
             padding-top: 2rem;
             border-top: 1px solid #cbdde6;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             font-size: 0.85rem;
             color: #4a6f8a;
         }
@@ -146,12 +210,6 @@
             border-bottom: 1px dotted #90b4cc;
         }
 
-        .footer a:hover {
-            color: #0a3b4f;
-            border-bottom-color: #15607a;
-        }
-
-        /* 右侧或额外信息区域不用多余脚本，保持干净 */
         @media (max-width: 680px) {
             body {
                 padding: 1.2rem;
@@ -173,45 +231,41 @@
     <div class="hero">
         <h1>
             🧰 ACE 实验室 · 在线工具箱
-            <span class="hero-badge">纯前端 · 安全</span>
+            <span class="hero-badge">持续更新</span>
         </h1>
-        <p>集合日常开发与隐私保护常用的小工具，完全运行在浏览器本地，无需上传任何数据。</p>
+        <p>轻量、安全、纯前端 —— 所有工具本地运行，绝不收集隐私数据。</p>
     </div>
 
+    <!-- 项目介绍 + 更新计划 -->
+    <div class="intro-card">
+        <h2>📌 关于本项目</h2>
+        <p><strong>HTML Lab</strong> 是一个由 <strong>ace-trump-tech</strong> 维护的开源工具集，专为开发者、设计师及日常用户提供便捷的在线小工具。所有功能均基于原生前端技术实现，无需任何后端，你的数据永远不会离开浏览器。</p>
+        <p><strong>🚀 持续更新路线图</strong></p>
+        <ul class="update-list">
+            <li><strong>✅ 已上线</strong> – Base64 编码/解码（支持 UTF-8 / 中文 / Emoji）</li>
+            <li><strong>📅 计划中</strong> – JSON 格式化与校验、Unix 时间戳转换、二维码生成器、颜色拾取器、Markdown 预览……</li>
+            <li><strong>⭐ 欢迎 Star & 贡献</strong> – 如果你有想要的小工具，可以在 Issues 中提出建议。</li>
+        </ul>
+    </div>
+
+    <h2 style="margin-bottom: 0.5rem;">🛠️ 使用工具</h2>
     <div class="tools-grid">
-        <!-- Base64 编码解码工具卡片 (核心子项目) -->
-        <a href="base64-tool/" class="tool-card">
+        <!-- Base64 工具卡片（带显眼按钮） -->
+        <div class="tool-card">
             <div class="card-icon">📦</div>
-            <h3>Base64 编码 / 解码</h3>
-            <p>支持 UTF-8 文本，包含中文、emoji 及特殊字符。在线转换，保护敏感信息，一键复制结果。</p>
-            <span class="tool-tag"># UTF-8</span>
-        </a>
+            <h3>Base64 编码/解码</h3>
+            <span class="tool-tag"># UTF-8 · 中文 · Emoji</span>
+            <p>将文本与 Base64 格式互相转换，支持多语言字符，一键复制结果。适用于数据传输、简单加扰等场景。</p>
+            <a href="base64-tool/" class="tool-btn">🔓 立即使用 →</a>
+        </div>
 
-        <!-- 未来拓展工具卡片示例1 (注释状态 或 可直接启用模板) 
-        <a href="json-formatter/" class="tool-card">
-            <div class="card-icon">🔧</div>
-            <h3>JSON 格式化 & 校验</h3>
-            <p>智能美化 JSON 结构，语法高亮，错误快速定位，本地处理无日志。</p>
-            <span class="tool-tag"># 格式化</span>
-        </a>
-        -->
-
-        <!-- 未来拓展卡片: 时间戳转换 -->
-        <!--
-        <a href="timestamp/" class="tool-card">
-            <div class="card-icon">⏱️</div>
-            <h3>Unix 时间戳转换</h3>
-            <p>毫秒与秒级时间戳互转，实时显示本地时间与UTC。</p>
-            <span class="tool-tag"># 时间工具</span>
-        </a>
-        -->
-
-        <!-- 展示一个“即将推出”占位卡片，让访问者知道仓库会持续更新 -->
-        <div class="tool-card" style="opacity:0.9; background:#f9fdfe;">
+        <!-- 占位卡片：更多工具即将推出，按钮不可点击 -->
+        <div class="tool-card placeholder">
             <div class="card-icon">✨</div>
-            <h3>更多工具即将推出</h3>
-            <p>计划加入二维码生成、颜色拾取、Markdown 预览等实用功能，保持关注。</p>
-            <span class="tool-tag"># 迭代中</span>
+            <h3>更多工具</h3>
+            <span class="tool-tag"># 即将到来</span>
+            <p>JSON 格式化、时间戳转换、二维码生成…… 保持关注，每周更新。</p>
+            <span class="tool-btn" style="background:#8ba0ae;">⏳ 敬请期待</span>
         </div>
     </div>
 
