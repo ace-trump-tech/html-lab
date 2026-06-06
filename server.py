@@ -5,7 +5,7 @@ import sys
 import mimetypes
 import urllib.parse
 
-PORT = 5500
+PORT = 5501
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 AUDIO_DIR = os.path.join(SCRIPT_DIR, 'audio')
 AUDIO_EXTENSIONS = {'.mp3', '.mp4', '.wav', '.flac', '.ogg', '.aac', '.m4a', '.wma', '.webm', '.opus'}
