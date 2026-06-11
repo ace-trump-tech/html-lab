@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>图像单通道分层工具 - RGB通道自定义颜色合并与比例尺保存</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fb;
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 24px 28px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            background: linear-gradient(135deg, #1e293b, #2d3a5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub {
+            color: #475569;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+            margin-bottom: 28px;
+            font-size: 0.9rem;
+        }
+
+        .upload-area {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 28px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 32px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .upload-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: #3b82f6;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .upload-label:hover {
+            background: #2563eb;
+            transform: scale(0.98);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .preview-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 36px;
+            justify-content: space-between;
+        }
+
+        .original-card {
+            flex: 1;
+            min-width: 200px;
+            background: #fefce8;
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .channel-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 36px;
+        }
+
+        .channel-card {
+            flex: 1;
+            min-width: 260px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            padding: 18px;
+            transition: all 0.2s;
+        }
+
+        .channel-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .channel-preview {
+            background: #1e1e2a;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+            min-height: 140px;
+            position: relative;
+        }
+
+        canvas.ch-canvas {
+            background: repeating-conic-gradient(#2d2d3a 0% 25%, #1e1e2a 0% 50%);
+            border-radius: 12px;
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            border: 1px solid #334155;
+        }
+
+        .control-group {
+            margin: 14px 0;
+        }
+
+        .control-group label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .slider {
+            width: 100%;
+            accent-color: #3b82f6;
+        }
+
+        .intensity-value {
+            display: inline-block;
+            background: #eef2ff;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+
+        .btn-save-channel {
+            width: 100%;
+            margin-top: 12px;
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 8px 0;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .btn-save-channel:hover {
+            background: #1e293b;
+        }
+
+        .merge-section {
+            background: #f1f5f9;
+            border-radius: 28px;
+            padding: 22px;
+            margin-top: 12px;
+        }
+
+        .merge-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .scale-control {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 60px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .scale-control input {
+            width: 100px;
+            padding: 8px;
+            border-radius: 40px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .merge-canvas-box {
+            text-align: center;
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        #mergedCanvas {
+            background: #0f172a;
+            border-radius: 16px;
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-right: 12px;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .status {
+            font-size: 0.8rem;
+            margin-top: 12px;
+            color: #475569;
+        }
+
+        hr {
+            margin: 20px 0;
+            border-color: #e2e8f0;
+        }
+
+        @media (max-width: 1000px) {
+            .container {
+                padding: 16px;
+            }
+            .channel-grid {
+                flex-direction: column;
+            }
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .visibility-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎨 单通道分层处理器</h1>
+    <div class="sub">分离 RGB 通道 | 自定义每层颜色 & 强度 | 合并图像 + 比例尺保存</div>
+
+    <!-- 上传区域 -->
+    <div class="upload-area" id="uploadArea">
+        <label class="upload-label">
+            📁 上传图片 (JPG/PNG)
+            <input type="file" id="imageUploader" accept="image/jpeg,image/png,image/jpg">
+        </label>
+        <div class="status" id="uploadStatus">点击上传，支持 JPG/PNG</div>
+    </div>
+
+    <!-- 原图预览 -->
+    <div class="preview-row">
+        <div class="original-card">
+            <div style="font-weight:600; margin-bottom:10px;">📷 原始图片</div>
+            <canvas id="originalCanvas" style="width:100%; border-radius: 16px; background:#eef2ff;" width="300" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- 三个通道卡片: R, G, B -->
+    <div class="channel-grid" id="channelsContainer"></div>
+
+    <!-- 合并区域 + 比例尺设置 -->
+    <div class="merge-section">
+        <div class="merge-header">
+            <h3 style="margin:0;">✨ 合并预览（根据上方图层颜色/强度/可见性实时合成）</h3>
+            <div class="scale-control">
+                <span>📏 比例尺设置：</span>
+                <label>长度(px): <input type="number" id="scaleLength" value="80" step="5" min="20" max="300"></label>
+                <label>标签文字: <input type="text" id="scaleText" value="80 px" style="width:90px;"></label>
+                <span style="font-size:12px; color:#475569;">(保存时叠加在图像右下角)</span>
+            </div>
+        </div>
+        <div class="merge-canvas-box">
+            <canvas id="mergedCanvas" width="400" height="300" style="max-width:100%; height:auto; border-radius:12px;"></canvas>
+        </div>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center;">
+            <button id="saveMergedBtn" class="btn-primary">💾 保存合并图像 (带比例尺)</button>
+            <span class="status" id="mergeInfo">图层改色/强度调整实时更新合并图</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ---------- 全局数据 ----------
+        let originalImageData = null;     // ImageData 原始像素 (width, height)
+        let imgWidth = 0, imgHeight = 0;
+        
+        // 存储每个通道的灰度数组 (0-255)
+        let channelGrays = {
+            R: null,   // Uint8ClampedArray 长度 = 像素总数
+            G: null,
+            B: null
+        };
+        
+        // 每个通道的UI绑定数据
+        let channelUI = {
+            R: { color: "#ff0000", intensity: 1.0, visible: true, canvasPreview: null, ctx: null },
+            G: { color: "#00ff00", intensity: 1.0, visible: true, canvasPreview: null, ctx: null },
+            B: { color: "#0000ff", intensity: 1.0, visible: true, canvasPreview: null, ctx: null }
+        };
+        
+        // DOM 元素
+        const fileInput = document.getElementById('imageUploader');
+        const originalCanvas = document.getElementById('originalCanvas');
+        const mergedCanvas = document.getElementById('mergedCanvas');
+        const saveMergedBtn = document.getElementById('saveMergedBtn');
+        const scaleLengthInput = document.getElementById('scaleLength');
+        const scaleTextInput = document.getElementById('scaleText');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const channelsContainer = document.getElementById('channelsContainer');
+        
+        let originalCtx = originalCanvas.getContext('2d');
+        let mergedCtx = mergedCanvas.getContext('2d');
+        
+        // 辅助函数: 解析hex颜色到RGB分量 0-255
+        function hexToRgb(hex) {
+            let r = 0, g = 0, b = 0;
+            if (hex.startsWith('#')) {
+                r = parseInt(hex.slice(1,3), 16);
+                g = parseInt(hex.slice(3,5), 16);
+                b = parseInt(hex.slice(5,7), 16);
+            }
+            return { r, g, b };
+        }
+        
+        // 根据灰度数组 + 目标颜色 + 可选的强度(强度只影响显示时的亮部? 预览单独通道时不叠加强度，只用颜色映射显示完全)
+        // 绘制通道预览 canvas (强度 = 1，完全彩色映射)
+        function renderChannelPreview(channelKey, grays, colorHex, targetCanvas) {
+            if (!originalImageData || !grays) return;
+            const w = imgWidth, h = imgHeight;
+            targetCanvas.width = w;
+            targetCanvas.height = h;
+            const ctx = targetCanvas.getContext('2d');
+            const imgData = ctx.createImageData(w, h);
+            const rgbColor = hexToRgb(colorHex);
+            const data = imgData.data;
+            const len = w * h;
+            for (let i = 0; i < len; i++) {
+                const gray = grays[i];
+                const intensityFactor = gray / 255;   // 0..1
+                let r = Math.floor(rgbColor.r * intensityFactor);
+                let g = Math.floor(rgbColor.g * intensityFactor);
+                let b = Math.floor(rgbColor.b * intensityFactor);
+                data[i*4] = r;
+                data[i*4+1] = g;
+                data[i*4+2] = b;
+                data[i*4+3] = 255;
+            }
+            ctx.putImageData(imgData, 0, 0);
+        }
+        
+        // 核心合并函数: 根据当前的通道灰度、颜色、强度、可见性生成合并图像（黑色背景累加模式）
+        function renderMergedImage() {
+            if (!originalImageData) {
+                // 清空合并canvas
+                mergedCtx.clearRect(0, 0, mergedCanvas.width, mergedCanvas.height);
+                return;
+            }
+            const w = imgWidth, h = imgHeight;
+            mergedCanvas.width = w;
+            mergedCanvas.height = h;
+            const imgData = mergedCtx.createImageData(w, h);
+            const data = imgData.data;
+            const totalPixels = w * h;
+            
+            // 初始化黑色背景 (0,0,0)
+            for (let i = 0; i < totalPixels; i++) {
+                data[i*4] = 0;
+                data[i*4+1] = 0;
+                data[i*4+2] = 0;
+                data[i*4+3] = 255;
+            }
+            
+            // 累加每个可见通道 (RGB三层独立贡献)
+            const channelsOrder = ['R','G','B'];
+            for (let ch of channelsOrder) {
+                const ui = channelUI[ch];
+                if (!ui.visible) continue;
+                const grays = channelGrays[ch];
+                if (!grays) continue;
+                const color = hexToRgb(ui.color);
+                const intensity = ui.intensity;
+                // 遍历所有像素累加贡献
+                for (let i = 0; i < totalPixels; i++) {
+                    const gray = grays[i];
+                    // 贡献系数 = (gray/255) * intensity
+                    const factor = (gray / 255) * intensity;
+                    let contribR = Math.floor(color.r * factor);
+                    let contribG = Math.floor(color.g * factor);
+                    let contribB = Math.floor(color.b * factor);
+                    // 累加并钳位
+                    let idx = i * 4;
+                    let newR = data[idx] + contribR;
+                    let newG = data[idx+1] + contribG;
+                    let newB = data[idx+2] + contribB;
+                    data[idx] = newR > 255 ? 255 : newR;
+                    data[idx+1] = newG > 255 ? 255 : newG;
+                    data[idx+2] = newB > 255 ? 255 : newB;
+                }
+            }
+            mergedCtx.putImageData(imgData, 0, 0);
+        }
+        
+        // 更新所有通道预览(改色后实时更新各自预览canvas)
+        function updateAllPreviews() {
+            if (!originalImageData) return;
+            renderChannelPreview('R', channelGrays.R, channelUI.R.color, channelUI.R.canvasPreview);
+            renderChannelPreview('G', channelGrays.G, channelUI.G.color, channelUI.G.canvasPreview);
+            renderChannelPreview('B', channelGrays.B, channelUI.B.color, channelUI.B.canvasPreview);
+        }
+        
+        // 刷新全部：通道预览 + 合并图
+        function refreshAll() {
+            if (!originalImageData) return;
+            updateAllPreviews();
+            renderMergedImage();
+        }
+        
+        // 从加载的Image对象中提取像素数据，分离R,G,B单通道灰度，初始化UI
+        function loadImageAndProcess(imgElement) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = imgElement.width;
+            canvas.height = imgElement.height;
+            ctx.drawImage(imgElement, 0, 0);
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            originalImageData = imgData;
+            imgWidth = canvas.width;
+            imgHeight = canvas.height;
+            
+            // 显示原图
+            originalCanvas.width = imgWidth;
+            originalCanvas.height = imgHeight;
+            originalCtx.putImageData(imgData, 0, 0);
+            
+            const totalPixels = imgWidth * imgHeight;
+            const pixels = imgData.data;
+            
+            // 分配通道灰度数组
+            channelGrays.R = new Uint8ClampedArray(totalPixels);
+            channelGrays.G = new Uint8ClampedArray(totalPixels);
+            channelGrays.B = new Uint8ClampedArray(totalPixels);
+            
+            for (let i = 0; i < totalPixels; i++) {
+                const r = pixels[i*4];
+                const g = pixels[i*4+1];
+                const b = pixels[i*4+2];
+                channelGrays.R[i] = r;
+                channelGrays.G[i] = g;
+                channelGrays.B[i] = b;
+            }
+            
+            // 重置每个通道UI为默认 (不改可见性和强度颜色默认)
+            channelUI.R = { color: "#ff0000", intensity: 1.0, visible: true, canvasPreview: channelUI.R.canvasPreview, ctx: channelUI.R.ctx };
+            channelUI.G = { color: "#00ff00", intensity: 1.0, visible: true, canvasPreview: channelUI.G.canvasPreview, ctx: channelUI.G.ctx };
+            channelUI.B = { color: "#0000ff", intensity: 1.0, visible: true, canvasPreview: channelUI.B.canvasPreview, ctx: channelUI.B.ctx };
+            
+            // 重新构建界面（确保canvas绑定最新）
+            buildChannelsUI();
+            
+            // 刷新所有预览和合并图
+            refreshAll();
+            uploadStatus.innerText = `✅ 图片已加载 | 尺寸: ${imgWidth} x ${imgHeight}`;
+        }
+        
+        // 动态构建三个通道卡片，绑定事件
+        function buildChannelsUI() {
+            if (!channelsContainer) return;
+            const channels = [
+                { key: 'R', name: '🔴 红色通道', defaultColor: '#ff0000', icon: '🔴' },
+                { key: 'G', name: '🟢 绿色通道', defaultColor: '#00ff00', icon: '🟢' },
+                { key: 'B', name: '🔵 蓝色通道', defaultColor: '#0000ff', icon: '🔵' }
+            ];
+            
+            channelsContainer.innerHTML = '';
+            for (let ch of channels) {
+                const key = ch.key;
+                const card = document.createElement('div');
+                card.className = 'channel-card';
+                card.innerHTML = `
+                    <div class="channel-title">
+                        <span>${ch.icon} ${ch.name}</span>
+                        <span style="font-size:12px; background:#eef2ff; padding:2px 8px; border-radius:20px;">单层</span>
+                    </div>
+                    <div class="channel-preview">
+                        <canvas class="ch-canvas" width="200" height="150" style="width:100%; height:auto; background:#111;"></canvas>
+                    </div>
+                    <div class="control-group">
+                        <label>🎨 图层映射颜色 (改色)</label>
+                        <input type="color" class="channel-color" value="${ch.defaultColor}" data-channel="${key}">
+                    </div>
+                    <div class="control-group">
+                        <label>⚡ 合并强度 <span class="intensity-value" id="intensityVal-${key}">100%</span></label>
+                        <input type="range" class="slider intensity-slider" data-channel="${key}" min="0" max="1" step="0.01" value="1">
+                    </div>
+                    <div class="visibility-toggle">
+                        <label style="margin-right:8px;">👁️ 图层可见</label>
+                        <input type="checkbox" class="channel-visible" data-channel="${key}" checked style="width:18px; height:18px;">
+                    </div>
+                    <button class="btn-save-channel" data-channel="${key}">📸 保存此通道图像 (带比例尺)</button>
+                `;
+                channelsContainer.appendChild(card);
+                
+                // 获取该卡片中canvas
+                const previewCanvas = card.querySelector('.ch-canvas');
+                // 存储canvas引用
+                channelUI[key].canvasPreview = previewCanvas;
+                channelUI[key].ctx = previewCanvas.getContext('2d');
+                
+                // 绑定颜色选择器
+                const colorPicker = card.querySelector('.channel-color');
+                colorPicker.addEventListener('input', (e) => {
+                    channelUI[key].color = e.target.value;
+                    refreshAll();
+                });
+                
+                // 绑定强度滑块
+                const intensitySlider = card.querySelector('.intensity-slider');
+                const intensitySpan = card.querySelector(`#intensityVal-${key}`);
+                intensitySlider.addEventListener('input', (e) => {
+                    const val = parseFloat(e.target.value);
+                    channelUI[key].intensity = val;
+                    intensitySpan.innerText = `${Math.round(val * 100)}%`;
+                    renderMergedImage();   // 合并预览更新强度
+                });
+                
+                // 可见性checkbox
+                const visCheck = card.querySelector('.channel-visible');
+                visCheck.addEventListener('change', (e) => {
+                    channelUI[key].visible = e.target.checked;
+                    renderMergedImage();
+                });
+                
+                // 保存单个通道图像（带比例尺）
+                const saveBtn = card.querySelector('.btn-save-channel');
+                saveBtn.addEventListener('click', (e) => {
+                    saveSingleChannelWithScale(key);
+                });
+            }
+            // 重新绑定后确保之前已有的灰度数据显示预览 (如果已有图像数据)
+            if (originalImageData) {
+                // 确保canvas引用都拿到了，重新渲染预览
+                updateAllPreviews();
+                renderMergedImage();
+            }
+        }
+        
+        // 保存单通道带比例尺
+        function saveSingleChannelWithScale(channelKey) {
+            if (!originalImageData) {
+                alert("请先上传图片");
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            const w = imgWidth, h = imgHeight;
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            // 获取当前通道的颜色和灰度，渲染完全映射 (强度为完整映射，不用合并强度，独立显示)
+            const grays = channelGrays[channelKey];
+            const colorHex = channelUI[channelKey].color;
+            const rgbColor = hexToRgb(colorHex);
+            const imgData = ctx.createImageData(w, h);
+            const data = imgData.data;
+            const total = w * h;
+            for (let i = 0; i < total; i++) {
+                const gray = grays[i];
+                const factor = gray / 255;
+                data[i*4] = Math.floor(rgbColor.r * factor);
+                data[i*4+1] = Math.floor(rgbColor.g * factor);
+                data[i*4+2] = Math.floor(rgbColor.b * factor);
+                data[i*4+3] = 255;
+            }
+            ctx.putImageData(imgData, 0, 0);
+            // 添加比例尺
+            const scaleLen = parseInt(scaleLengthInput.value, 10);
+            const scaleText = scaleTextInput.value.trim() || `${scaleLen} px`;
+            addScaleBarToCanvas(canvas, scaleLen, scaleText);
+            // 保存
+            const link = document.createElement('a');
+            link.download = `channel_${channelKey}_with_scale.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // 给目标canvas添加比例尺 (右下角，固定样式)
+        function addScaleBarToCanvas(canvas, lengthPx, labelText) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            if (w === 0 || h === 0) return;
+            const margin = 20;
+            const barHeight = 6;
+            const startX = w - margin - lengthPx;
+            const startY = h - margin;
+            // 绘制半透背景提高可读性
+            ctx.save();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "rgba(0,0,0,0.6)";
+            ctx.fillRect(startX - 4, startY - 22, lengthPx + 8, 28);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 14px 'Segoe UI'";
+            ctx.textAlign = "center";
+            ctx.fillText(labelText, startX + lengthPx/2, startY - 6);
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(startX + lengthPx, startY);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#ffffff";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(startX, startY - 5);
+            ctx.lineTo(startX, startY + 5);
+            ctx.moveTo(startX + lengthPx, startY - 5);
+            ctx.lineTo(startX + lengthPx, startY + 5);
+            ctx.stroke();
+            ctx.restore();
+        }
+        
+        // 保存合并图像带比例尺
+        function saveMergedWithScale() {
+            if (!originalImageData) {
+                alert("没有图像数据，请先上传图片");
+                return;
+            }
+            // 获取当前合并结果 (基于canvas)
+            const w = mergedCanvas.width, h = mergedCanvas.height;
+            if (w === 0 || h === 0) return;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = w;
+            tempCanvas.height = h;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(mergedCanvas, 0, 0);
+            // 添加比例尺
+            const scaleLen = parseInt(scaleLengthInput.value, 10);
+            const scaleText = scaleTextInput.value.trim() || `${scaleLen} px`;
+            addScaleBarToCanvas(tempCanvas, scaleLen, scaleText);
+            const link = document.createElement('a');
+            link.download = 'merged_image_with_scale.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // 监听文件上传
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert("请上传图片文件");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    // 限制最大尺寸防止性能过载，但保持宽高比，最大宽高1200px左右
+                    let maxDim = 1400;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = (height / width) * maxDim;
+                            width = maxDim;
+                        } else {
+                            width = (width / height) * maxDim;
+                            height = maxDim;
+                        }
+                        const resizeCanvas = document.createElement('canvas');
+                        resizeCanvas.width = width;
+                        resizeCanvas.height = height;
+                        const resizeCtx = resizeCanvas.getContext('2d');
+                        resizeCtx.drawImage(img, 0, 0, width, height);
+                        const resizedImg = new Image();
+                        resizedImg.onload = () => {
+                            loadImageAndProcess(resizedImg);
+                        };
+                        resizedImg.src = resizeCanvas.toDataURL();
+                    } else {
+                        loadImageAndProcess(img);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('click', (e) => {
+            if (e.target !== fileInput && !fileInput.contains(e.target)) {
+                fileInput.click();
+            }
+        });
+        
+        saveMergedBtn.addEventListener('click', saveMergedWithScale);
+        
+        // 初始化空界面，但不构建卡片等待上传后构建
+        function initEmpty() {
+            channelsContainer.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8;">上传图片后自动显示RGB三通道控制面板</div>';
+        }
+        initEmpty();
+        
+        // 预览区域拖拽可选
+        window.addEventListener('dragover', (e) => e.preventDefault());
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const dt = e.dataTransfer;
+            if (dt.files && dt.files[0]) {
+                handleFile(dt.files[0]);
+            }
+        });
+    })();
+</script>
+</body>
+</html>
